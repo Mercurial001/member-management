@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div class="member-profile-details-div">
+        <div>
+            {{ member.name }}
+        </div>
+        <div>
+            {{ member.age }}
+        </div>
+        <div>
+            {{ member.brgy }}
+        </div>
+        <div>
+            {{ member.gender }}
+        </div>
+        <div>
+            <img src="{% static 'images/qr-codes/' %}QR-Code-{{ member.name }}-{{ member.brgy }}-{{ member.id }}.png">
+        </div>
+        <div>
+            {% if not member.name in no_leader_member_list %}
+                {% for leader in leaders %}
+                    <div>
+                        <a href="{% url 'tag-leader' member.name leader.name %}">Assign Member to Leader</a>
+                        <span>{{ leader.name }}</span>
+                    </div>
+                {% empty %}
+                    No Leaders in this barangay
+                {% endfor %}
+            {% else %}
+                <span></span>
+            {% endif %}
+        </div>
+    </div>
+        <div id="memberDetailsBlock">
+            <div class="member-details-member-id">
+                <div>
+                    {{ member.name }}<a href="{% url 'promote-member-to-leader' member.name %}">Promote to Leader</a>
+                </div>
+                <div>
+                    {{ member.age }}
+                </div>
+                <div>
+                    {{ member.brgy }}
+                </div>
+                <div>
+                    {{ member.gender }}
+                </div>
+            </div>
+        </div>
+        <div>
+            <button onclick="downloadMemberDetails()">Download Member Details</button>
+        </div>
+
+    <script>
+        function downloadMemberDetails() {
+            var memberDetailsBlock = document.getElementById('memberDetailsBlock');
+
+            html2canvas(memberDetailsBlock).then(function(canvas) {
+                // Convert the canvas to a data URL and trigger the download
+                var dataUrl = canvas.toDataURL('image/png');
+                var a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = '{{ member.name }}.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        }
+    </script>
+<!--        {% for tryer, none in terydac.items %}-->
+<!--            {% for heart in tryer %}-->
+<!--                {% if not member.name in heart.name %}-->
+<!--                    <div>-->
+<!--                        {% for leader in leaders %}-->
+<!--                            <div>-->
+<!--                                {{ leader.name }}-->
+<!--                            </div>-->
+<!--                        {% endfor %}-->
+<!--                    </div>-->
+<!--                {% else %}-->
+<!--                    <div>-->
+<!--                    </div>-->
+<!--                {% endif %}-->
+<!--            {% endfor %}-->
+<!--        {% endfor %}-->
+    </div>
+
+
+
+{% endblock %}

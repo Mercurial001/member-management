@@ -1,0 +1,93 @@
+.add-member-form-container-div{
+    margin: auto;
+    width: 50%;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.add-member-form-header-div{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    font-family: 'Montserrat';
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-weight: 800;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.add-member-add-member-form{
+    border: 1px solid rgb(100, 100, 100);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.add-member-field-and-label-container-div{
+    background-color: rgb(240, 240, 240);
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    font-family: 'Montserrat';
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin:auto;
+    width: 95%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.add-member-field-and-label-min-container-div{
+    display: inline-block;
+    background-color: rgb(240, 240, 240);
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    font-family: 'Montserrat';
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin:auto;
+    width: 47%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.add-member-field-label{
+    text-align: left;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 30px;
+}
+
+.add-member-field{
+    margin: auto;
+    width: 90%;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid rgb(100, 100, 100);
+}
+
+.add-member-field-min{
+    width: 80%;
+    height: 26px;
+    border-radius: 5px;
+    border: 1px solid rgb(100, 100, 100);
+}
+
+.add-member-field-min:focus{
+    outline: none;
+}
+
+.add-member-field:focus{
+    outline: none
+}
+
+.add-member-form-btn{
+    width: 100px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: beige;
+    font-family: 'Montserrat';
+    background-color: rgb(10, 40, 40);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+}

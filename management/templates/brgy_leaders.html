@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div class="brgy-cluster-brgy-name-title-heading-div">
+        <h1>Brgy. {{ name_brgy.brgy_name }} Cluster</h1>
+    </div>
+    <div class="brgy-leaders-leader-member-cluster-container">
+        {% for leader in brgy_clusters %}
+            <div class="brgy-leaders-cluster-div">
+                <div class="brgy-cluster-leader-name-heading-div">
+                    {{ leader.leader }}
+                </div>
+                <div class="brgy-cluster-leader-members-div">
+                    {% for members in leader.members.all %}
+                        <div>
+                            <a href="{% url 'member-profile' members.name %}">{{ members.name }}</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

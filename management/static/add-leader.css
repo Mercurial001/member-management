@@ -1,0 +1,70 @@
+.add-leader-form-container-div{
+    margin: auto;
+    width: 50%;
+    text-align: center;
+    margin-top: 20px;
+    background-color: rgb(240, 240, 240);
+}
+
+.add-leader-form-title-header-div{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-family: 'Montserrat';
+    font-weight: 800;
+}
+
+.add-leader-form-field-label-container{
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    margin: auto;
+    width: 95%;
+    padding-bottom: 15px;
+    padding-top: 5px;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.add-leader-field-label-div{
+    text-align: left;
+    margin-left: 25px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    font-family: 'Montserrat';
+
+}
+
+.add-leader-field{
+    margin: auto;
+    width: 90%;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid rgb(100, 100, 100);
+}
+
+.add-leader-field:focus{
+    outline: none;
+}
+
+.add-leader-form{
+    border: 1px solid rgb(100, 100, 100);
+    padding-bottom: 15px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.add-leader-form-btn{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    font-family: 'Montserrat';
+    width: 100px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+}

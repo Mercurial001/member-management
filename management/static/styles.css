@@ -1,0 +1,250 @@
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin: 0px;
+}
+
+/* base.html */
+
+#main-header{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    width:20%;
+    float: left;
+    min-height: 100vh;
+    position: fixed;
+}
+
+.home-header-nav-links{
+    list-style: none;
+    margin-right: 50px;
+}
+
+.home-header-nav-link{
+    margin-top: 20px;
+}
+
+.home-link-to-page{
+    color: beige;
+    text-decoration: none;
+    font-family: 'Montserrat';
+}
+
+.home-link-icon-container{
+    display: inline-block;
+}
+
+.home-link-icon-div{
+    width: 25px;
+}
+
+/* This base-block-content-section-container compresses the width of all pages that is an extension of the base.html. */
+.base-block-content-section-container{
+    width:80%;
+    float:right;
+    overflow: hidden;
+}
+
+.home-base-utmost-container-div{
+    text-align: center;
+}
+
+.home-base-search-engine-container-div{
+    margin-top: 40px;
+}
+
+.home-search-engine-lens-icon{
+    position: absolute;
+    margin-top: 10px;
+    margin-left: 15px;
+    color: rgb(120, 120, 120);
+}
+
+#home-base-search-field-members{
+    width: 400px;
+    border-top-left-radius:20px;
+    border-bottom-left-radius:20px;
+    border: rgb(150, 150, 150) solid 1px;
+    height: 30px;
+    padding-left: 40px;
+}
+
+#home-base-search-field-members:focus{
+    outline: none;
+}
+
+#home-base-search-field-members-btn{
+    background-color: rgb(10, 40, 40);
+    font-family: 'Montserrat';
+    color: beige;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    height: 34px;
+    width: 70px;
+    font-size: 12px;
+    cursor: pointer;
+    border: none;
+}
+
+.home-base-search-results-container-div{
+    margin-top: 50px;
+    border-top: 2px solid rgb(100, 100, 100);
+    text-align: left;
+}
+
+.home-base-results-div{
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+.home-base-no-result-container-container-div{
+    text-align: center;
+}
+
+.fa-cloud{
+    margin-top: 40px;
+    font-size: 300px;
+    color: rgb(180, 180, 180);
+}
+
+.home-base-empty-message-container-div{
+    font-family: 'Impact';
+    color: rgb(100, 110, 100);
+    font-size: 30px;
+}
+
+.home-base-empty-result-suggestion-div{
+    text-align: left;
+    margin-left: 30px;
+    font-family: 'Montserrat';
+}
+
+.home-base-search-statistics-div{
+    font-family: 'Montserrat';
+    font-weight: 800;
+    margin: 20px;
+}
+
+.home-base-member-name-result{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 50px;
+}
+
+.home-base-member-result-link{
+    text-decoration: none;
+    font-family: 'Montserrat';
+}
+
+.home-base-member-result-link:hover{
+    text-decoration: underline;
+}
+
+/* clusters.html */
+
+.cluster-utmost-container-div{
+    padding:10px;
+    background-color: rgb(40, 40, 40);
+    position: fixed;
+    width: 100%;
+}
+
+.cluster-brgy-title-heading-div{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    padding: 10px;
+}
+
+.cluster-brgy-header-div{
+    background-color: red;
+}
+
+.cluster-brgy-hyper-link-div{
+    display: inline-block;
+}
+
+#cluster-to-top-link{
+    text-decoration: none;
+}
+
+.cluster-brgy-hyper-link{
+    padding: 5px;
+    color: beige;
+    text-decoration: none;
+    font-family: Impact;
+}
+
+.cluster-brgy-leaders-section-div{
+    margin-top: 40px;
+}
+
+.cluster-brgy-title-heading-div a{
+    text-decoration: none;
+    color: beige;
+}
+
+.cluster-leader-name-div{
+    margin: 20px;
+}
+
+/* brgy_leaders.html */
+
+.brgy-leaders-leader-member-cluster-container{
+    text-align: center;
+    margin-top: 20px;
+}
+
+.brgy-leaders-cluster-div{
+    display: inline-block;
+    vertical-align: top;
+    width: 20%;
+}
+
+.brgy-cluster-leader-name-heading-div{
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    background-color: rgb(30, 100, 100);
+    color: beige;
+    text-align: center;
+}
+
+.brgy-cluster-leader-members-div{
+    background-color: rgb(240, 240, 240);
+    min-height: 100px;
+    text-align: center;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.brgy-cluster-brgy-name-title-heading-div{
+    text-align: center;
+}
+
+/* member_brgy.html */
+
+.member-brgy-empty-notifier-message-div{
+    font-family: Impact;
+    font-size: 50px;
+    color: rgb(200, 200, 200);
+    text-align: center;
+    margin-top: 100px;
+}
+
+.brgy-profile-cluster-member{
+    margin: 10px;
+    width: 90%;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    text-align: left;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 5px;
+    padding-right: 5px;
+    font-family: 'Montserrat';
+}
+

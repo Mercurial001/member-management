@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div id="cluster-to-top-link"></div>
+    <div class="cluster-utmost-container-div">
+        <a class="cluster-brgy-hyper-link" href="#cluster-to-top-link">^</a>
+        {% for brgys in barangays %}
+            <div class="cluster-brgy-hyper-link-div">
+                <a class="cluster-brgy-hyper-link" href="#brgy-{{ brgys }}">{{ brgys }}</a>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="cluster-brgy-leaders-section-div">
+        {% for leaders, brgys in leaders.items %}
+            <div>
+                <a href="{% url 'brgy-leaders' brgys %}">
+                    <div class="cluster-brgy-title-heading-div" id="brgy-{{ brgys }}">
+                        {{ brgys }}
+                    </div>
+                </a>
+            </div>
+            <div>
+                Leaders:
+            </div>
+            {% for leader in leaders %}
+                <div class="cluster-leader-name-div" id="cluster-leader-{{ leader.name }}">
+                    <a href="{% url 'cluster' leader.name %}">
+                        {{ leader.name }}
+                    </a>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endblock %}

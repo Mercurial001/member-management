@@ -1,0 +1,39 @@
+.no-member-leaders-table{
+    font-family: 'Montserrat';
+}
+
+.no-member-leaders-table-head{
+    background-color: rgb(70, 140, 140);
+    width: 300px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: beige;
+}
+
+.no-member-leaders-table-data{
+    background-color: rgb(220, 220, 220);
+    padding-left: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.no-member-leaders-table-link{
+    color: rgb(50, 50, 50);
+    text-decoration: none;
+}
+
+.no-member-leaders-table-link:hover{
+    text-decoration: underline;
+}
+
+.no-member-leaders-table-container-div{
+    margin: auto;
+    width: fit-content;
+}
+
+.no-member-leaders-title-header-div{
+    text-align: center;
+    font-family: 'Montserrat';
+    font-size: 25px;
+    margin: 20px;
+}

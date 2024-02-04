@@ -1,0 +1,39 @@
+.member-count-per-brgy-title-header-div{
+    text-align: center;
+    font-size: 35px;
+    font-family: 'Montserrat';
+    color: rgb(90, 90, 90);
+    margin: 40px;
+}
+
+.member-count-per-brgy-table-container-div{
+    margin:auto;
+    width: fit-content;
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
+.member-count-per-brgy-table{
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+                rgba(0, 0, 0, 0.12) 0px -12px 30px,
+                rgba(0, 0, 0, 0.12) 0px 4px 6px,
+                rgba(0, 0, 0, 0.17) 0px 12px 13px,
+                rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.member-count-per-brgy-table-head{
+    background-color: rgb(80, 160, 160);
+    font-family: 'Montserrat';
+    color: beige;
+    width: 270px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.member-count-per-brgy-table-data{
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 15px;
+    font-family: 'Montserrat';
+    background-color: rgb(230, 230, 230);
+}

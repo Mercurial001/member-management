@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Member Management</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="{% static 'member_profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'add-brgy.css' %}">
+    <link rel="stylesheet" href="{% static 'add-leader.css' %}">
+    <link rel="stylesheet" href="{% static 'add-member.css' %}">
+    <link rel="stylesheet" href="{% static 'reports.css' %}">
+    <link rel="stylesheet" href="{% static 'brgy-profile.css' %}">
+    <link rel="stylesheet" href="{% static 'no-member-brgy.css' %}">
+    <link rel="stylesheet" href="{% static 'leader-no-members.css' %}">
+    <link rel="stylesheet" href="{% static 'leaderless-members.css' %}">
+    <link rel="stylesheet" href="{% static 'member-count-per-brgy.css' %}">
+
+    <script src="{% static 'chart.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+    <header id="main-header">
+        <ul class="home-header-nav-links">
+            {% if request.user.is_authenticated %}
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'homepage' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-home"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Home
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'dashboard' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-line-chart"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Dashboard
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'clusters' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-users" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Clusters
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'add-brgy' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fas fa-dharmachakra" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Add Barangay
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'add-leader' %}">
+                        <div class="home-link-icon-container">
+                           <div class="home-link-icon-div">
+                               <i class="fas fa-user-tie" aria-hidden="true"></i>
+                           </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Add Leader
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'add-members' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fas fa-user-plus" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Add Member
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'reports' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-file" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Reports
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'logout' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Logout
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% else %}
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'login' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-sign-in" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Login
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </header>
+    <section class="base-block-content-section-container">
+        {% block content %}
+            <div class="home-base-utmost-container-div">
+                <div class="home-base-search-engine-container-div">
+                    <form class="home-base-search-engine-form" method="GET" action="{% url 'homepage' %}">
+                        <span class="home-search-engine-lens-icon">
+                            <i class="fa fa-search"></i>
+                        </span>
+                        <input id="home-base-search-field-members" type="text" name="search" placeholder="Search Members">
+                        <button id="home-base-search-field-members-btn" type="submit">Search</button>
+                    </form>
+                </div>
+                {% if search_engine_field_query %}
+                    {% if not total_results == 0 %}
+                        <div class="home-base-search-results-container-div">
+                            <div class="home-base-search-statistics-div">
+                                {% if not total_results == 1 %}
+                                    About {{ total_results }} results for "{{ search_engine_field_query }}"
+                                {% else %}
+                                    About {{ total_results }} result for "{{ search_engine_field_query }}"
+                                {% endif %}
+                            </div>
+                            <div class="home-base-results-div">
+                                <div class="home-base-search-results-member-container-div">
+                                    {% for member in search_engine_result_member %}
+                                        <div class="home-base-member-name-result">
+                                            <a class="home-base-member-result-link"
+                                               href="{% url 'member-profile' member.name %}">
+                                                {{ member.name }}
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="home-base-search-results-leader-container-div">
+                                    {% for leader in search_engine_result_leader %}
+                                        <div class="home-base-member-name-result">
+                                            <a class="home-base-member-result-link"
+                                               href="{% url 'cluster' leader.name %}">
+                                                {{ leader.name }}
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="home-base-search-results-container-div">
+                            <div class="home-base-no-result-container-container-div">
+                                <div class="home-base-empty-cloud-icon-div">
+                                    <i class="fa fa-cloud" aria-hidden="true"></i>
+                                </div>
+                                <div class="home-base-empty-message-container-div">
+                                    No Search Results for "{{ search_engine_field_query }}"
+                                </div>
+                                <div class="home-base-empty-result-suggestion-div">
+                                    <div>
+                                        Suggestions
+                                    </div>
+                                    <ul>
+                                        <li>Search using Barangay name for broad results</li>
+                                        <li>Make sure all words are spelled correctly.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endblock %}
+    </section>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+</html>

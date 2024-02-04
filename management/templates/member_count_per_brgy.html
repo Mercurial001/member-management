@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="member-count-per-brgy-utmost-container-section">
+        <div class="member-count-per-brgy-title-header-div">
+            Members per Barangay Report
+        </div>
+        <div class="member-count-per-brgy-table-container-div">
+            <table class="member-count-per-brgy-table">
+                <tr class="member-count-per-brgy-table-row">
+                    <th class="member-count-per-brgy-table-head">
+                        Barangay Name
+                    </th>
+                    <th class="member-count-per-brgy-table-head">
+                        Member Number
+                    </th>
+                    <th class="member-count-per-brgy-table-head">
+                        Member Percentage
+                    </th>
+                </tr>
+                {% for brgy, data_list in member_per_brgy_list.items %}
+                    {% for data_tuple in data_list %}
+                        <tr class="member-count-per-brgy-table-row">
+                            <td class="member-count-per-brgy-table-data">
+                                {{ brgy }}
+                            </td>
+                            <td class="member-count-per-brgy-table-data">
+                                {{ data_tuple.0 }} {# Accessing the first element of the tuple (sum) #}
+                            </td>
+                            <td class="member-count-per-brgy-table-data">
+                                {{ data_tuple.1 }} %{# Accessing the second element of the tuple (percentage) #}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+    </section>
+{% endblock %}

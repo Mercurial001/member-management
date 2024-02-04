@@ -1,0 +1,41 @@
+.no-member-brgys-table{
+    font-family: 'montserrat';
+}
+
+.no-member-brgys-table-head{
+    background-color: rgb(70, 150, 150);
+    width: 500px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    color: beige;
+}
+
+.no-member-brgys-table-data{
+    background-color: rgb(200, 200, 200);
+    padding-left: 40px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.no-member-brgys-table-link{
+    color: rgb(40, 40, 40);
+    text-decoration: none;
+}
+
+.no-member-brgys-table-link:hover{
+    text-decoration: underline;
+}
+
+.no-member-brgy-title-header-div{
+    text-align: center;
+    font-size: 35px;
+    font-family: 'Montserrat';
+    margin: 20px;
+}
+
+.no-member-brgy-table-container-div{
+    margin: auto;
+    width: fit-content;
+    margin-top: 40px;
+    border-radius: 10px;
+}

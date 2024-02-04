@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<section class="reports-utmost-container-section">
+    <div class="sassa">Yasha</div>
+    <div class="reports-title-header-div">
+        Reports
+    </div>
+    <div class="reports-block-container-div">
+        <a class="reports-report-block-div" href="{% url 'no-member-brgys' %}">
+            <div class="reports-block-report-title-div">
+                 No Member Brgys
+            </div>
+        </a>
+        <a class="reports-report-block-div" href="{% url 'member-count-brgy' %}">
+            <div class="reports-block-report-title-div">
+                Member per Brgy
+            </div>
+        </a>
+        <a class="reports-report-block-div" href="{% url 'no-member-leader' %}">
+            <div class="reports-block-report-title-div">
+                Leaders w/o Members
+            </div>
+        </a>
+        <a class="reports-report-block-div" href="{% url 'leaderless-members' %}">
+            <div class="reports-block-report-title-div">
+                Members w/o Leader
+            </div>
+        </a>
+    </div>
+</section>
+{% endblock %}

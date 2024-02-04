@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    <div>
+        {% for brgy in barangays %}
+            <div>
+                {{ brgy.brgy_name }}
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div>
+                    <input type="hidden" id="brgy-id" name="brgy-id" value="{{ brgy.id }}">
+                </div>
+                <div>
+                    <input type="hidden" id="brgy-name" name="brgy-name" value="{{ brgy.brgy_name }}">
+                </div>
+                <div>
+                    {{ change_brgy_name_form.brgy_name }}
+                </div>
+                <div>
+                    <button name="change-brgy-name-btn" type="submit">Change</button>
+                </div>
+            </form>
+        {% endfor %}
+    </div>
+
+{% endblock %}

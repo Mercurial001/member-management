@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            {{ sitio_form.as_p }}
+        </div>
+    </form>
+{% endblock %}

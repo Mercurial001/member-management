@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="no-member-leaders-utmost-container-section">
+        <div class="no-member-leaders-title-header-div">
+            No Member Leaders Report
+        </div>
+        <div class="no-member-leaders-table-container-div">
+            <table class="no-member-leaders-table">
+                <tr class="no-member-leaders-table-row">
+                    <th class="no-member-leaders-table-head">Leader</th>
+                    <th class="no-member-leaders-table-head">Barangay</th>
+                </tr>
+                {% for leaders in no_members %}
+                    <tr class="no-member-leaders-table-row">
+                        <td class="no-member-leaders-table-data">
+                            <a class="no-member-leaders-table-link"
+                               href="{% url 'cluster' leaders.leader %}">
+                                {{ leaders.leader }}
+                            </a>
+                        </td>
+                        <td class="no-member-leaders-table-data">
+                            <a class="no-member-leaders-table-link"
+                               href="{% url 'brgy-leaders' leaders.leader.brgy %}">{{ leaders.leader.brgy }}
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </section>
+
+{% endblock %}

@@ -1,0 +1,39 @@
+.leaderless-members-header-title-div{
+    text-align: center;
+    margin: 20px;
+    font-family: 'Montserrat';
+    font-size: 25px;
+    color: rgb(50, 50, 50);
+
+}
+
+.leaderless-members-table-container-div{
+    margin: auto;
+    width: fit-content;
+}
+
+.leader-members-table-head{
+    background-color: rgb(70, 150, 150);
+    padding-top: 15px;
+    padding-bottom: 15px;
+    width: 300px;
+    font-family: 'Montserrat';
+    color: beige;
+}
+
+.leaderless-members-table-data{
+    background-color: rgb(220, 220, 220);
+    font-family: 'Montserrat';
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+}
+
+.leaderless-members-table-link-to-page{
+    text-decoration: none;
+    color: rgb(70, 70, 70);
+}
+
+.leaderless-members-table-link-to-page:hover{
+    text-decoration: underline;
+}

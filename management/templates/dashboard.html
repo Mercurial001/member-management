@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="dashboard-utmost-container-section">
+        <div class="dashboard-heading-title-div">
+            <h1>Dashboard & Analytics</h1>
+        </div>
+        <div class="dashboard-statistics-block-container-div">
+            <div class="dashboard-statistic-block" id="dashboard-statistic-block-total-brgy">
+                <div class="dashboard-statistics-block-detail-div">
+                    <div class="dashboard-statistics-number-div">
+                        {{ count_brgy_sum }}
+                    </div>
+                    <div>
+                        Total Number of Barangays
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-statistic-block">
+                <div class="dashboard-statistics-block-detail-div">
+                    <div class="dashboard-statistics-number-div">
+                        {{ member_sum }}
+                    </div>
+                    <div>
+                        Total Number of Members
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-statistic-block">
+                <div class="dashboard-statistics-block-detail-div">
+                    <div class="dashboard-statistics-number-div">
+                        {{ leaders_sum }}
+                    </div>
+                    <div>
+                        Total Number of Leaders
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="brgy-members-graph-div">
+            <canvas id="brgy_members_graph"></canvas>
+        </div>
+        <div class="dashboard-population-percentage-map-container-div">
+            {% if map_html %}
+                <div class="dashboard-population-percentage-map">
+                    {{ map_html|safe }}
+                </div>
+            {% else %}
+                <p>No Barangay data available for mapping.</p>
+            {% endif %}
+        </div>
+        <div class="dashboard-map-lifter-div"></div>
+    </section>
+    <script>
+        var brgy_name = {{ brgys|safe }};
+        var member_counts = {{ brgy_member_count|safe }};
+        var member_percentage_population = {{ member_percentage_population|safe }};
+
+        // Combine barangay names with percentage information
+        var labels = brgy_name.map((name, index) => `${name}\n(${member_counts[index]})`);
+
+        var ctx = document.getElementById('brgy_members_graph').getContext('2d');
+
+        var data = {
+          labels: labels, // Modified array of barangay names with percentage
+          datasets: [{
+            label: 'Percentage Per Barangay',
+            data: member_percentage_population, // Array of member counts
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        };
+
+        var myBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                scales: {
+                    x: {
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        maxRotation: 90, // Rotate labels to a maximum of 90 degrees
+                        minRotation: 0, // Rotate labels to a minimum of 0 degrees
+                        ticks: {
+                            autoSkip: false, // Do not skip labels
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        ticks: {
+                            callback: function (value) {
+                                return value + '%'; // Add percentage symbol to the y-axis ticks
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                var label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.y + '%';
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

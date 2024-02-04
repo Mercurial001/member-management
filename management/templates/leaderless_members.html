@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="leaderless-members-utmost-container-section">
+        <div class="leaderless-members-header-title-div">
+            Leaderless Members Report
+        </div>
+        <div class="leaderless-members-table-container-div">
+            <table class="leaderless-members-table">
+                <tr class="leaderless-members-table-row">
+                    <th class="leader-members-table-head">
+                        Member Name
+                    </th>
+                    <th class="leader-members-table-head">
+                        Member Barangay
+                    </th>
+                </tr>
+                {% for members, brgy in leaderless.items %}
+                    <tr>
+                        <td class="leaderless-members-table-data">
+                            <a class="leaderless-members-table-link-to-page"
+                               href="{% url 'member-profile' members %}">{{ members }}</a>
+                        </td>
+                        <td class="leaderless-members-table-data">
+                            <a href="{% url 'member-brgy' brgy %}"
+                               class="leaderless-members-table-link-to-page">{{ brgy }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div>
+        <div class="add-brgy-brgy-list-container-div">
+            <div class="add-brgy-list-detail-container">
+                <div class="add-brgy-list-title-header-div">
+                    <h1><i class="fas fa-dharmachakra" aria-hidden="true"></i>Added Barangays</h1>
+                </div>
+                <div class="add-brgy-brgy-list">
+                    {% for brgy in member_brgy %}
+                        <a class="add-brgy-link-to-brgy"
+                           href="{% url 'member-brgy' brgy.brgy_name %}">
+                            <div class="add-brgy-added-brgys-div">
+                                {{ brgy.brgy_name }}
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div class="add-brgy-form-container-div">
+        <div class="add-brgy-form-header-title">
+            Add a Barangay
+        </div>
+        <form class="add-brgy-form" id="add-brgy-add-brgy-form" method="POST">
+            {% csrf_token %}
+            <div>
+                {{ brgy_add_form.brgy_name }}
+            </div>
+            <div>
+                {{ brgy_add_form.brgy_voter_population }}
+            </div>
+            <div>
+                {{ brgy_add_form.lat }}
+            </div>
+            <div>
+                {{ brgy_add_form.long }}
+            </div>
+            <div class="add-brgy-form-btn-container-div">
+                <button class="add-brgy-form-btn" name="add-brgy-form-btn" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+    <div class="add-brgy-form-container-div">
+        <div class="add-brgy-form-header-title">
+            Add Sitio
+        </div>
+
+        <form class="add-brgy-form" id="add-brgy-add-sitio-form" method="post">
+            {% csrf_token %}
+            <div>
+                {{ add_sitio_form.name }}
+            </div>
+            <div>
+                {{ add_sitio_form.brgy }}
+            </div>
+            <div class="add-brgy-form-btn-container-div" id="add-brgy-sito-btn-container-div">
+                <button class="add-brgy-form-btn" name="add-sitio-form-btn">Submit</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

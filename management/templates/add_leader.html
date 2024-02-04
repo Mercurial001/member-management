@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="forms-section">
+        {% if messages %}
+            {% for message in messages %}
+                <div>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="add-leader-form-container-div">
+            <div class="add-leader-form-title-header-div">
+                Add Leader
+            </div>
+            <form class="add-leader-form" method="post">
+                {% csrf_token %}
+                <div class="add-leader-form-fields-container-div">
+                    <div class="add-leader-form-field-label-container">
+                        <div class="add-leader-field-label-div">
+                            Name:
+                        </div>
+                        <div class="add-leader-field-div">
+                          {{ leader_form.name }}
+                        </div>
+                    </div>
+                    <div class="add-leader-form-field-label-container">
+                        <div class="add-leader-field-label-div">
+                            Age:
+                        </div>
+                        <div class="add-leader-field-div">
+                          {{ leader_form.age }}
+                        </div>
+                    </div>
+                    <div class="add-leader-form-field-label-container">
+                        <div class="add-leader-field-label-div">
+                            Gender:
+                        </div>
+                        <div class="add-leader-field-div">
+                          {{ leader_form.gender }}
+                        </div>
+                    </div>
+                    <div class="add-leader-form-field-label-container">
+                        <div class="add-leader-field-label-div">
+                            Barangay:
+                        </div>
+                        <div class="add-leader-field-div">
+                            <select class="add-leader-field" id="leader-brgys" name="leader-brgy">
+                                <option>---------</option>
+                                {% for brgy in brgys %}
+                                    <option value="{{ brgy.brgy_name }}">{{ brgy.brgy_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="add-leader-form-field-label-container">
+                        <div class="add-leader-field-label-div">
+                            Sitio:
+                        </div>
+                        <div class="add-leader-field-div">
+                            <select class="add-leader-field" id="sitio-dropdown" name="leader-sitio">
+                                <option>---------</option>
+                                {% if selected_brgy %}
+                                    {% for filtered_sitio in filtered_sitios %}
+                                        <option value="{{ filtered_sitio.id }}">{{ filtered_sitio.name }}</option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-leader-btn-container-div">
+                    <button class="add-leader-form-btn" type="submit">Submit</button>
+                </div>
+
+            </form>
+        </div>
+    </section>
+    <script>
+        document.getElementById('leader-brgys').addEventListener('change', function() {
+            // Get the selected value
+            var selectedValue = this.value;
+            console.log(selectedValue);
+            // Make an AJAX request to the server
+            // Make an AJAX request to your Django view
+            $.ajax({
+                url: '/get_filtered_sitios/',  // Update with your actual URL
+                method: 'GET',
+                data: { barangay: selectedValue },
+                success: function(data) {
+                    var sitioDropdown = $('#sitio-dropdown');
+
+                    sitioDropdown.empty();
+                    sitioDropdown.append('<option value="None">None</option>');
+                    $.each(data, function(index, sitio) {
+                        sitioDropdown.append('<option value="' + sitio.id + '">' + sitio.name + '</option>');
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching Sitios:', error);
+                }
+            });
+        });
+    </script>
+{% endblock %}

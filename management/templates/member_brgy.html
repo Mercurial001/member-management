@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="brgy-profile-brgy-header-title-div">
+        <span class="brgy-profile-brgy-header-title">BARANGAY PROFILE</span>
+        <span class="brgy-edit-profile-toggle-btn">
+            <i class="fas fa-edit"></i>
+        </span>
+    </section>
+    <section class="brgy-profile-brgy-details-container-div">
+        <div class="brgy-profile-edit-form-barangay-data-container">
+            <div class="brgy-profile-edit-form-header-title-div">
+                <span class="brgy-profile-edit-form-header-title">
+                    EDIT BRGY DETAILS
+                </span>
+                <span class="brgy-profile-hide-edit-form-btn">
+                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                </span>
+            </div>
+            <div class="brgy-profile-edit-form-container-div">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="brgy-profile-data-and-field-div">
+                        <div class="brgy-profile-label-and-edit-div">
+                            <span class="brgy-profile-label">
+                                Barangay:
+                            </span>
+                            <span class="brgy-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="brgy-profile-product-data-and-field-container-div">
+                            <div class="brgy-profile-product-data-div">
+                                {{ brgy.brgy_name }}
+                            </div>
+                            <div class="brgy-profile-field-div">
+                                {{ brgy_edit_form.brgy_name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="brgy-profile-data-and-field-div">
+                        <div class="brgy-profile-label-and-edit-div">
+                            <span class="brgy-profile-label">
+                                Voter Population:
+                            </span>
+                            <span class="brgy-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="brgy-profile-product-data-and-field-container-div">
+                            <div class="brgy-profile-product-data-div">
+                                {{ brgy.brgy_voter_population }}
+                            </div>
+                            <div class="brgy-profile-field-div">
+                                {{ brgy_edit_form.brgy_voter_population }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="brgy-profile-save-changes-btn">
+                        <button type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <section class="brgy-profile-details-section">
+            <div class="brgy-profile-brgy-showcase-container-div">
+                <div class="brgy-profile-brgy-name-showcase-div">
+                    {{ brgy.brgy_name }}
+                </div>
+                <div class="brgy-profile-analytics-block-container-div">
+                    <div class="brgy-profile-analytics-block-div">
+                        <div class="brgy-profile-analytics-block-title">
+                            Total Members in {{ brgy.brgy_name }}
+                        </div>
+                        <div class="brgy-profile-analytics-data">
+                            {{ brgy_individual_sum }}
+                        </div>
+                    </div>
+                    <div class="brgy-profile-analytics-block-div">
+                        <div class="brgy-profile-analytics-block-title">
+                            Total Brgy {{ brgy.brgy_name }} Sitio
+                        </div>
+                        <div class="brgy-profile-analytics-data">
+                            {{ brgy_sitio_sum }}
+                        </div>
+                    </div>
+                    <div class="brgy-profile-analytics-block-div">
+                        <div class="brgy-profile-analytics-block-title">
+                            Total Voter Population in {{ brgy.brgy_name }}
+                        </div>
+                        <div class="brgy-profile-analytics-data">
+                            {{ brgy.brgy_voter_population }}
+                        </div>
+
+                    </div>
+                    <div class="brgy-profile-analytics-block-div">
+                        <div class="brgy-profile-analytics-block-title">
+                            Coordinates
+                        </div>
+                        <div class="brgy-profile-analytics-data">
+                            <div class="brgy-profile-analytics-coordinate-div">Latitude: {{ brgy.lat }}</div>
+                            <div class="brgy-profile-analytics-coordinate-div">Longitude: {{ brgy.long }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="brgy-profile-showcase-underline"></div>
+            <div class="brgy-profile-brgy-details-block-container-div">
+                <div class="brgy-profile-details-title-header-div">
+                    Data List
+                </div>
+                <div class="brgy-profile-showcase-details-block-div">
+                    <div class="brgy-profile-details-block-header-title">
+                        Brgy. {{ brgy.brgy_name }} Leaders
+                    </div>
+                    <div class="brgy-profile-details-div">
+                        {% for leader in brgy_leader %}
+                            <div class="brgy-profile-data-detail">
+                                <a class="brgy-profile-link-page"
+                                   href="{% url 'cluster' leader.name %}">{{ leader.name }}</a>
+                            </div>
+                        {% empty %}
+                            <div class="brgy-profile-empty-detail-notifier">
+                                No Leaders in this BRGY
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="brgy-profile-showcase-details-block-div">
+                    <div class="brgy-profile-details-block-header-title">
+                        Brgy. {{ brgy.brgy_name }} Sitios
+                    </div>
+                    <div class="brgy-profile-details-div">
+                        {% for sitio in sitios %}
+                            <div class="brgy-profile-data-detail">
+                                {{ sitio.name }}
+                            </div>
+                        {% empty %}
+                            <div class="brgy-profile-empty-detail-notifier">
+                                No Sitios in this Barangay
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+                <div class="brgy-profile-showcase-details-block-div">
+                    <div class="brgy-profile-details-block-header-title">
+                        Brgy. {{ brgy.brgy_name }} Members
+                    </div>
+                    <div class="brgy-profile-details-div">
+                        {% for member in member_brgy %}
+                            <div class="brgy-profile-data-detail">
+                                <a class="brgy-profile-link-page" href="{% url 'member-profile' member.name %}">{{ member.name }}</a>
+                            </div>
+                        {% empty %}
+                            <div class="brgy-profile-empty-detail-notifier">
+                                No Members in this BRGY
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+            <div class="brgy-profile-brgy-clusters-container-div">
+                <div class="brgy-profile-cluster-title-header-div">
+                    Brgy. {{ brgy.name }} Clusters
+                </div>
+                {% for cluster in brgy_cluster %}
+                    <div class="brgy-profile-cluster-block-div">
+                        <div class="brgy-profile-cluster-leader-header">
+                            {{ cluster.leader }}
+                        </div>
+                        <div class="brgy-profile-cluster-members-div">
+                            {% for member in cluster.members.all %}
+                                <div class="brgy-profile-cluster-member">
+                                    <a href="{% url 'member-profile' member.name %}">{{ member }}</a>
+                                </div>
+                            {% empty %}
+                                <div class="brgy-profile-empty-member-cluster-notifier">
+                                    No Members in this Cluster
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all elements with the class "brgy-profile-edit-btn-div"
+            var editButtons = document.querySelectorAll('.brgy-profile-edit-btn-div');
+
+            // Loop through each edit button
+            editButtons.forEach(function (button) {
+                // Add a click event listener to each edit button
+                button.addEventListener('click', function () {
+                    // Find the parent element with the class "product-profile-data-and-field-div"
+                    var dataAndFieldDiv = button.closest('.brgy-profile-data-and-field-div');
+
+
+                    // Find the child elements with classes "product-profile-product-data-div" and "product-profile-field-div"
+                    var productDataDiv = dataAndFieldDiv.querySelector('.brgy-profile-product-data-div');
+                    var fieldDiv = dataAndFieldDiv.querySelector('.brgy-profile-field-div');
+                    var saveChangesBtn = document.querySelector('.brgy-profile-save-changes-btn');
+
+                    var isProductDataVisible = productDataDiv.classList.contains('brgy-name-visibility');
+                    var isFieldVisible = fieldDiv.classList.contains('brgy-name-field-visibility');
+
+                    // Toggle the display property
+                    productDataDiv.classList.toggle('brgy-name-visibility'); // Hide product data
+                    fieldDiv.classList.toggle('brgy-name-field-visibility'); // Show field
+
+                    if (productDataDiv.classList.contains('brgy-name-visibility') || fieldDiv.classList.contains('brgy-name-field-visibility')) {
+                        saveChangesBtn.style.display = 'block';
+                    }
+                });
+            });
+        });
+
+        const toggleProfileDetails = document.querySelector('.brgy-edit-profile-toggle-btn');
+        const editForm = document.querySelector('.brgy-profile-edit-form-barangay-data-container');
+        const unToggleBtn = document.querySelector('.brgy-profile-hide-edit-form-btn');
+
+        toggleProfileDetails.addEventListener('click', ()=> {
+            editForm.classList.add('show-brgy-edit-profile-toggle');
+        });
+
+        unToggleBtn.addEventListener('click', ()=> {
+            editForm.classList.remove('show-brgy-edit-profile-toggle');
+        });
+    </script>
+{% endblock %}

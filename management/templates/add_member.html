@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="add-member-utmost-container-section">
+        <div class="add-member-form-container-div">
+            <div class="add-member-form-header-div">
+                Add Member
+            </div>
+            <form class="add-member-add-member-form" method="post">
+                {% csrf_token %}
+                <div class="add-member-field-and-label-container-div">
+                    <div class="add-member-field-label">
+                        Name:
+                    </div>
+                    <div class="add-member-field-div">
+                      {{ member_form.name }}
+                    </div>
+                </div>
+                <div class="add-member-field-and-label-min-container-div">
+                    <div class="add-member-field-label">
+                        Age:
+                    </div>
+                    <div class="add-member-field-div">
+                      {{ member_form.age }}
+                    </div>
+                </div>
+                <div class="add-member-field-and-label-min-container-div">
+                    <div class="add-member-field-label">
+                        Gender
+                    </div>
+                    <div class="add-member-field-div">
+                      {{ member_form.gender }}
+                    </div>
+                </div>
+                <div class="add-member-field-and-label-container-div">
+                    <div class="add-member-field-label">
+                        Barangay
+                    </div>
+                    <div class="add-member-field-div">
+                        <select class="add-member-field" id="member-brgys" name="member-brgy">
+                            <option value="None">---------</option>
+                            {% for brgy in brgys %}
+                                <option value="{{ brgy.brgy_name }}">{{ brgy.brgy_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="add-member-field-and-label-container-div">
+                    <div class="add-member-field-label">
+                        Sitio:
+                    </div>
+                    <div class="add-member-field-div">
+                        <select class="add-member-field" id="sitio-dropdown" name="member-sitio">
+                            <option value="None">Sitio</option>
+                            {% if selected_brgy %}
+                                {% for filtered_sitio in filtered_sitios %}
+                                    <option value="{{ filtered_sitio.id }}">{{ filtered_sitio.name }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <div class="add-member-field-and-label-container-div">
+                    <div class="add-member-field-label">
+                        Leader:
+                    </div>
+                    <div class="add-member-field-div">
+                        <select class="add-member-field" id="leader-dropdown" name="member-leader">
+                            <option value="None">Leader</option>
+                            {% if selected_brgy %}
+                                {% for leader in filtered_leaders %}
+                                    <option value="{{ leader.id }}">{{ leader.name }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <button class="add-member-form-btn" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </section>
+    <script>
+        document.getElementById('member-brgys').addEventListener('change', function() {
+            // Get the selected value
+            var selectedValue = this.value;
+            console.log(selectedValue);
+            // Make an AJAX request to the server
+            // Make an AJAX request to your Django view
+            $.ajax({
+                url: '/get_filtered_sitios/',  // Update with your actual URL
+                method: 'GET',
+                data: { barangay: selectedValue },
+                success: function(data) {
+                    var sitioDropdown = $('#sitio-dropdown');
+
+                    sitioDropdown.empty();
+                    sitioDropdown.append('<option value="None">None</option>');
+                    $.each(data, function(index, sitio) {
+                        sitioDropdown.append('<option value="' + sitio.id + '">' + sitio.name + '</option>');
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching Sitios:', error);
+                }
+            });
+        });
+    </script>
+    <script>
+        document.getElementById('member-brgys').addEventListener('change', function() {
+            // Get the selected value
+            var selectedValue = this.value;
+            console.log(selectedValue);
+            // Make an AJAX request to the server
+            // Make an AJAX request to your Django view
+            $.ajax({
+                url: '/get_filtered_leaders/',  // Update with your actual URL
+                method: 'GET',
+                data: { barangay: selectedValue },
+                success: function(data) {
+                    var leaderDropdown = $('#leader-dropdown');
+
+                    leaderDropdown.empty();
+                    leaderDropdown.append('<option value="None">None</option>');
+                    $.each(data, function(index, leader) {
+                        leaderDropdown.append('<option value="' + leader.id + '">' + leader.name + '</option>');
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching Sitios:', error);
+                }
+            });
+        });
+    </script>
+{% endblock %}

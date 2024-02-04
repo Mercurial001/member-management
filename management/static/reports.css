@@ -1,0 +1,38 @@
+.reports-utmost-container-section{
+    background-image: linear-gradient(to right, rgb(10, 10, 10), rgb(10, 40, 40), rgb(10, 40, 40), rgb(10, 10, 10));
+    min-height: 100vh;
+}
+
+.reports-title-header-div{
+    margin-top: 30px;
+    text-align: center;
+    font-size: 40px;
+    text-transform: uppercase;
+    font-family: 'Montserrat';
+    color: beige;
+}
+
+.reports-block-container-div{
+    text-align: center;
+    margin-top: 50px;
+}
+
+.reports-report-block-div{
+    display: inline-block;
+    height: 170px;
+    width: 170px;
+    background-color: rgba(10, 40, 40, 0.8);
+    margin: 10px;
+    border-radius: 10px;
+    border: rgb(100, 200, 200) solid 1px;
+    text-decoration: none;
+    font-size: 20px;
+    color: beige;
+    font-family: 'Montserrat';
+    vertical-align: top;
+    box-shadow: rgba(240, 240, 240, 0.35) 0px 5px 15px;
+}
+
+.reports-block-report-title-div{
+    margin-top: 50px;
+}

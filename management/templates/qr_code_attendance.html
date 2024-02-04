@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body class="qr-code-scanner-attendance-body">
+    <div class="qr-code-scanner-attendance-heading-div">
+        <h1>QR Code Scan Attendance</h1>
+    </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <div id="qr-code-attendance-message-container"></div>
+    <div class="qr-code-camera-scanner-container-div">
+        <video id="qr-code-scanner-camera" autoplay></video>
+    </div>
+    <script src="{% static 'instascan.min.js' %}"></script>
+    <script>
+        const video = document.getElementById('qr-code-scanner-camera');
+
+        // Access the user's camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+                // Initialize the QR code scanner
+                let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+
+                // Listen for scan events
+                scanner.addListener('scan', (content) => {
+                    console.log(content);  // Content of the scanned QR code
+                    // You can now send 'content' to your backend for processing
+                    // Send an AJAX request to the server
+                    fetch('/attendance/qr-code-scan/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken'),  // Include CSRF token
+                        },
+                        body: JSON.stringify({ 'scanned_data': content }),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        updateMessageContainer(data.status, data.message);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        updateMessageContainer('error', 'Invalid Scanned Data');
+                    });
+                });
+
+                // Start scanning
+                Instascan.Camera.getCameras().then((cameras) => {
+                    if (cameras.length > 0) {
+                        scanner.start(cameras[0]);
+                    } else {
+                        console.error('No cameras found.');
+                    }
+                });
+            })
+
+        function updateMessageContainer(status, message) {
+            const messageContainer = document.getElementById('qr-code-attendance-message-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+
+            if (status === 'success') {
+                messageDiv.classList.add('success-message');
+            } else {
+                messageDiv.classList.add('error-message');
+            }
+
+            // Clear existing messages before adding the new one
+            messageContainer.innerHTML = '';
+            messageContainer.appendChild(messageDiv);
+
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

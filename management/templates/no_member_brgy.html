@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="no-member-brgy-utmost-container-section">
+        <div class="no-member-brgy-title-header-div">
+            No Members Barangay Report
+        </div>
+        <div class="no-member-brgy-table-container-div">
+            <table class="no-member-brgys-table">
+                <tr class="no-member-brgys-table-row">
+                    <th class="no-member-brgys-table-head">Barangay Name</th>
+                </tr>
+                {% for brgy, no_mem_brgy in no_member_brgy_list.items %}
+                    <tr class="no-member-brgys-table-row">
+                        <td class="no-member-brgys-table-data">
+                            <a class="no-member-brgys-table-link" href="{% url 'member-brgy' brgy %}">{{ brgy }}</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="no-member-brgys-table-row">
+                        <td class="no-member-brgys-table-data">All Barangays have members</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </section>
+
+{% endblock %}
