@@ -39,16 +39,16 @@ class ChangeBarangayNameForm(ModelForm):
 class LeaderRegistrationForm(ModelForm):
     class Meta:
         model = Leader
-        fields = ['name', 'gender', 'age']
+        fields = ['name', 'gender', 'age', 'image']
         widgets = {
             'name': TextInput(attrs={
                 'class': "add-leader-field",
             }),
             'gender': Select(attrs={
-                'class': "add-leader-field",
+                'class': "add-leader-field-min",
             }),
             'age': NumberInput(attrs={
-                'class': "add-leader-field",
+                'class': "add-leader-field-min",
             }),
         }
 
@@ -62,7 +62,7 @@ class MemberRegistrationForm(ModelForm):
 class AddMemberRegistrationForm(ModelForm):
     class Meta:
         model = Member
-        fields = ['name', 'gender', 'age']
+        fields = ['name', 'gender', 'age', 'image']
         widgets = {
             'name': TextInput(attrs={
                 'class': "add-member-field",

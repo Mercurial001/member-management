@@ -8,7 +8,7 @@
             <div class="add-member-form-header-div">
                 Add Member
             </div>
-            <form class="add-member-add-member-form" method="post">
+            <form class="add-member-add-member-form" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="add-member-field-and-label-container-div">
                     <div class="add-member-field-label">
@@ -34,12 +34,12 @@
                       {{ member_form.gender }}
                     </div>
                 </div>
-                <div class="add-member-field-and-label-container-div">
+                <div class="add-member-field-and-label-min-container-div">
                     <div class="add-member-field-label">
                         Barangay
                     </div>
                     <div class="add-member-field-div">
-                        <select class="add-member-field" id="member-brgys" name="member-brgy">
+                        <select class="add-member-field-min" id="member-brgys" name="member-brgy">
                             <option value="None">---------</option>
                             {% for brgy in brgys %}
                                 <option value="{{ brgy.brgy_name }}">{{ brgy.brgy_name }}</option>
@@ -47,12 +47,12 @@
                         </select>
                     </div>
                 </div>
-                <div class="add-member-field-and-label-container-div">
+                <div class="add-member-field-and-label-min-container-div">
                     <div class="add-member-field-label">
                         Sitio:
                     </div>
                     <div class="add-member-field-div">
-                        <select class="add-member-field" id="sitio-dropdown" name="member-sitio">
+                        <select class="add-member-field-min" id="sitio-dropdown" name="member-sitio">
                             <option value="None">Sitio</option>
                             {% if selected_brgy %}
                                 {% for filtered_sitio in filtered_sitios %}
@@ -75,6 +75,14 @@
                                 {% endfor %}
                             {% endif %}
                         </select>
+                    </div>
+                </div>
+                <div class="add-member-field-and-label-container-div">
+                    <div class="add-member-field-label">
+                        Image:
+                    </div>
+                    <div class="add-member-field-div">
+                      {{ member_form.image }}
                     </div>
                 </div>
                 <div>

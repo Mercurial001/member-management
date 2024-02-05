@@ -1,0 +1,117 @@
+/* clusters.html */
+
+.swiper-slide.last-slide {
+    min-width:2000000000000000000px;
+}
+
+.swiper-wrapper {
+    display: flex;
+}
+
+.swiper-slide{
+    min-width: 200px; /* Set your desired minimum width */
+    padding: 10px;
+    margin: 0;
+}
+
+.swiper-slide:hover{
+    cursor: grab;
+}
+
+.swiper-slide:active{
+    cursor: grabbing;
+}
+
+.cluster-hyper-scroll-link{
+    font-family: 'Montserrat';
+    color: rgb(80, 80, 80);
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.3s ease;
+}
+
+.cluster-utmost-container-div{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    position: fixed;
+    width: 100%;
+    z-index: 2;
+    color: rgb(80, 80, 80);
+    background-color: rgb(255,255,255);
+}
+
+.cluster-brgy-name-header-div{
+    font-family: 'Montserrat';
+    padding: 15px;
+    color: beige;
+    padding: 20px;
+    background-image: linear-gradient(to right, rgb(10, 10, 10),
+                                                rgb(30, 60, 60),
+                                                rgb(30, 60, 60),
+                                                rgb(30, 60, 60),
+                                                rgba(50, 100, 100, 0.8));
+    transition: all ease 0.5s;
+}
+
+.animate {
+    font-size: 20px;
+    font-weight: 800;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), /* White glow */
+                 0 0 20px rgba(255, 255, 255, 0.6), /* White glow */
+                 0 0 30px rgba(255, 255, 255, 0.4); /* White glow */
+}
+
+.cluster-leader-header-title-div{
+    font-family: 'Montserrat';
+    margin: 10px;
+}
+
+.cluster-leader-name-div{
+    display: inline-block;
+    width: 400px;
+    padding: 20px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.cluster-leader-profile-link{
+    font-family: 'Montserrat';
+    text-decoration: none;
+    color: rgb(40, 40, 40);
+}
+
+.cluster-leader-profile-link:hover{
+    text-decoration: underline;
+}
+
+.cluster-hyper-link-brgy-cluster{
+    color: beige;
+    text-decoration: none;
+}
+
+.cluster-brgy-hyper-link-div{
+    display: inline-block;
+}
+
+#cluster-to-top-link{
+    text-decoration: none;
+}
+
+.cluster-brgy-hyper-link{
+    padding: 5px;
+    color: beige;
+    text-decoration: none;
+    font-family: Impact;
+}
+
+.cluster-brgy-leaders-section-div{
+    margin-top: 40px;
+    background-color: rgb(240, 240, 240);
+}
+
+.cluster-brgy-title-heading-div a{
+    text-decoration: none;
+    color: beige;
+}
+
+.cluster-leader-name-div{
+    margin: 20px;
+}

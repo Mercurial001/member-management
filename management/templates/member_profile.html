@@ -17,6 +17,17 @@
             {{ member.gender }}
         </div>
         <div>
+            {% if member.image %}
+                <div>
+                    <img id="product-profile-product-img" src="{{ member.image.url }} ">
+                </div>
+            {% else %}
+                <div>
+                    <span>No Image</span>
+                </div>
+            {% endif %}
+        </div>
+        <div>
             <img src="{% static 'images/qr-codes/' %}QR-Code-{{ member.name }}-{{ member.brgy }}-{{ member.id }}.png">
         </div>
         <div>

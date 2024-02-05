@@ -3,34 +3,99 @@
 {% load static %}
 
 {% block content %}
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <div id="cluster-to-top-link"></div>
     <div class="cluster-utmost-container-div">
-        <a class="cluster-brgy-hyper-link" href="#cluster-to-top-link">^</a>
-        {% for brgys in barangays %}
-            <div class="cluster-brgy-hyper-link-div">
-                <a class="cluster-brgy-hyper-link" href="#brgy-{{ brgys }}">{{ brgys }}</a>
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                {% for brgys, brgy in leaders.items %}
+                    <div class="swiper-slide" id="barangay-{{ brgy }}">
+                        <a class="cluster-hyper-scroll-link" href="#brgy-{{ brgy }}" onclick="animateBrgy('{{ brgy }}')">{{ brgy }}</a>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
     </div>
     <div class="cluster-brgy-leaders-section-div">
         {% for leaders, brgys in leaders.items %}
-            <div>
-                <a href="{% url 'brgy-leaders' brgys %}">
-                    <div class="cluster-brgy-title-heading-div" id="brgy-{{ brgys }}">
-                        {{ brgys }}
-                    </div>
+            <div class="cluster-brgy-name-header-div" id="brgy-{{ brgys }}">
+                <a class="cluster-hyper-link-brgy-cluster" href="{% url 'brgy-leaders' brgys %}">
+                    {{ brgys }}
                 </a>
             </div>
-            <div>
+            <div class="cluster-leader-header-title-div">
                 Leaders:
             </div>
-            {% for leader in leaders %}
-                <div class="cluster-leader-name-div" id="cluster-leader-{{ leader.name }}">
-                    <a href="{% url 'cluster' leader.name %}">
-                        {{ leader.name }}
-                    </a>
-                </div>
-            {% endfor %}
+            <div class="cluster-leader-clusters-block-container-div">
+                {% for leader in leaders %}
+                    <div class="cluster-leader-name-div" id="cluster-leader-{{ leader.name }}">
+                        <a class="cluster-leader-profile-link" href="{% url 'cluster' leader.name %}">
+                            {{ leader.name }}
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
         {% endfor %}
     </div>
+    <script>
+        var mySwiper = new Swiper('.swiper-container', {
+            // Optional parameters
+            direction: 'horizontal',
+            freeMode: true,
+
+            // Sticky positioning when swiping
+            freeModeSticky: true,
+
+            pagination: {
+              el: '.swiper-pagination',
+              clickable: true,
+            },
+
+            on: {
+                init: function () {
+                    // Get the last slide
+                    var lastSlide = this.slides[this.slides.length - 1];
+
+                    // Add a custom class to the last slide
+                    lastSlide.classList.add('last-slide');
+                },
+            },
+        });
+    </script>
+    <script>
+        function animateBrgy(brgy) {
+            // Get the corresponding div
+            const brgyDiv = document.getElementById(`brgy-${brgy}`);
+            const brgyName = brgyDiv.id.replace('brgy-', '');
+            const navbar = document.querySelector('.cluster-utmost-container-div');
+
+            const navHeight = navbar.getBoundingClientRect().height;
+            const brgyDivHeight = brgyDiv.getBoundingClientRect().height
+
+            console.log('navHeight: ' + navHeight + ', brgyDivHeight: ' + brgyDivHeight)
+
+            let brgyClusterPosition = brgyDiv.offsetTop - navHeight;
+
+            console.log(brgyClusterPosition);
+
+            // Toggle the 'animate' class to trigger the animation
+            brgyDiv.classList.add('animate');
+
+            // Use setTimeout to revert the font-size after 1000 milliseconds (1 second)
+            setTimeout(() => {
+                brgyDiv.classList.remove('animate');
+
+            }, 1000);
+
+            setTimeout(() => {
+                window.scrollTo({
+                    top: brgyClusterPosition,
+                    behavior: 'smooth',
+                });
+
+            }, 1);
+        }
+
+    </script>
+
 {% endblock %}

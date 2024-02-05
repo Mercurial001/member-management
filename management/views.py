@@ -360,7 +360,7 @@ def add_leader(request):
         sitios_exist = False
 
     if request.method == 'POST':
-        form = LeaderRegistrationForm(request.POST)
+        form = LeaderRegistrationForm(request.POST, request.FILES)
         brgy_field_value = request.POST.get('leader-brgy')
         sitio_field_value = request.POST.get('leader-sitio')
         leader_brgy = Barangay.objects.get(brgy_name=brgy_field_value)
@@ -429,7 +429,7 @@ def add_members(request):
         leaders_exists = False
 
     if request.method == 'POST':
-        form = AddMemberRegistrationForm(request.POST)
+        form = AddMemberRegistrationForm(request.POST, request.FILES)
         brgy_field_value = request.POST.get('member-brgy')
         sitio_field_value = request.POST.get('member-sitio')
         leader_field_value = request.POST.get('member-leader')

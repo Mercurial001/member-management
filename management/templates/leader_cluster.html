@@ -4,6 +4,17 @@
 
 {% block content %}
     {{ leader.name }}
+    <div>
+        {% if leader.image %}
+            <div>
+                <img id="product-profile-product-img" src="{{ leader.image.url }} ">
+            </div>
+        {% else %}
+            <div>
+                <span>No Image</span>
+            </div>
+        {% endif %}
+    </div>
     <form method="post">
         {% csrf_token %}
         <div>

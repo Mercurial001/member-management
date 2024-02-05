@@ -39,6 +39,7 @@ class Leader(models.Model):
     brgy = models.ForeignKey(Barangay, related_name='leader_brgy', on_delete=models.CASCADE)
     sitio = models.ForeignKey(Sitio, related_name='leader_sitio', on_delete=models.CASCADE, null=True, blank=True)
     date_registered = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(null=True, blank=True, upload_to="images/")
 
     def __str__(self):
         return self.name
@@ -51,6 +52,7 @@ class Member(models.Model):
     brgy = models.ForeignKey(Barangay, related_name='member_brgy', on_delete=models.CASCADE)
     sitio = models.ForeignKey(Sitio, related_name='member_sitio', on_delete=models.CASCADE, null=True, blank=True)
     date_registered = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(null=True, blank=True, upload_to="images/")
 
     def __str__(self):
         return self.name
@@ -80,7 +82,6 @@ class Individual(models.Model):
     brgy = models.ForeignKey(Barangay, related_name='individual_brgy', on_delete=models.CASCADE)
     sitio = models.ForeignKey(Sitio, related_name='individual_sitio', on_delete=models.CASCADE, null=True, blank=True)
     date_registered = models.DateTimeField(auto_now_add=True)
-    # date_registered_no_time = models.DateField()
 
     def __str__(self):
         return self.name

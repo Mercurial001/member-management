@@ -15,7 +15,7 @@
             <div class="add-leader-form-title-header-div">
                 Add Leader
             </div>
-            <form class="add-leader-form" method="post">
+            <form class="add-leader-form" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="add-leader-form-fields-container-div">
                     <div class="add-leader-form-field-label-container">
@@ -26,7 +26,7 @@
                           {{ leader_form.name }}
                         </div>
                     </div>
-                    <div class="add-leader-form-field-label-container">
+                    <div class="add-leader-field-and-label-min-container-div">
                         <div class="add-leader-field-label-div">
                             Age:
                         </div>
@@ -34,7 +34,7 @@
                           {{ leader_form.age }}
                         </div>
                     </div>
-                    <div class="add-leader-form-field-label-container">
+                    <div class="add-leader-field-and-label-min-container-div">
                         <div class="add-leader-field-label-div">
                             Gender:
                         </div>
@@ -71,10 +71,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="add-leader-form-field-label-container">
+                    <div class="add-leader-field-label-div">
+                        Image:
+                    </div>
+                    <div class="add-leader-field-div">
+                      {{ leader_form.image }}
+                    </div>
+                </div>
                 <div class="add-leader-btn-container-div">
                     <button class="add-leader-form-btn" type="submit">Submit</button>
                 </div>
-
             </form>
         </div>
     </section>

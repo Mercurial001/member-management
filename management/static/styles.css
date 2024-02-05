@@ -15,6 +15,7 @@ body{
     float: left;
     min-height: 100vh;
     position: fixed;
+    z-index:20;
 }
 
 .home-header-nav-links{
@@ -140,53 +141,6 @@ body{
 
 .home-base-member-result-link:hover{
     text-decoration: underline;
-}
-
-/* clusters.html */
-
-.cluster-utmost-container-div{
-    padding:10px;
-    background-color: rgb(40, 40, 40);
-    position: fixed;
-    width: 100%;
-}
-
-.cluster-brgy-title-heading-div{
-    background-color: rgb(10, 40, 40);
-    color: beige;
-    padding: 10px;
-}
-
-.cluster-brgy-header-div{
-    background-color: red;
-}
-
-.cluster-brgy-hyper-link-div{
-    display: inline-block;
-}
-
-#cluster-to-top-link{
-    text-decoration: none;
-}
-
-.cluster-brgy-hyper-link{
-    padding: 5px;
-    color: beige;
-    text-decoration: none;
-    font-family: Impact;
-}
-
-.cluster-brgy-leaders-section-div{
-    margin-top: 40px;
-}
-
-.cluster-brgy-title-heading-div a{
-    text-decoration: none;
-    color: beige;
-}
-
-.cluster-leader-name-div{
-    margin: 20px;
 }
 
 /* brgy_leaders.html */

@@ -50,6 +50,31 @@
     outline: none;
 }
 
+.add-leader-field-and-label-min-container-div{
+    display: inline-block;
+    background-color: rgb(240, 240, 240);
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    font-family: 'Montserrat';
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin:auto;
+    width: 47%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.add-leader-field-min{
+    width: 80%;
+    height: 26px;
+    border-radius: 5px;
+    border: 1px solid rgb(100, 100, 100);
+}
+
+.add-leader-field-min:focus{
+    outline: none;
+}
+
 .add-leader-form{
     border: 1px solid rgb(100, 100, 100);
     padding-bottom: 15px;
