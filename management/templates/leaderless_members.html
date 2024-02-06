@@ -17,11 +17,12 @@
                         Member Barangay
                     </th>
                 </tr>
+<!--                {{ cluster_members_filter }}-->
                 {% for members, brgy in leaderless.items %}
                     <tr>
                         <td class="leaderless-members-table-data">
                             <a class="leaderless-members-table-link-to-page"
-                               href="{% url 'member-profile' members %}">{{ members }}</a>
+                               href="{% url 'member-profile' members members.id %}">{{ members }}</a>
                         </td>
                         <td class="leaderless-members-table-data">
                             <a href="{% url 'member-brgy' brgy %}"

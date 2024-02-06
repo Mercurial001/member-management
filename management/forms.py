@@ -56,7 +56,18 @@ class LeaderRegistrationForm(ModelForm):
 class MemberRegistrationForm(ModelForm):
     class Meta:
         model = Member
-        fields = ['name', 'gender', 'age']
+        fields = ['name', 'gender', 'age', 'image']
+        widgets = {
+            'name': TextInput(attrs={
+                'class': "add-new-member-in-leader-field",
+            }),
+            'gender': Select(attrs={
+                'class': "add-new-member-in-leader-field-min",
+            }),
+            'age': NumberInput(attrs={
+                'class': "add-new-member-in-leader-field-min",
+            }),
+        }
 
 
 class AddMemberRegistrationForm(ModelForm):
@@ -98,3 +109,5 @@ class BarangayForm(ModelForm):
                 'placeholder': 'Barangay Latitude'
             }),
         }
+
+

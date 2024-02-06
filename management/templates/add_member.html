@@ -57,6 +57,8 @@
                             {% if selected_brgy %}
                                 {% for filtered_sitio in filtered_sitios %}
                                     <option value="{{ filtered_sitio.id }}">{{ filtered_sitio.name }}</option>
+                                {% empty %}
+                                    <option value="None">None</option>
                                 {% endfor %}
                             {% endif %}
                         </select>

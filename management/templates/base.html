@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{% static 'leaderless-members.css' %}">
     <link rel="stylesheet" href="{% static 'member-count-per-brgy.css' %}">
     <link rel="stylesheet" href="{% static 'cluster.css' %}">
+    <link rel="stylesheet" href="{% static 'leader-profile.css' %}">
     <!-- Add this to include Swiper.js -->
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <script src="{% static 'chart.js' %}"></script>
@@ -185,7 +186,7 @@
                                     {% for member in search_engine_result_member %}
                                         <div class="home-base-member-name-result">
                                             <a class="home-base-member-result-link"
-                                               href="{% url 'member-profile' member.name %}">
+                                               href="{% url 'member-profile' member.name member.id %}">
                                                 {{ member.name }}
                                             </a>
                                         </div>

@@ -47,7 +47,7 @@ def homepage(request):
 
         if search_result_sum_member is None and search_result_sum_leader is None:
             total_results = 0
-        elif search_result_sum_member is None and search_result_sum_member is not None:
+        elif search_result_sum_member is None and search_result_sum_leader is not None:
             search_result_sum_member = 0
             total_results = search_result_sum_member + search_result_sum_leader
         elif search_result_sum_leader is None and search_result_sum_member is not None:
@@ -222,7 +222,9 @@ def dashboard(request):
 def leader_cluster(request, name):
     leader = Leader.objects.get(name=name)
     members = Cluster.objects.get(leader=leader)
-
+    barangays = Barangay.objects.all()
+    sitios = Sitio.objects.filter(brgy=leader.brgy)
+    selected_sitio = request.POST.get('added-member-sitio')
     # Create QR Code for each user
     qr = qrcode.QRCode(
         version=1,
@@ -248,27 +250,45 @@ def leader_cluster(request, name):
     img.save(f'management/static/images/qr-codes/QR-Code-{leader.name}-{leader.brgy}-{leader.id}.png')
 
     member_registration_form = MemberRegistrationForm()
+    edit_leader_profile_form = LeaderRegistrationForm(instance=leader)
+
     if request.method == 'POST':
-        form = MemberRegistrationForm(request.POST)
-        if form.is_valid():
-            member = form.save(commit=False)
-            member.brgy = leader.brgy
-            member.save()
+        if 'add-new-member-btn' in request.POST:
+            form = MemberRegistrationForm(request.POST, request.FILES)
+            if form.is_valid():
+                member = form.save(commit=False)
+                member.brgy = leader.brgy
+                if selected_sitio != 'None':
+                    print(f'Sitio: {selected_sitio}')
+                    member_sitio = Sitio.objects.get(id=selected_sitio)
+                    member.sitio = member_sitio
+                else:
+                    member.sitio = None
+                member.save()
 
-            # Let's create a cluster object
-            cluster, created = Cluster.objects.get_or_create(leader=leader)
-            cluster.members.add(member)
-            cluster.save()
+                # Let's create a cluster object
+                cluster, created = Cluster.objects.get_or_create(leader=leader)
+                cluster.members.add(member)
+                cluster.save()
 
-            member_added_obj, created = AddedMembers.objects.get_or_create(member=member.name)
-            member_added_obj.save()
+                member_added_obj, created = AddedMembers.objects.get_or_create(member=member.name)
+                member_added_obj.save()
 
-            messages.success(request, 'Member Added')
+                messages.success(request, 'Member Added')
+        elif 'edit-leader-profile-btn' in request.POST:
+            edit_profile_leader_profile_form = LeaderRegistrationForm(request.POST, request.FILES, instance=leader)
+            if edit_profile_leader_profile_form.is_valid():
+                leader_profile = edit_profile_leader_profile_form.save(commit=False)
+                leader_profile.save()
+                messages.success(request, 'Editted!')
 
     return render(request, 'leader_cluster.html', {
         'leader': leader,
         'member_registration_form': member_registration_form,
         'members': members,
+        'sitios': sitios,
+        'edit_leader_profile_form': edit_leader_profile_form,
+        'barangays': barangays,
     })
 
 
@@ -290,9 +310,11 @@ def add_barangay(request):
                     brgy.long = barangay.long
                     brgy.save()
                     messages.success(request, 'Existing Barangay Updated!')
+                    return redirect('add-brgy')
                 else:
                     barangay.save()
-                    messages.success(request, "Barangay Added")
+                    messages.success(request, "Barangay Added"), redirect('add-brgy')
+                    return redirect('add-brgy')
         elif 'add-sitio-form-btn' in request.POST:
             sitio_form = AddSitioForm(request.POST)
             if sitio_form.is_valid():
@@ -302,10 +324,13 @@ def add_barangay(request):
                     existing_sitio.name = sitio.name
                     existing_sitio.brgy = sitio.brgy
                     existing_sitio.save()
-                    return messages.success(request, 'Existing Sitio Updated')
+                    messages.success(request, 'Existing Sitio Updated'), redirect('add-brgy')
+                    return redirect('add-brgy')
                 else:
                     sitio.save()
-                    return messages.success(request, 'Sitio Successfully Added')
+                    messages.success(request, 'Sitio Successfully Added'), redirect('add-brgy')
+                    return redirect('add-brgy')
+
     return render(request, 'add_brgy.html', {
         'brgy_add_form': brgy_add_form,
         'member_brgy': member_brgy,
@@ -471,8 +496,8 @@ def add_members(request):
     })
 
 
-def member_profile(request, name):
-    member = Member.objects.get(name=name)
+def member_profile(request, name, id):
+    member = Member.objects.get(id=id, name=name)
     members = Cluster.objects.values('members__name')
     leaders = Leader.objects.filter(brgy=member.brgy)
 
@@ -572,17 +597,18 @@ def leaderless_members(request):
     leaderless_member = Cluster.objects.values('members__name')
 
     cluster_members_filter = [members['members__name'] for members in leaderless_member]
-    all_members_filter = [member for member in members]
 
     leaderless = {}
-    for member in all_members_filter:
-        if member not in cluster_members_filter:
+    for member in members:
+        member_name = member.name
+        if member_name not in cluster_members_filter:
             leaderless[member] = member.brgy
 
     return render(request, 'leaderless_members.html', {
         'members': members,
         'leaderless_member': leaderless_member,
         'leaderless': leaderless,
+        'cluster_members_filter': cluster_members_filter,
     })
 
 

@@ -3,38 +3,245 @@
 {% load static %}
 
 {% block content %}
-    {{ leader.name }}
-    <div>
-        {% if leader.image %}
-            <div>
-                <img id="product-profile-product-img" src="{{ leader.image.url }} ">
-            </div>
-        {% else %}
-            <div>
-                <span>No Image</span>
-            </div>
-        {% endif %}
-    </div>
-    <form method="post">
-        {% csrf_token %}
-        <div>
-            {{ member_registration_form.as_p }}
+    <section class="leader-profile-utmost-container-section">
+        <div class="leader-profile-page-title-navbar">
+            <span>Leader Profile</span>
+            <span class="leader-profile-edit-detail-toggle-btn"><i class="fa fa-edit"></i></span>
         </div>
-        <button type="submit">Submit</button>
-    </form>
-    <div class="qr-code-member-profile">
-        <img src="{% static 'images/qr-codes/' %}QR-Code-{{ leader.name }}-{{ leader.brgy }}-{{ leader.id }}.png">
-    </div>
-    <div>
-        <h1>Members</h1>
-    </div>
-    <div>
-        {% for member in members.members.all %}
-            <div>
-                <a href="{% url 'member-profile' member.name %}">{{ member.name }}</a>
+        <div class="leader-profile-edit-profile-form-container">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div>
+                    {{ edit_leader_profile_form.name }}
+                </div>
+                <div class="add-leader-form-field-label-container">
+                    <div class="add-leader-field-label-div">
+                        Barangay:
+                    </div>
+                    <div class="add-leader-field-div">
+                        <select class="add-leader-field" id="leader-edit-brgys" name="leader-brgy">
+                            <option>---------</option>
+                            {% for brgy in barangays %}
+                                <option value="{{ brgy.brgy_name }}">{{ brgy.brgy_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="leader-profile-add-member-field">
+                    <select class="add-new-member-in-leader-field"
+                            name="leader-new-sitio" id="leader-profile-edit-sitio-dropdown">
+                        {% for sitio in sitios %}
+                            <option value="{{ sitio.id }}">{{ sitio.name }}</option>
+                        {% empty %}
+                            <option value="None">None</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    {{ edit_leader_profile_form.age }}
+                </div>
+                <div>
+                    {{ edit_leader_profile_form.gender }}
+                </div>
+                <div>
+                    <button name="edit-leader-profile-btn" type="submit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+        <div style="padding: 1px;"></div>
+        <div class="leader-profile-showcase-container-div">
+            <div class="leader-profile-leader-name-header-title-div">
+                {{ leader.name }}
             </div>
-        {% empty %}
-            No Members
-        {% endfor %}
-    </div>
+            <div class="leader-profile-leader-profile-photo-container-div">
+                {% if leader.image %}
+                    <div class="leader-profile-photo-image-div">
+                        <img class="leader-profile-leader-image-photo"
+                             id="leader-profile-leader-image-photo"
+                             src="{{ leader.image.url }}"
+                        >
+                    </div>
+                {% else %}
+                    <div class="leader-profile-no-leader-image-div">
+                        <i id="leader-profile-default-img" class="fa fa-user" aria-hidden="true"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="leader-profile-detail-block-">
+            <div class="leader-profile-leader-detail-float" id="leader-profile-leader-detail-float-left">
+                <div class="leader-profile-detail-div">
+                    <span class="leader-profile-detail-icon-span">
+                        <i class="fas fa-dharmachakra" aria-hidden="true"></i>
+                    </span>
+                    <span>{{ leader.brgy }}</span>
+                </div>
+                <div class="leader-profile-detail-div">
+                    <span class="leader-profile-detail-icon-span">
+                        <i class="fas fa-route" aria-hidden="true"></i>
+                    </span>
+                    <span>{{ leader.sitio }}</span>
+                </div>
+                <div class="leader-profile-detail-div">
+                    <span class="leader-profile-detail-icon-span">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                    </span>
+                    <span>{{ leader.date_registered }}</span>
+                </div>
+            </div>
+            <div class="leader-profile-leader-detail-float" id="leader-profile-leader-detail-float-right">
+                <div class="leader-profile-detail-div">
+                    <span class="leader-profile-detail-icon-span">
+                        <i class="fas fa-hourglass-half" aria-hidden="true"></i>
+                    </span>
+                    <span>{{ leader.age }}</span>
+                </div>
+                <div class="leader-profile-detail-div">
+                    <span class="leader-profile-detail-icon-span">
+                        <i class="fa fa-neuter" aria-hidden="true"></i>
+                    </span>
+                    <span>{{ leader.gender }}</span>
+                </div>
+            </div>
+        </div>
+        <div style="box-shadow: 1px 2px 5px 1px rgba(0, 0, 0, 0.5); padding: 1px; margin-top: 100px;"></div>
+        <div class="leader-profile-member-form-leader-members-container-div">
+            <div class="leader-profile-leader-members-container-div">
+                <div class="leader-profile-members-container-header">
+                    Members
+                </div>
+                <div class="leader-profile-leader-members-div">
+                    <div style="padding: 1px;"></div>
+                    {% for member in members.members.all %}
+                        <div class="leader-profile-member">
+                            <div style="padding: 1px;"></div>
+                            <div class="leader-profile-member-profile-photo-container-div">
+                                {% if member.image %}
+                                    <div class="leader-profile-member-photo-image-div">
+                                        <img class="leader-profile-member-image-photo"
+                                             id="leader-profile-member-image-photo"
+                                             src="{{ member.image.url }}"
+                                        >
+                                    </div>
+                                {% else %}
+                                    <div class="leader-profile-no-image-member-div">
+                                        <i id="leader-profile-member-default-img" class="fa fa-user" aria-hidden="true"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <a class="leader-profile-link-to-member-profile"
+                               href="{% url 'member-profile' member.name member.id %}">
+                                {{ member.name }}
+                            </a>
+                        </div>
+                    {% empty %}
+                        <div class="leader-profile-no-member-notifier-div">
+                            No Members
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="leader-profile-other-details-container-block-div">
+            <div class="leader-profile-add-member-form-container-div">
+                <div class="leader-profile-add-member-header-title">
+                    Add New Member
+                </div>
+                <div class="leader-profile-add-member-form-div">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="leader-profile-add-member-field-and-label-container">
+                            <div class="leader-profile-add-field-label">
+                                Member Name:
+                            </div>
+                            <div class="leader-profile-add-member-field">
+                                {{ member_registration_form.name }}
+                            </div>
+
+                        </div>
+                        <div class="leader-profile-add-member-min-fields-container">
+                            <div class="leader-profile-add-member-field-and-label-container-min">
+                                <div class="leader-profile-add-field-label">
+                                    Gender:
+                                </div>
+                                <div class="leader-profile-add-member-field">
+                                    {{ member_registration_form.gender }}
+                                </div>
+                            </div>
+                            <div class="leader-profile-add-member-field-and-label-container-min">
+                                <div class="leader-profile-add-field-label">
+                                    Age:
+                                </div>
+                                <div class="leader-profile-add-member-field">
+                                    {{ member_registration_form.age }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="leader-profile-add-member-field-and-label-container">
+                            <div class="leader-profile-add-field-label">
+                                Sitio:
+                            </div>
+                            <div class="leader-profile-add-member-field">
+                                <select class="add-new-member-in-leader-field"
+                                        name="added-member-sitio">
+                                    {% for sitio in sitios %}
+                                        <option value="{{ sitio.id }}">{{ sitio.name }}</option>
+                                    {% empty %}
+                                        <option value="None">None</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="leader-profile-add-member-field-and-label-container">
+                            <div class="leader-profile-add-field-label">
+                                Image:
+                            </div>
+                            <div class="leader-profile-add-member-field">
+                                {{ member_registration_form.image }}
+                            </div>
+                        </div>
+                        <div class="leader-profile-add-new-member-btn-container-div">
+                            <button
+                                    class="leader-profile-add-new-member-btn"
+                                    type="submit"
+                                    name='add-new-member-btn'>
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="leader-profile-qr-code-container-div">
+                <div class="leader-profile-qr-code-header-title">
+                    {{ leader.name }} QR Code
+                </div>
+                <img class="leader-profile-qr-code"
+                     src="{% static 'images/qr-codes/' %}QR-Code-{{ leader.name }}-{{ leader.brgy }}-{{ leader.id }}.png"
+                >
+            </div>
+        </div>
+</section>
+<script>
+    document.getElementById('leader-edit-brgys').addEventListener('change', function() {
+        // Get the selected value
+        var selectedValue = this.value;
+        console.log(selectedValue);
+        $.ajax({
+            url: '/get_filtered_sitios/',  // Update with your actual URL
+            method: 'GET',
+            data: { barangay: selectedValue },
+            success: function(data) {
+                var sitioDropdown = $('#leader-profile-edit-sitio-dropdown');
+                sitioDropdown.empty();
+                $.each(data, function(index, sitio) {
+                    sitioDropdown.append('<option value="' + sitio.id + '">' + sitio.name + '</option>');
+                });
+                sitioDropdown.append('<option value="None">None</option>');
+            },
+            error: function(error) {
+                console.error('Error fetching Sitios:', error);
+            }
+        });
+    });
+</script>
 {% endblock %}
