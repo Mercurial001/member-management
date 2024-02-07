@@ -62,6 +62,9 @@ class Cluster(models.Model):
     leader = models.ForeignKey(Leader, related_name='cluster_leader', on_delete=models.CASCADE)
     members = models.ManyToManyField(Member, related_name='cluster_member')
 
+    def __str__(self):
+        return self.leader.name
+
 
 class AddedLeaders(models.Model):
     leader = models.CharField(max_length=255)

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm, AddMemberRegistrationForm, \
-    ChangeBarangayNameForm, AddSitioForm
+    ChangeBarangayNameForm, AddSitioForm, LeaderRegistrationEditForm
 from django.contrib import messages
 from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual
 from django.db.models import Sum, Count, Q
@@ -250,7 +250,7 @@ def leader_cluster(request, name):
     img.save(f'management/static/images/qr-codes/QR-Code-{leader.name}-{leader.brgy}-{leader.id}.png')
 
     member_registration_form = MemberRegistrationForm()
-    edit_leader_profile_form = LeaderRegistrationForm(instance=leader)
+    edit_leader_profile_form = LeaderRegistrationEditForm(instance=leader)
 
     if request.method == 'POST':
         if 'add-new-member-btn' in request.POST:
@@ -276,11 +276,18 @@ def leader_cluster(request, name):
 
                 messages.success(request, 'Member Added')
         elif 'edit-leader-profile-btn' in request.POST:
-            edit_profile_leader_profile_form = LeaderRegistrationForm(request.POST, request.FILES, instance=leader)
+            edit_profile_leader_profile_form = LeaderRegistrationEditForm(request.POST, request.FILES, instance=leader)
             if edit_profile_leader_profile_form.is_valid():
+
+                # external_data
+                edit_selected_sitio = request.POST.get('leader-profile-edit-sitio')
+                selected_sitio_edit = Sitio.objects.get(id=edit_selected_sitio)
+
                 leader_profile = edit_profile_leader_profile_form.save(commit=False)
+                leader_profile.sitio = selected_sitio_edit
                 leader_profile.save()
                 messages.success(request, 'Editted!')
+                return redirect('cluster', name=leader_profile.name)
 
     return render(request, 'leader_cluster.html', {
         'leader': leader,
@@ -500,7 +507,7 @@ def member_profile(request, name, id):
     member = Member.objects.get(id=id, name=name)
     members = Cluster.objects.values('members__name')
     leaders = Leader.objects.filter(brgy=member.brgy)
-
+    get_member_leader = Cluster.objects.filter(members__name=member.name)
     no_leader_member_list = [name['members__name'] for name in members]
 
     # Create QR Code for each user
@@ -532,6 +539,7 @@ def member_profile(request, name, id):
         'no_leader_member_list': no_leader_member_list,
         'leaders': leaders,
         'encrypted_data': encrypted_data,
+        'get_member_leader': get_member_leader,
     })
 
 
@@ -616,6 +624,16 @@ def get_filtered_sitios(request):
     selected_brgy = request.GET.get('barangay')
     if selected_brgy:
         sitios = Sitio.objects.filter(brgy__brgy_name=selected_brgy)
+        serialized_sitios = [{'id': sitio.id, 'name': sitio.name} for sitio in sitios]
+        return JsonResponse(serialized_sitios, safe=False)
+    else:
+        return JsonResponse([], safe=False)
+
+
+def get_filtered_sitios_edit_leader_profile(request):
+    selected_brgy = request.GET.get('barangay')
+    if selected_brgy:
+        sitios = Sitio.objects.filter(brgy__id=selected_brgy)
         serialized_sitios = [{'id': sitio.id, 'name': sitio.name} for sitio in sitios]
         return JsonResponse(serialized_sitios, safe=False)
     else:

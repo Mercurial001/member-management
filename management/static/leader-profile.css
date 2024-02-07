@@ -150,7 +150,8 @@
 }
 
 .leader-profile-qr-code-container-div{
-    margin-top: 100px;
+    margin-top: 50px;
+    margin-bottom: 50px;
     margin-left: 50px;
     width: 75%;
     text-align: center;
@@ -288,7 +289,32 @@
 .leader-profile-edit-profile-form-container{
     position: fixed;
     z-index: 20;
+    top: -500px;
     right: 0;
+    transition: 1s all ease;
+    font-family: 'Montserrat';
+    background-color: rgb(255,255,255);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.leader-profile-edit-form-header-title-container-div{
+    background-color: rgb(20, 50, 50);
+    color: beige;
+    padding: 10px
+}
+
+#leader-profile-edit-form-header-title-left{
+    margin-right: 50px;
+}
+
+.leader-profile-edit-form-container-div{
+    padding: 10px;
+
+}
+
+.show-leader-edit-form{
     top: 0;
 }
 
@@ -296,4 +322,46 @@
     float: right;
     margin-right: 20px;
     cursor: pointer;
+}
+
+.leader-profile-hide-edit-form-btn{
+    cursor: pointer;
+}
+
+.edit-leader-field{
+    border: none;
+    border-bottom: 1px solid rgb(100, 100, 100);
+    background: none;
+    width: 90%;
+}
+
+.edit-leader-field:focus{
+    outline: none;
+}
+
+.leader-profile-edit-leader-profile-btn-container-div{
+    text-align: center;
+}
+
+.leader-profile-edit-leader-profile-btn{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    font-family: 'Montserrat';
+    cursor: pointer;
+    border-radius: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: 10px;
+    border: none;
+}
+
+.leader-profile-no-member-notifier-div{
+    color: rgb(150, 150, 150);
+    font-family: 'Impact';
+    font-size: 60px;
+    transform: rotate(-45deg);
+    transform-origin: 100% 100%;
+    margin-right: 50px;
 }

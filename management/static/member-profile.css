@@ -1,0 +1,169 @@
+.member-profile-page-title-upper-bar{
+    font-family: 'Montserrat';
+    text-align: center;
+    background-color: rgb(255,255,255);
+    position: fixed;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    width: 80%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    z-index: 10;
+}
+
+.member-profile-showcase-div{
+    margin: auto;
+    width: 90%;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    padding-top: 100px;
+    padding-bottom: 80px;
+}
+
+.member-profile-showcase-member-name{
+    font-family: 'Montserrat';
+    font-size: 40px;
+    color: rgb(100, 100, 100);
+    margin: 50px;
+}
+
+.member-profile-member-image-container-div{
+    margin: auto;
+    width: 100%;
+    text-align: center;
+}
+
+.member-profile-profile-img-container{
+    margin-right: 180px;
+    margin-top: -80px;
+}
+
+.member-profile-profile-image{
+    position: absolute;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    box-shadow:
+        5px -5px 10px rgba(0, 0, 0, 0.2),   /* Top-left */
+        -5px -5px 10px rgba(0, 0, 0, 0.2);  /* Top-right */
+}
+
+.member-profile-details-container-div{
+    background-color: red;
+    width: 100%;
+}
+
+#member-profile-detail-float-right{
+    float: right;
+    margin-right: 40px;
+    margin-top: 25px;
+}
+
+#member-profile-detail-float-left{
+    float: left;
+    margin-left: 50px;
+    margin-top: 10px;
+}
+
+.member-profile-detail{
+    font-family: 'Montserrat';
+    margin: 10px;
+}
+
+.member-profile-no-image-member-div{
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    border: 8px solid rgb(100, 140, 140);
+    box-shadow:
+        5px -5px 10px rgba(100, 100, 100, 0.5),
+        -5px -5px 10px rgba(100, 100, 100, 0.5);
+        background-color: rgb(200, 200, 200);
+    font-size: 120px;
+    color: rgb(100, 100, 100);
+}
+
+#member-profile-member-default-img{
+    position: absolute;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    box-shadow:
+        5px -5px 10px rgba(0, 0, 0, 0.2),   /* Top-left */
+        -5px -5px 10px rgba(0, 0, 0, 0.2);  /* Top-right */
+    background-color: rgb(200, 200, 200);
+    border: 10px solid rgb(50, 100, 100);
+    font-size: 100px;
+    color: rgb(150, 150, 150);
+    padding: 10px;
+}
+
+.member-profile-no-profile-img-container{
+    margin-right: 140px;
+    margin-top: -80px;
+}
+
+.member-profile-left-block-container-div{
+    float: left;
+}
+
+.member-profile-qr-code-container-div{
+    margin-left: 80px;
+    width: 100%;
+    text-align: center;
+    border: 1px solid rgb(100, 150, 150);
+    border-radius: 15px;
+    margin-bottom: 50px;
+}
+
+.member-profile-member-qr-code-title-header{
+    font-family: 'Montserrat';
+    background-color: rgb(10, 40, 40);
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    color: beige;
+}
+
+.member-profile-qr-code{
+    height: 250px;
+    width: 250px;
+}
+
+.member-profile-right-block-container-div{
+    float: right;
+}
+
+.member-profile-member-affiliation-block-div{
+    margin-right: 100px;
+}
+
+.member-profile-member-not-affiliated-heading-message-div{
+    font-family: 'Impact';
+    color: rgb(120, 20, 20);
+    font-size: 20px;
+}
+
+.member-profile-leaders-brgy-message-div{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    font-family: 'Montserrat';
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    text-align: center;
+}
+
+.member-profile-unaffiliated-member-leaders{
+    height: 250px;
+    overflow-y: scroll;
+    padding: 10px;
+    border: 1px solid rgb(100, 100, 100);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}

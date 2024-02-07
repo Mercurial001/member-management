@@ -53,6 +53,26 @@ class LeaderRegistrationForm(ModelForm):
         }
 
 
+class LeaderRegistrationEditForm(ModelForm):
+    class Meta:
+        model = Leader
+        fields = ['name', 'brgy', 'gender', 'age', 'image']
+        widgets = {
+            'name': TextInput(attrs={
+                'class': "edit-leader-field",
+            }),
+            'gender': Select(attrs={
+                'class': "edit-leader-field",
+            }),
+            'brgy': Select(attrs={
+                'class': "edit-leader-field",
+                'id': 'leader-edit-brgys',
+            }),
+            'age': NumberInput(attrs={
+                'class': "edit-leader-field",
+            }),
+        }
+
 class MemberRegistrationForm(ModelForm):
     class Meta:
         model = Member
