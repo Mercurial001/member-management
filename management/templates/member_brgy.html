@@ -152,7 +152,9 @@
                     <div class="brgy-profile-details-div">
                         {% for member in member_brgy %}
                             <div class="brgy-profile-data-detail">
-                                <a class="brgy-profile-link-page" href="{% url 'member-profile' member.name %}">{{ member.name }}</a>
+                                <a class="brgy-profile-link-page" href="{% url 'member-profile' member.name member.id %}">
+                                    {{ member.name }}
+                                </a>
                             </div>
                         {% empty %}
                             <div class="brgy-profile-empty-detail-notifier">

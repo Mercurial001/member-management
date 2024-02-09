@@ -44,12 +44,16 @@ urlpatterns = [
     path('promote/<str:name>/', views.promote_to_leader, name='promote-member-to-leader'),
     path('add-sitio/', views.add_sitio, name='add-sitio'),
     path('get_filtered_sitios/', views.get_filtered_sitios, name='get_filtered_sitios'),
-    path('get-filtered-sitios-edit-leader-profile/', views.get_filtered_sitios_edit_leader_profile,
-         name='get-filtered-sitios-edit-leader'),
+    path('get_filtered_sitios_using_brgy_id/', views.get_filtered_sitios_using_brgy_id,
+         name='get-filtered-sitios-using-brgy-id'),
     path('get_filtered_leaders/', views.get_filtered_leaders, name='get_filtered_leaders'),
     path('login/', views.authentication, name='login'),
     path('logout/', views.logout_user, name='logout'),
-    path('create-individuals/', views.create_individuals, name='create-individuals')
+    path('create-individuals/', views.create_individuals, name='create-individuals'),
+    path('registration/', views.registration_validation, name='registration'),
+    path('registrants/', views.registrants, name='registrants'),
+    path('create-json/', views.create_json, name='create-json'),
+    path('load-json/', views.load_json, name='load-json'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

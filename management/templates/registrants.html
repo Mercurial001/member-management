@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    {% for registrant in registrant_objects %}
+        <div>
+            {{ registrant.username }}
+        </div>
+        <div>
+            {{ registrant.name }}
+        </div>
+        <div>
+            {{ registrant.brgy }}
+        </div>
+        <div>
+            {{ registrant.sitio }}
+        </div>
+        <div>
+            {{ registrant.gender }}
+        </div>
+        <div>
+            {{ registrant.age }}
+        </div>
+        <div class="leader-profile-leader-profile-photo-container-div">
+            {% if registrant.image %}
+                <div class="leader-profile-photo-image-div">
+                    <img class="leader-profile-leader-image-photo"
+                         id="leader-profile-leader-image-photo"
+                         src="{{ registrant.image.url }}"
+                    >
+                </div>
+            {% else %}
+                <div class="leader-profile-no-leader-image-div">
+                    <i id="leader-profile-default-img" class="fa fa-user" aria-hidden="true"></i>
+                </div>
+            {% endif %}
+        </div>
+    {% empty %}
+        No registrants
+    {% endfor %}
+{% endblock %}

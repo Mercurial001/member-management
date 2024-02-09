@@ -8,6 +8,11 @@ from .models import AddedMembers
 from .models import AddedLeaders
 from .models import Sitio
 from .models import Individual
+from .models import Registrants
+
+
+class RegistrantsAdmin(admin.ModelAdmin):
+    list_display = ('username', 'name', 'brgy', 'sitio')
 
 
 class IndividualAdmin(admin.ModelAdmin):
@@ -46,6 +51,7 @@ class CLusterAdmin(admin.ModelAdmin):
     list_display = ('leader',)
 
 
+admin.site.register(Registrants, RegistrantsAdmin)
 admin.site.register(Individual, IndividualAdmin)
 admin.site.register(Sitio, SitioAdmin)
 admin.site.register(AddedLeaders, AddedLeadersAdmin)

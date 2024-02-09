@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import Group, User
 
 
 class Gender(models.Model):
@@ -33,6 +34,7 @@ class Sitio(models.Model):
 
 
 class Leader(models.Model):
+    # user = models.ForeignKey(User, related_name='leader_user', on_delete=models.CASCADE) # Added for version 2, 2/9/2024
     name = models.CharField(max_length=255)
     gender = models.ForeignKey(Gender, related_name='leader_gender', on_delete=models.CASCADE)
     age = models.IntegerField()
@@ -46,6 +48,7 @@ class Leader(models.Model):
 
 
 class Member(models.Model):
+    # user = models.ForeignKey(User, related_name='member_user', on_delete=models.CASCADE) # Added for version 2, 2/9/2024
     name = models.CharField(max_length=255)
     gender = models.ForeignKey(Gender, related_name='member_gender', on_delete=models.CASCADE)
     age = models.IntegerField()
@@ -88,3 +91,18 @@ class Individual(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# Added 2/9/2024 for Version 2
+class Registrants(models.Model):
+    username = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    email = models.EmailField()
+    date = models.DateField()
+    date_time = models.DateTimeField()
+    brgy = models.ForeignKey(Barangay, on_delete=models.CASCADE)
+    sitio = models.ForeignKey(Sitio, on_delete=models.CASCADE)
+    age = models.IntegerField()
+    gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="images/")

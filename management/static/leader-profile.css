@@ -365,3 +365,7 @@
     transform-origin: 100% 100%;
     margin-right: 50px;
 }
+
+#leader-profile-edit-form-header-title-right{
+    float: right;
+}

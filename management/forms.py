@@ -1,9 +1,11 @@
-from .models import Gender, Barangay, Leader, Member, Cluster, Barangay, Sitio
+from .models import Gender, Barangay, Leader, Member, Cluster, Barangay, Sitio, Registrants
 from django.forms import Select, DateInput, Textarea, TextInput, ModelForm, SelectMultiple, NumberInput
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.contrib.auth import password_validation
+from django.utils.translation import gettext_lazy as _
 
 
 class AddSitioForm(ModelForm):
@@ -73,6 +75,7 @@ class LeaderRegistrationEditForm(ModelForm):
             }),
         }
 
+
 class MemberRegistrationForm(ModelForm):
     class Meta:
         model = Member
@@ -86,6 +89,27 @@ class MemberRegistrationForm(ModelForm):
             }),
             'age': NumberInput(attrs={
                 'class': "add-new-member-in-leader-field-min",
+            }),
+        }
+
+
+class MemberRegistrationEditForm(ModelForm):
+    class Meta:
+        model = Member
+        fields = ['name', 'gender', 'age', 'brgy', 'image']
+        widgets = {
+            'name': TextInput(attrs={
+                'class': "edit-leader-field",
+            }),
+            'gender': Select(attrs={
+                'class': "edit-leader-field",
+            }),
+            'age': NumberInput(attrs={
+                'class': "edit-leader-field",
+            }),
+            'brgy': Select(attrs={
+                'class': "edit-leader-field",
+                'id': 'member-edit-brgys',
             }),
         }
 
@@ -131,3 +155,32 @@ class BarangayForm(ModelForm):
         }
 
 
+# Added 2/9/2024 for Version 2
+
+
+class RegistrantsForm(ModelForm):
+    password1 = forms.CharField(
+        label=_("Password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
+                                          'class': 'registration_validation_field',
+                                          'placeholder': 'Password'}),
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    password2 = forms.CharField(
+        label=_("Password confirmation"),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
+                                          'class': 'registration_validation_field',
+                                          'placeholder': 'Confirm Password'}),
+        strip=False,
+    )
+
+    class Meta:
+        model = Registrants
+        fields = ['username', 'name', 'email', 'brgy', 'age', 'gender', 'image']
+        widgets = {
+            'brgy': Select(attrs={
+                'class': "registration-field",
+                'id': 'registration-brgy-field',
+            }),
+        }

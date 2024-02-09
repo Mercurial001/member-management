@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm, AddMemberRegistrationForm, \
-    ChangeBarangayNameForm, AddSitioForm, LeaderRegistrationEditForm
+    ChangeBarangayNameForm, AddSitioForm, LeaderRegistrationEditForm, MemberRegistrationEditForm, RegistrantsForm
 from django.contrib import messages
-from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual
+from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants
 from django.db.models import Sum, Count, Q
-
+from django.contrib.auth.models import Group, User
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponseRedirect
 import qrcode
 from cryptography.fernet import Fernet
@@ -17,6 +18,8 @@ from django.db import models
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .decorators import authenticated_user
+from django.utils import timezone
+from django.core.serializers import serialize, deserialize
 
 
 @login_required(login_url='login')
@@ -281,10 +284,13 @@ def leader_cluster(request, name):
 
                 # external_data
                 edit_selected_sitio = request.POST.get('leader-profile-edit-sitio')
-                selected_sitio_edit = Sitio.objects.get(id=edit_selected_sitio)
 
                 leader_profile = edit_profile_leader_profile_form.save(commit=False)
-                leader_profile.sitio = selected_sitio_edit
+                if edit_selected_sitio != 'None':
+                    selected_sitio_edit = Sitio.objects.get(id=edit_selected_sitio)
+                    leader_profile.sitio = selected_sitio_edit
+                else:
+                    leader_profile.sitio = None
                 leader_profile.save()
                 messages.success(request, 'Editted!')
                 return redirect('cluster', name=leader_profile.name)
@@ -510,6 +516,8 @@ def member_profile(request, name, id):
     get_member_leader = Cluster.objects.filter(members__name=member.name)
     no_leader_member_list = [name['members__name'] for name in members]
 
+    sitios = Sitio.objects.filter(brgy=member.brgy)
+
     # Create QR Code for each user
     qr = qrcode.QRCode(
         version=1,
@@ -533,6 +541,18 @@ def member_profile(request, name, id):
     img = qr.make_image(fill_color="black", back_color="white")
 
     img.save(f'management/static/images/qr-codes/QR-Code-{member.name}-{member.brgy}-{member.id}.png')
+    edit_member_detail_form = MemberRegistrationEditForm(instance=member)
+    if request.method == 'POST':
+        form = MemberRegistrationEditForm(request.POST, request.FILES, instance=member)
+        if form.is_valid():
+            edited_member = form.save(commit=False)
+
+            # External Data
+            selected_sitio = request.POST.get('member-edit-sitio')
+            member_sitio = Sitio.objects.get(id=selected_sitio)
+            edited_member.sitio = member_sitio
+            edited_member.save()
+            return redirect('member-profile', name=edited_member.name, id=member.id)
 
     return render(request, 'member_profile.html', {
         'member': member,
@@ -540,6 +560,8 @@ def member_profile(request, name, id):
         'leaders': leaders,
         'encrypted_data': encrypted_data,
         'get_member_leader': get_member_leader,
+        'edit_member_detail_form': edit_member_detail_form,
+        "sitios": sitios,
     })
 
 
@@ -630,7 +652,7 @@ def get_filtered_sitios(request):
         return JsonResponse([], safe=False)
 
 
-def get_filtered_sitios_edit_leader_profile(request):
+def get_filtered_sitios_using_brgy_id(request):
     selected_brgy = request.GET.get('barangay')
     if selected_brgy:
         sitios = Sitio.objects.filter(brgy__id=selected_brgy)
@@ -795,5 +817,101 @@ def create_individuals(request):
         )
 
         individual_member.save()
+
+    return redirect('homepage')
+
+
+# Added 2/9/2024 for Version 2, registration_validation, registrants, confirm_registration_member
+
+
+def registration_validation(request):
+    current_date = timezone.now()
+    registrant_form = RegistrantsForm()
+    if request.method == 'POST':
+        form = RegistrantsForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            registrant = form.save(commit=False)
+
+            sitio_id = request.POST.get('registrant-sitio')
+            selected_sitio = Sitio.objects.get(id=sitio_id)
+
+            password1 = form.cleaned_data['password1']
+            password2 = form.cleaned_data['password2']
+            if User.objects.filter(email=registrant.email).exists() or\
+                    Registrants.objects.filter(email=registrant.email).exists():
+                messages.error(request, 'Email Already Exists')
+
+            if password1 == password2 and not User.objects.filter(email=registrant.email).exists() and not \
+                    Registrants.objects.filter(email=registrant.email).exists():
+
+                hashed_password = make_password(password1)
+
+                registrant.password = hashed_password
+                registrant.date = current_date
+                registrant.date_time = current_date
+                registrant.sitio = selected_sitio
+
+                registrant.save()
+                messages.success(request, 'Works')
+                return redirect('homepage')
+
+            elif password1 != password2:
+                messages.error(request, 'Password not the same')
+
+            if User.objects.filter(username=registrant.username).exists() or \
+                    Registrants.objects.filter(username=registrant.username).exists():
+                messages.error(request, 'Username Already Exists')
+
+    return render(request, 'registrations.html', {
+        'registrant_form': registrant_form,
+    })
+
+
+def registrants(request):
+    registrant_objects = Registrants.objects.all()
+    return render(request, 'registrants.html', {
+        'registrant_objects': registrant_objects,
+    })
+
+
+# def confirm_registration_member(request, username):
+#     registrant = Registrants.objects.get(username=username)
+#
+#     # Create A User object
+#
+#     user, created = User.objects.get_or_create(
+#         username=registrant.username,
+#         email=registrant.email,
+#         password=registrant.password,
+#     )
+
+
+def create_json(request):
+    member_objects = Member.objects.all()
+    leader_objects = Leader.objects.all()
+    individual_objects = Individual.objects.all()
+    
+    serialized_members = serialize('json', member_objects)
+    serialized_leaders = serialize('json', leader_objects)
+    serialized_individual = serialize('json', individual_objects)
+
+    # Write the serialized data into a JSON file
+    with open('Member_model.json', 'w') as f:
+        f.write(serialized_members)
+
+    with open('Leader_model.json', 'w') as f:
+        f.write(serialized_leaders)
+
+    with open('Individual_model.json', 'w') as f:
+        f.write(serialized_individual)
+
+    return redirect('homepage')
+
+
+def load_json(request):
+    with open('Individual_model.json', 'r') as f:
+        for obj in deserialize('json', f):
+            obj.save()
 
     return redirect('homepage')

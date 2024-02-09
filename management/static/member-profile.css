@@ -109,6 +109,7 @@
 }
 
 .member-profile-qr-code-container-div{
+    margin-top: 20px;
     margin-left: 80px;
     width: 100%;
     text-align: center;
@@ -166,4 +167,132 @@
     border: 1px solid rgb(100, 100, 100);
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
+}
+
+.member-profile-unaffiliated-member-leader{
+    font-family: 'Montserrat';
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin: 10px;
+    width: 94%;
+    height: 70px;
+    border-radius: 10px;
+}
+
+.member-profile-unaffiliated-member-leader-profile-img{
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    margin: 10px;
+    float: left;
+}
+
+#member-profile-unaffiliated-member-leader-default-profile-img{
+    margin-top: 8px;
+    margin-left: 12px;
+    font-size: 30px;
+    color: rgb(150, 150, 150);
+}
+
+.member-profile-leader-no-img-container-span{
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    background-color: rgb(100, 100, 100);
+    margin: 10px;
+    float: left;
+}
+
+.member-profile-unaffiliated-member-leader-name-div{
+    margin-top: 25px;
+    float: left;
+}
+
+.member-profile-assign-member-to-leader-btn-container-div{
+    float: right;
+    margin-right: 20px;
+    margin-top: 27px;
+}
+
+.member-profile-member-associated-leader-container-div{
+    font-family: 'Montserrat';
+}
+
+.member-profile-associated-member-header-title{
+    font-size: 40px;
+    color: rgb(100, 100, 100);
+    text-align: center;
+    margin: 20px;
+}
+
+.member-profile-member-associated-leader-container{
+    width: 300px;
+    height: 200px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.member-profile-member-associated-leader-profile-img{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 20px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.member-profile-edit-member-data-form-container-div{
+    width: 250px;
+    position: fixed;
+    z-index: 20;
+    top: -500px;
+    right: 0;
+    transition: 1s all ease;
+    font-family: 'Montserrat';
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background-color: rgb(255,255,255);
+}
+
+.member-profile-edit-member-data-form-container-div-show{
+    top: 0px;
+}
+
+.member-profile-edit-form-container{
+    padding-right: 20px;
+    padding-left: 20px;
+    background-color: rgb(255,255,255);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    z-index: 20;
+}
+
+.member-profile-edit-detail-form-header{
+    background-color: rgb(10, 40, 40);
+    color:beige;
+    padding-left: 10px;
+    padding-top: 15px;
+    padding-right: 10px;
+    padding-bottom: 15px;
+}
+
+.member-profile-edit-member-data-btn-container{
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.member-profile-edit-detail-toggle-btn{
+    float: right;
+    color: rgb(100, 100, 100);
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.member-profile-hide-edit-form-btn{
+    float: right;
+    color: beige;
+    margin-right: 10px;
+    cursor: pointer;
 }

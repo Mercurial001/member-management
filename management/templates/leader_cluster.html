@@ -67,6 +67,14 @@
                             {{ edit_leader_profile_form.gender }}
                         </div>
                     </div>
+                    <div class="leader-profile-edit-form-field-and-label-container">
+                        <div class="leader-profile-edit-form-label-div">
+                            Image
+                        </div>
+                        <div class="leader-profile-edit-field-div">
+                            {{ edit_leader_profile_form.image }}
+                        </div>
+                    </div>
                     <div class="leader-profile-edit-leader-profile-btn-container-div">
                         <button class="leader-profile-edit-leader-profile-btn" name="edit-leader-profile-btn" type="submit">Save Changes</button>
                     </div>
@@ -252,7 +260,7 @@
         var selectedValue = this.value;
         console.log(selectedValue);
         $.ajax({
-            url: '/get-filtered-sitios-edit-leader-profile/',  // Update with your actual URL
+            url: '/get_filtered_sitios_using_brgy_id/',  // Update with your actual URL
             method: 'GET',
             data: { barangay: selectedValue },
             success: function(data) {
