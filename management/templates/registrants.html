@@ -6,6 +6,12 @@
 
     {% for registrant in registrant_objects %}
         <div>
+            <a href="{% url 'confirm-member' registrant.username %}">Verify as Member</a>
+        </div>
+        <div>
+            <a href="{% url 'confirm-leader' registrant.username %}">Verify as Leader</a>
+        </div>
+        <div>
             {{ registrant.username }}
         </div>
         <div>

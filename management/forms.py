@@ -1,5 +1,5 @@
 from .models import Gender, Barangay, Leader, Member, Cluster, Barangay, Sitio, Registrants
-from django.forms import Select, DateInput, Textarea, TextInput, ModelForm, SelectMultiple, NumberInput
+from django.forms import Select, DateInput, Textarea, TextInput, ModelForm, SelectMultiple, NumberInput, EmailInput, FileInput
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth.models import User
@@ -163,14 +163,14 @@ class RegistrantsForm(ModelForm):
         label=_("Password"),
         strip=False,
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
-                                          'class': 'registration_validation_field',
+                                          'class': 'registration_field',
                                           'placeholder': 'Password'}),
         help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
         label=_("Password confirmation"),
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
-                                          'class': 'registration_validation_field',
+                                          'class': 'registration_field',
                                           'placeholder': 'Confirm Password'}),
         strip=False,
     )
@@ -178,8 +178,39 @@ class RegistrantsForm(ModelForm):
     class Meta:
         model = Registrants
         fields = ['username', 'name', 'email', 'brgy', 'age', 'gender', 'image']
+
+        def clean_email(self):
+            email = self.cleaned_data.get('email')
+            if not email or '@' not in email:
+                raise ValidationError('Invalid Email Format')
+            return email
+
         widgets = {
             'brgy': Select(attrs={
+                'class': "registration-field",
+                'id': 'registration-brgy-field',
+            }),
+            'username': TextInput(attrs={
+                'class': "registration-field",
+                'id': 'registration-brgy-field',
+            }),
+            'name': TextInput(attrs={
+                'class': "registration-field",
+                'id': 'registration-brgy-field',
+            }),
+            'email': EmailInput(attrs={
+                'class': "registration-field",
+                'id': 'registration-brgy-field',
+            }),
+            'age': NumberInput(attrs={
+                'class': "registration-field",
+                'id': 'registration-brgy-field',
+            }),
+            'gender': Select(attrs={
+                'class': "registration-field",
+                'id': 'registration-brgy-field',
+            }),
+            'image': FileInput(attrs={
                 'class': "registration-field",
                 'id': 'registration-brgy-field',
             }),

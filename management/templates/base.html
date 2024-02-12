@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     {% load static %}
+    {% load humanize %}
     <meta charset="UTF-8">
     <title>Member Management</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
@@ -21,10 +22,12 @@
     <link rel="stylesheet" href="{% static 'cluster.css' %}">
     <link rel="stylesheet" href="{% static 'leader-profile.css' %}">
     <link rel="stylesheet" href="{% static 'member-profile.css' %}">
+    <link rel="stylesheet" href="{% static 'registrants.css' %}">
     <!-- Add this to include Swiper.js -->
-    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+<!--    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->
+    <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
     <script src="{% static 'chart.js' %}"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{% static 'swiper-bundle.min.js' %}"></script>
 </head>
 <body>
     <header id="main-header">
@@ -86,22 +89,23 @@
                         </div>
                     </a>
                 </li>
+                <!-- Commented 2/11/2024 for V.2 -->
+<!--                <li class="home-header-nav-link">-->
+<!--                    <a class="home-link-to-page" href="{% url 'add-leader' %}">-->
+<!--                        <div class="home-link-icon-container">-->
+<!--                           <div class="home-link-icon-div">-->
+<!--                               <i class="fas fa-user-tie" aria-hidden="true"></i>-->
+<!--                           </div>-->
+<!--                        </div>-->
+<!--                        <div class="home-link-icon-container">-->
+<!--                            <div class="home-link-name">-->
+<!--                                Add Leader-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </a>-->
+<!--                </li>-->
                 <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'add-leader' %}">
-                        <div class="home-link-icon-container">
-                           <div class="home-link-icon-div">
-                               <i class="fas fa-user-tie" aria-hidden="true"></i>
-                           </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Add Leader
-                            </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'add-members' %}">
+                    <a class="home-link-to-page" href="{% url 'registrants' %}">
                         <div class="home-link-icon-container">
                             <div class="home-link-icon-div">
                                 <i class="fas fa-user-plus" aria-hidden="true"></i>
@@ -109,7 +113,7 @@
                         </div>
                         <div class="home-link-icon-container">
                             <div class="home-link-name">
-                                Add Member
+                                Registrants
                             </div>
                         </div>
                     </a>
@@ -127,6 +131,48 @@
                             </div>
                         </div>
                     </a>
+                </li>
+                <li class="home-header-nav-link">
+                    <div class="main-header-link-container-div" id="notification-toggle">
+                        <div class="notification-counter-div">
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-bell" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Notification
+                            </div>
+                        </div>
+                    </div>
+                    {% csrf_token %}
+                    <div class="notification-list" id="notification-list">
+                        {% for notification in notifications %}
+                            <div class="notification">
+                                <div class="notification-title">
+                                    {{ notification.title }}
+                                </div>
+                                <div class="notification-date-time">
+                                    {{ notification.date_time | naturaltime }}
+                                </div>
+                                <div class="notification-message">
+                                    {{ notification.message }}
+                                </div>
+                                <div class="notification-delete-div">
+                                    <a class="notification-delete"
+                                       href="{% url 'delete-notification' notification.title notification.id %}">
+                                        Remove Notification
+                                    </a>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="notification-empty-notifier">
+                                No Notification
+                            </div>
+                        {% endfor %}
+                    </div>
                 </li>
                 <li class="home-header-nav-link">
                     <a class="home-link-to-page" href="{% url 'logout' %}">
@@ -231,5 +277,109 @@
         {% endblock %}
     </section>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const notificationToggle = document.querySelector('#notification-toggle');
+            const notificationList = document.querySelector('.notification-list');
+
+            notificationToggle.addEventListener('click', () =>{
+                notificationList.classList.toggle('notification-list-show');
+                console.log('works');
+
+                fetch('/seen-notifications/')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Notifications marked as seen:', data);
+                        // You can perform additional actions based on the response if needed
+                    })
+                    .catch(error => console.error('Error marking notifications as seen:', error));
+                    });
+        });
+
+        $(document).on('click', '.notification-delete', function() {
+            // Get notification details from the data attributes
+            var title = $(this).data('title');
+            var id = $(this).data('id');
+            var deleteUrl = '/delete-notification/' + title + '/' + id + '/';
+
+            // Make an AJAX request to remove the notification
+            $.ajax({
+                url: deleteUrl,
+                type: 'POST',
+                data: {title: title, id: id, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val() },
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response.message);
+                    // Remove the notification from the UI if removal is successful
+                    $(this).closest('.notification').remove();
+                },
+                error: function(error) {
+                    console.error('Failed to remove notification', error);
+                }
+            });
+        });
+
+        setInterval(function() {
+            $.ajax({
+                url: '{% url "notifications" %}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    var expiredProducts = response.expired_products;
+                    var expiringProducts = response.expiring_products;
+                    var notifications = response.notification;
+                    $('.notification-counter-div').empty();
+
+                    $('#notification-list').empty();
+
+                    if (notifications.length === 0) {
+                        var emptyNotifier =
+                        `
+                            <div class="notification-empty-notifier">
+                                No Notification
+                            </div>
+                        `;
+                        $('#notification-list').html(emptyNotifier);
+                    } else {
+                        for (var i = 0; i < notifications.length; i++) {
+                            var notification = notifications[i];
+                            var notificationCounter =
+                            `
+                                <div class="notification-counter">
+                                    ${notification.unseen}
+                                </div>
+                            `;
+                            var notificationHtml =
+                            `
+                                <div class="notification">
+                                    <div class="notification-title">
+                                        ${notification.title}
+                                    </div>
+                                    <div class="notification-date-time">
+                                        ${notification.time}
+                                    </div>
+                                    <div class="notification-message">
+                                        ${notification.message}
+                                    </div>
+                                    <div class="notification-delete-div">
+                                        <a class="notification-delete" data-title="${notification.title}" data-id="${notification.id}">
+                                            Remove Notification
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                            if (notification.unseen !== null) {
+                                $('.notification-counter-div').append(notificationCounter)
+                            } else {
+                                $('.notification-counter-div').empty();
+                            };
+                            $('#notification-list').append(notificationHtml);
+                        }
+                    }
+                }
+            });
+        }, 1000);
+    </script>
 </body>
 </html>

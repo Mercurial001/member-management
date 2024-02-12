@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm, AddMemberRegistrationForm, \
     ChangeBarangayNameForm, AddSitioForm, LeaderRegistrationEditForm, MemberRegistrationEditForm, RegistrantsForm
 from django.contrib import messages
-from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants
+from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants, \
+    Notification
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
@@ -20,6 +21,9 @@ from django.contrib.auth.decorators import login_required
 from .decorators import authenticated_user
 from django.utils import timezone
 from django.core.serializers import serialize, deserialize
+from django.core.files.storage import default_storage
+import os
+from django.contrib.humanize.templatetags.humanize import naturaltime
 
 
 @login_required(login_url='login')
@@ -228,6 +232,47 @@ def leader_cluster(request, name):
     barangays = Barangay.objects.all()
     sitios = Sitio.objects.filter(brgy=leader.brgy)
     selected_sitio = request.POST.get('added-member-sitio')
+
+    leader_brgy_unassociated_members = Member.objects.filter(brgy=leader.brgy)
+
+    members_brgy = [member for member in leader_brgy_unassociated_members]
+
+    # First let's retrieve the search field in the base.html
+    search_engine_field_query = request.GET.get('search')
+
+    # Now that we have retrieve the search engine field in the base.html, it's time to delve into the login of it
+
+    if search_engine_field_query:
+        search_engine_result_member = Member.objects.filter(
+            Q(name__icontains=search_engine_field_query, brgy=leader.brgy) |
+            Q(sitio__name__icontains=search_engine_field_query, brgy=leader.brgy))
+
+        search_result_count_member = search_engine_result_member.annotate(count=Count('name'))
+        search_result_sum_member = search_result_count_member.aggregate(sum=Sum('count'))['sum']
+
+        if search_result_sum_member is None:
+            total_results = 0
+        else:
+            total_results = search_result_sum_member
+
+    else:
+        search_engine_result_member = []
+        total_results = []
+
+    brgy_members = Cluster.objects.all()
+    members_b = []
+    for members in brgy_members:
+        for member in members.members.all():
+            member_name = member.name
+            if member_name not in members_b:
+                members_b.append(member_name)
+
+    unassociated_members = []
+    for member in members_brgy:
+        member_name = member.name
+        if member_name not in members_b:
+            unassociated_members.append(member)
+
     # Create QR Code for each user
     qr = qrcode.QRCode(
         version=1,
@@ -256,44 +301,62 @@ def leader_cluster(request, name):
     edit_leader_profile_form = LeaderRegistrationEditForm(instance=leader)
 
     if request.method == 'POST':
-        if 'add-new-member-btn' in request.POST:
-            form = MemberRegistrationForm(request.POST, request.FILES)
-            if form.is_valid():
-                member = form.save(commit=False)
-                member.brgy = leader.brgy
-                if selected_sitio != 'None':
-                    print(f'Sitio: {selected_sitio}')
-                    member_sitio = Sitio.objects.get(id=selected_sitio)
-                    member.sitio = member_sitio
-                else:
-                    member.sitio = None
-                member.save()
+        # Added for V.2, 2/10/ 2024
+        edit_profile_leader_profile_form = LeaderRegistrationEditForm(request.POST, request.FILES, instance=leader)
+        if edit_profile_leader_profile_form.is_valid():
 
-                # Let's create a cluster object
-                cluster, created = Cluster.objects.get_or_create(leader=leader)
-                cluster.members.add(member)
-                cluster.save()
+            # external_data
+            edit_selected_sitio = request.POST.get('leader-profile-edit-sitio')
 
-                member_added_obj, created = AddedMembers.objects.get_or_create(member=member.name)
-                member_added_obj.save()
+            leader_profile = edit_profile_leader_profile_form.save(commit=False)
+            if edit_selected_sitio != 'None':
+                selected_sitio_edit = Sitio.objects.get(id=edit_selected_sitio)
+                leader_profile.sitio = selected_sitio_edit
+            else:
+                leader_profile.sitio = None
+            leader_profile.save()
+            messages.success(request, 'Editted!')
+            return redirect('cluster', name=leader_profile.name)
 
-                messages.success(request, 'Member Added')
-        elif 'edit-leader-profile-btn' in request.POST:
-            edit_profile_leader_profile_form = LeaderRegistrationEditForm(request.POST, request.FILES, instance=leader)
-            if edit_profile_leader_profile_form.is_valid():
-
-                # external_data
-                edit_selected_sitio = request.POST.get('leader-profile-edit-sitio')
-
-                leader_profile = edit_profile_leader_profile_form.save(commit=False)
-                if edit_selected_sitio != 'None':
-                    selected_sitio_edit = Sitio.objects.get(id=edit_selected_sitio)
-                    leader_profile.sitio = selected_sitio_edit
-                else:
-                    leader_profile.sitio = None
-                leader_profile.save()
-                messages.success(request, 'Editted!')
-                return redirect('cluster', name=leader_profile.name)
+        # Commented for V.2, 2/10/2024
+        # if 'add-new-member-btn' in request.POST:
+        #     form = MemberRegistrationForm(request.POST, request.FILES)
+        #     if form.is_valid():
+        #         member = form.save(commit=False)
+        #         member.brgy = leader.brgy
+        #         if selected_sitio != 'None':
+        #             print(f'Sitio: {selected_sitio}')
+        #             member_sitio = Sitio.objects.get(id=selected_sitio)
+        #             member.sitio = member_sitio
+        #         else:
+        #             member.sitio = None
+        #         member.save()
+        #
+        #         # Let's create a cluster object
+        #         cluster, created = Cluster.objects.get_or_create(leader=leader)
+        #         cluster.members.add(member)
+        #         cluster.save()
+        #
+        #         member_added_obj, created = AddedMembers.objects.get_or_create(member=member.name)
+        #         member_added_obj.save()
+        #
+        #         messages.success(request, 'Member Added')
+        # elif 'edit-leader-profile-btn' in request.POST:
+        #     edit_profile_leader_profile_form = LeaderRegistrationEditForm(request.POST, request.FILES, instance=leader)
+        #     if edit_profile_leader_profile_form.is_valid():
+        #
+        #         # external_data
+        #         edit_selected_sitio = request.POST.get('leader-profile-edit-sitio')
+        #
+        #         leader_profile = edit_profile_leader_profile_form.save(commit=False)
+        #         if edit_selected_sitio != 'None':
+        #             selected_sitio_edit = Sitio.objects.get(id=edit_selected_sitio)
+        #             leader_profile.sitio = selected_sitio_edit
+        #         else:
+        #             leader_profile.sitio = None
+        #         leader_profile.save()
+        #         messages.success(request, 'Editted!')
+        #         return redirect('cluster', name=leader_profile.name)
 
     return render(request, 'leader_cluster.html', {
         'leader': leader,
@@ -302,6 +365,12 @@ def leader_cluster(request, name):
         'sitios': sitios,
         'edit_leader_profile_form': edit_leader_profile_form,
         'barangays': barangays,
+        'brgy_members': brgy_members,
+        'members_b': members_b,
+        'unassociated_members': unassociated_members,
+        'search_engine_result_member': search_engine_result_member,
+        'search_engine_field_query': search_engine_field_query,
+        'total_results': total_results,
     })
 
 
@@ -834,7 +903,6 @@ def registration_validation(request):
             registrant = form.save(commit=False)
 
             sitio_id = request.POST.get('registrant-sitio')
-            selected_sitio = Sitio.objects.get(id=sitio_id)
 
             password1 = form.cleaned_data['password1']
             password2 = form.cleaned_data['password2']
@@ -850,9 +918,28 @@ def registration_validation(request):
                 registrant.password = hashed_password
                 registrant.date = current_date
                 registrant.date_time = current_date
-                registrant.sitio = selected_sitio
-
+                if sitio_id != 'None':
+                    selected_sitio = Sitio.objects.get(id=sitio_id)
+                    registrant.sitio = selected_sitio
+                else:
+                    registrant.sitio = None
                 registrant.save()
+
+                current_time = timezone.now()
+
+                # Format the current date and time as a string
+                formatted_time = current_time.strftime("%B %d, %Y")
+
+                registrant_notification, created = Notification.objects.get_or_create(
+                    title=f'Registrant {registrant.name} Unverified ',
+                    message=f'This is to notify you that a registrant, {registrant.name} '
+                            f'registered on {formatted_time} is awaiting verification',
+                    identifier=f'Registrant Verified as Member Identifier: {registrant.name}-{registrant.id}',
+                    date=timezone.now(),
+                    date_time=timezone.now(),
+                )
+                registrant_notification.save()
+
                 messages.success(request, 'Works')
                 return redirect('homepage')
 
@@ -862,6 +949,10 @@ def registration_validation(request):
             if User.objects.filter(username=registrant.username).exists() or \
                     Registrants.objects.filter(username=registrant.username).exists():
                 messages.error(request, 'Username Already Exists')
+
+        else:
+            # Handle form errors, including the email format error
+            messages.error(request, 'Invalid Form Submission. Check Your Email format')
 
     return render(request, 'registrations.html', {
         'registrant_form': registrant_form,
@@ -875,16 +966,151 @@ def registrants(request):
     })
 
 
-# def confirm_registration_member(request, username):
-#     registrant = Registrants.objects.get(username=username)
-#
-#     # Create A User object
-#
-#     user, created = User.objects.get_or_create(
-#         username=registrant.username,
-#         email=registrant.email,
-#         password=registrant.password,
-#     )
+def confirm_registration_member(request, username):
+    registrant = Registrants.objects.get(username=username)
+
+    new_filename = f"member-{registrant.username}"
+
+    # Save the image with the new filename
+    old_image_path = registrant.image.path
+    new_image_path = os.path.join(default_storage.location, new_filename)
+    default_storage.save(new_filename, default_storage.open(old_image_path))
+
+    # Create A User object
+
+    user, created = User.objects.get_or_create(
+        username=registrant.username,
+        email=registrant.email,
+        password=registrant.password,
+    )
+    user.save()
+
+    new_user = User.objects.get(username=user.username)
+
+    # Member objects creation
+    member, created_member = Member.objects.get_or_create(
+        user=new_user,
+        name=registrant.name,
+        gender=registrant.gender,
+        age=registrant.age,
+        brgy=registrant.brgy,
+        sitio=registrant.sitio,
+        image=new_filename,
+    )
+    member.save()
+
+    # create Individual object
+
+    individual, individual_created = Individual.objects.get_or_create(
+        user=new_user,
+        name=registrant.name,
+        gender=registrant.gender,
+        age=registrant.age,
+        brgy=registrant.brgy,
+        sitio=registrant.sitio,
+    )
+    individual.save()
+
+    current_time = timezone.now()
+
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+
+    member_verified_notification, created = Notification.objects.get_or_create(
+        title=f'Registrant {registrant.name} verified as Member ',
+        message=f'This is to notify you that the registrant, {registrant.name} '
+                f'has been verified as a member {formatted_time}',
+        identifier=f' Registrant Verified as Member Identifier: {registrant.name}-{registrant.id}',
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    member_verified_notification.save()
+
+    registrant.delete()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
+
+
+def confirm_registration_leader(request, username):
+    registrant = Registrants.objects.get(username=username)
+
+    new_filename = f"leader-{registrant.username}"
+
+    # Save the image with the new filename
+    old_image_path = registrant.image.path
+    new_image_path = os.path.join(default_storage.location, new_filename)
+    default_storage.save(new_filename, default_storage.open(old_image_path))
+
+    # Create A User object
+
+    user, created = User.objects.get_or_create(
+        username=registrant.username,
+        email=registrant.email,
+        password=registrant.password,
+    )
+    user.save()
+
+    new_user = User.objects.get(username=user.username)
+
+    # Member objects creation
+    leader, created_leader = Leader.objects.get_or_create(
+        user=new_user,
+        name=registrant.name,
+        gender=registrant.gender,
+        age=registrant.age,
+        brgy=registrant.brgy,
+        sitio=registrant.sitio,
+        image=new_filename,
+    )
+    leader.save()
+
+    cluster, created = Cluster.objects.get_or_create(leader=leader)
+    cluster.save()
+
+    # create Individual object
+
+    individual, individual_created = Individual.objects.get_or_create(
+        user=new_user,
+        name=registrant.name,
+        gender=registrant.gender,
+        age=registrant.age,
+        brgy=registrant.brgy,
+        sitio=registrant.sitio,
+    )
+    individual.save()
+
+    current_time = timezone.now()
+
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+
+    leader_verified_notification, created = Notification.objects.get_or_create(
+        title=f'Registrant {registrant.name} verified as Leader ',
+        message=f'This is to notify you that the registrant, {registrant.name} '
+                f'has been verified as a leader on {formatted_time}',
+        identifier=f' Registrant Verified as Leader Identifier: {registrant.name}-{registrant.id}',
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    leader_verified_notification.save()
+
+    registrant.delete()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
 
 
 def create_json(request):
@@ -915,3 +1141,98 @@ def load_json(request):
             obj.save()
 
     return redirect('homepage')
+
+
+def associate_member_to_leader(request, leader_username, member_username):
+    leader_user = User.objects.get(username=leader_username)
+    member_user = User.objects.get(username=member_username)
+
+    leader = Leader.objects.get(user=leader_user)
+    member = Member.objects.get(user=member_user)
+
+    leader_cluster = Cluster.objects.get(leader=leader)
+    leader_cluster.members.add(member)
+    leader_cluster.save()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
+
+
+def remove_member_from_leader(request, leader_username, member_username):
+    leader_user = User.objects.get(username=leader_username)
+    member_user = User.objects.get(username=member_username)
+
+    leader = Leader.objects.get(user=leader_user)
+    member = Member.objects.get(user=member_user)
+
+    leader_cluster = Cluster.objects.get(leader=leader)
+    leader_cluster.members.remove(member)
+    leader_cluster.save()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
+
+
+def notifications_async(request):
+    notifications = Notification.objects.filter(removed=False)
+    notification_list = []
+
+    unseen_notifications = Notification.objects.filter(is_seen=False).annotate(unseen_notifications=Count('is_seen'))
+    unseen_sum = unseen_notifications.aggregate(unseen=Sum('unseen_notifications'))['unseen']
+
+    for notification in notifications:
+        natural_time = naturaltime(notification.date_time)
+        notification_data = {
+            'title': notification.title,
+            'message': notification.message,
+            'time': natural_time,
+            'id': notification.id,
+            'unseen': unseen_sum
+        }
+        # print(naturaltime(notification.date_time))
+        notification_list.append(notification_data)
+
+    return JsonResponse({
+        'notification': notification_list,
+    })
+
+
+@login_required(login_url='login')
+def remove_notification(request, title, id):
+    notification = Notification.objects.get(title=title, id=id)
+    notification.removed = True
+    notification.save()
+
+    # Assuming you want to send a JSON response to confirm the removal
+    return JsonResponse({'message': 'Notification removed successfully'})
+
+
+@login_required(login_url='login')
+def seen_notifications(request):
+    try:
+        notifications = Notification.objects.all()
+        for notification in notifications:
+            notification.is_seen = True
+            notification.save()
+
+        # Return a success response
+        return JsonResponse({'status': 'success'})
+
+    except ValueError as e:
+        # Print the error for debugging purposes
+        print('Error marking notifications as seen:', str(e))
+
+        # Return an error response
+        return JsonResponse({'status': 'error', 'message': str(e)})

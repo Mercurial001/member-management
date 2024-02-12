@@ -9,6 +9,11 @@ from .models import AddedLeaders
 from .models import Sitio
 from .models import Individual
 from .models import Registrants
+from .models import Notification
+
+
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('title',)
 
 
 class RegistrantsAdmin(admin.ModelAdmin):
@@ -51,6 +56,7 @@ class CLusterAdmin(admin.ModelAdmin):
     list_display = ('leader',)
 
 
+admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Registrants, RegistrantsAdmin)
 admin.site.register(Individual, IndividualAdmin)
 admin.site.register(Sitio, SitioAdmin)

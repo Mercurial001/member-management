@@ -54,6 +54,15 @@ urlpatterns = [
     path('registrants/', views.registrants, name='registrants'),
     path('create-json/', views.create_json, name='create-json'),
     path('load-json/', views.load_json, name='load-json'),
+    path('registration/confirm/member/<str:username>/', views.confirm_registration_member, name='confirm-member'),
+    path('registration/confirm/leader/<str:username>/', views.confirm_registration_leader, name='confirm-leader'),
+    path('associate/<str:leader_username>/<str:member_username>/', views.associate_member_to_leader,
+         name='associate-member'),
+    path('remove/<str:leader_username>/<str:member_username>/', views.remove_member_from_leader,
+         name='unassociated-member'),
+    path('notifications/', views.notifications_async, name='notifications'),
+    path('seen-notifications/', views.seen_notifications, name='seen-notifications'),
+    path('delete-notification/<str:title>/<int:id>/', views.remove_notification, name='delete-notification'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

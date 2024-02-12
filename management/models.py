@@ -34,7 +34,7 @@ class Sitio(models.Model):
 
 
 class Leader(models.Model):
-    # user = models.ForeignKey(User, related_name='leader_user', on_delete=models.CASCADE) # Added for version 2, 2/9/2024
+    user = models.ForeignKey(User, related_name='leader_user', on_delete=models.CASCADE) # Added for version 2, 2/9/2024
     name = models.CharField(max_length=255)
     gender = models.ForeignKey(Gender, related_name='leader_gender', on_delete=models.CASCADE)
     age = models.IntegerField()
@@ -48,7 +48,7 @@ class Leader(models.Model):
 
 
 class Member(models.Model):
-    # user = models.ForeignKey(User, related_name='member_user', on_delete=models.CASCADE) # Added for version 2, 2/9/2024
+    user = models.ForeignKey(User, related_name='member_user', on_delete=models.CASCADE) # Added for version 2, 2/9/2024
     name = models.CharField(max_length=255)
     gender = models.ForeignKey(Gender, related_name='member_gender', on_delete=models.CASCADE)
     age = models.IntegerField()
@@ -82,11 +82,12 @@ class AddedMembers(models.Model):
 
 
 class Individual(models.Model):
+    user = models.ForeignKey(User, related_name='user_individual', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    gender = models.ForeignKey(Gender, related_name='individual_gender', on_delete=models.CASCADE)
+    gender = models.ForeignKey(Gender, related_name='individual_gender', on_delete=models.PROTECT)
     age = models.IntegerField()
-    brgy = models.ForeignKey(Barangay, related_name='individual_brgy', on_delete=models.CASCADE)
-    sitio = models.ForeignKey(Sitio, related_name='individual_sitio', on_delete=models.CASCADE, null=True, blank=True)
+    brgy = models.ForeignKey(Barangay, related_name='individual_brgy', on_delete=models.PROTECT)
+    sitio = models.ForeignKey(Sitio, related_name='individual_sitio', on_delete=models.PROTECT, null=True, blank=True)
     date_registered = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -102,7 +103,20 @@ class Registrants(models.Model):
     date = models.DateField()
     date_time = models.DateTimeField()
     brgy = models.ForeignKey(Barangay, on_delete=models.CASCADE)
-    sitio = models.ForeignKey(Sitio, on_delete=models.CASCADE)
+    sitio = models.ForeignKey(Sitio, on_delete=models.CASCADE, null=True, blank=True)
     age = models.IntegerField()
     gender = models.ForeignKey(Gender, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="images/")
+
+
+class Notification(models.Model):
+    title = models.CharField(max_length=255)
+    message = models.CharField(max_length=400)
+    is_seen = models.BooleanField(default=False, null=True, blank=True)
+    removed = models.BooleanField(default=False, null=True, blank=True)
+    date = models.DateField()
+    date_time = models.DateTimeField()
+    identifier = models.CharField(max_length=500)
+
+    class Meta:
+        ordering = ['-date_time']

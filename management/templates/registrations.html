@@ -1,18 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
 </head>
 <body>
-
     <section class="registration-utmost-container-section">
         <div class="registration-form-container-div">
+            {% if messages %}
+                {% for message in messages %}
+                    <div>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div>
-                    {{ registrant_form.as_p }}
+                    {{ registrant_form.username }}
+                </div>
+                <div>
+                    {{ registrant_form.email }}
+                </div>
+                <div>
+                    {{ registrant_form.password1 }}
+                </div>
+                <div>
+                    {{ registrant_form.password2 }}
+                </div>
+                <div>
+                    {{ registrant_form.name }}
+                </div>
+                <div>
+                    {{ registrant_form.brgy }}
                 </div>
                 <div class="leader-profile-edit-form-field-and-label-container">
                     <div class="leader-profile-edit-form-label-div">
@@ -28,6 +50,15 @@
                             {% endfor %}
                         </select>
                     </div>
+                </div>
+                <div>
+                    {{ registrant_form.age }}
+                </div>
+                <div>
+                    {{ registrant_form.gender }}
+                </div>
+                <div>
+                    {{ registrant_form.image }}
                 </div>
                 <div>
                     <button type="submit">Register</button>
