@@ -119,7 +119,7 @@
                         {% for leader in brgy_leader %}
                             <div class="brgy-profile-data-detail">
                                 <a class="brgy-profile-link-page"
-                                   href="{% url 'cluster' leader.name %}">{{ leader.name }}</a>
+                                   href="{% url 'cluster' leader.name leader.user %}">{{ leader.name }}</a>
                             </div>
                         {% empty %}
                             <div class="brgy-profile-empty-detail-notifier">
@@ -177,7 +177,7 @@
                         <div class="brgy-profile-cluster-members-div">
                             {% for member in cluster.members.all %}
                                 <div class="brgy-profile-cluster-member">
-                                    <a href="{% url 'member-profile' member.name %}">{{ member }}</a>
+                                    <a href="{% url 'member-profile' member.name member.id %}">{{ member }}</a>
                                 </div>
                             {% empty %}
                                 <div class="brgy-profile-empty-member-cluster-notifier">

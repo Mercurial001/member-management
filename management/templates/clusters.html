@@ -29,9 +29,27 @@
             <div class="cluster-leader-clusters-block-container-div">
                 {% for leader in leaders %}
                     <div class="cluster-leader-name-div" id="cluster-leader-{{ leader.name }}">
-                        <a class="cluster-leader-profile-link" href="{% url 'cluster' leader.name %}">
-                            {{ leader.name }}
-                        </a>
+                        <div class="cluster-leader-detail-container-div">
+                            {% if leader.image %}
+                                <div class="cluster-leader-photo-image-div">
+                                    <img class="cluster-leader-image-photo"
+                                         id="cluster-leader-image-photo"
+                                         src="{{ leader.image.url }}"
+                                    >
+                                </div>
+                            {% else %}
+                                <div class="cluster-leader-no-image-leader-div">
+                                    <i id="cluster-leader-default-img" class="fa fa-user" aria-hidden="true"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="cluster-leader-detail-container-div">
+                            <div class="cluster-leader-name-container-div">
+                                <a class="cluster-leader-profile-link" href="{% url 'cluster' leader.name leader.user %}">
+                                    {{ leader.name }}
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 {% endfor %}
             </div>

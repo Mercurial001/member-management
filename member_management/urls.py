@@ -26,7 +26,7 @@ urlpatterns = [
     path('brgy/<str:brgy_name>/', views.barangay_members, name='member-brgy'),
     path('leader-brgy/<str:brgy_name>/', views.barangay_leader, name='leader-brgy'),
     path('dashboard/', views.dashboard, name='dashboard'),
-    path('leader/profile/<str:name>/', views.leader_cluster, name='cluster'),
+    path('leader/profile/<str:name>/<str:username>/', views.leader_cluster, name='cluster'),
     path('member-profile/<str:name>/<int:id>/', views.member_profile, name='member-profile'),
     path('add-brgy/', views.add_barangay, name='add-brgy'),
     path('add-members/', views.add_members, name='add-members'),
@@ -63,6 +63,9 @@ urlpatterns = [
     path('notifications/', views.notifications_async, name='notifications'),
     path('seen-notifications/', views.seen_notifications, name='seen-notifications'),
     path('delete-notification/<str:title>/<int:id>/', views.remove_notification, name='delete-notification'),
+    path('deny-registration/<str:username>/', views.deny_registration, name='deny-registration'),
+    path('profile/leader/<str:name>/<str:username>/', views.non_admin_leader_profile, name='profile-leader'),
+    path('profile/member/<str:name>/<str:username>/', views.non_admin_member_profile, name='profile-member'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

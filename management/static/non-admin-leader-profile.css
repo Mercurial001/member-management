@@ -1,0 +1,514 @@
+.leader-profile-page-title-navbar{
+/*    background-color: rgb(255, 255, 255);
+    font-family: 'Montserrat';
+    color: rgb(50, 50, 50);
+    text-align: center;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    position: fixed;
+    width:100%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    z-index: 5;*/
+    background-color: rgb(255, 255, 255);
+    padding: 20px;
+    margin-top:-10px;
+    margin-left:-20px;
+    position: fixed;
+    width: 100%;
+    z-index: 5;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    text-align: center;
+    font-family: 'Montserrat';
+}
+
+.leader-profile-showcase-container-div{
+    text-align: center;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    margin: auto;
+    padding-top: 10px;
+    padding-bottom: 120px;
+
+}
+
+.leader-profile-leader-name-header-title-div{
+    margin-top: 100px;
+    font-family: 'Montserrat';
+    font-size: 60px;
+    color: rgb(80, 80, 80);
+}
+
+.leader-profile-leader-profile-photo-container-div{
+    position: absolute;
+    margin: auto;
+    width: 99%;
+    margin-top: 30px;
+}
+
+.leader-profile-photo-image-div{
+}
+
+.leader-profile-leader-image-photo{
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    border: 8px solid rgb(100, 140, 140);
+    box-shadow:
+        5px -5px 10px rgba(100, 100, 100, 0.5),
+        -5px -5px 10px rgba(100, 100, 100, 0.5);
+}
+
+.leader-profile-no-leader-image-div{
+    margin:auto;
+    height: 150px;
+    width: 150px;
+    border-radius: 50%;
+    border: 8px solid rgb(100, 140, 140);
+    box-shadow:
+        5px -5px 10px rgba(100, 100, 100, 0.5),
+        -5px -5px 10px rgba(100, 100, 100, 0.5);
+        background-color: rgb(200, 200, 200);
+    font-size: 120px;
+    color: rgb(100, 100, 100);
+}
+
+.leader-profile-leader-members-container-div{
+    width: 75%;
+    margin-top: 50px;
+    margin-left: 100px;
+    margin-bottom: 100px;
+}
+
+.leader-profile-members-container-header{
+    background-color: rgb(200, 200, 200);
+    font-family: 'Montserrat';
+    font-size: 20px;
+    padding: 15px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.leader-profile-leader-members-div{
+    border-left: 1px solid rgb(150, 150, 150);
+    border-right: 1px solid rgb(150, 150, 150);
+    border-bottom: 1px solid rgb(150, 150, 150);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    height: 400px;
+    overflow-y: scroll;
+    margin: auto;
+}
+
+.leader-profile-member{
+    margin: 10px;
+    width: 43%;
+    height: 60%;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    text-align: center;
+    border-radius: 10px;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid rgb(100, 140, 140);
+}
+
+.leader-profile-member-name-container-div{
+    height: 60px;
+}
+
+.leader-profile-member-image-photo{
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.leader-profile-link-to-member-profile{
+    font-family: 'Montserrat';
+    text-decoration: none;
+    color: rgb(100, 100, 100);
+    font-weight: 800;
+}
+
+.leader-profile-member-profile-photo-container-div{
+    margin: 20px;
+}
+
+
+.leader-profile-link-to-member-profile:hover{
+    text-decoration: underline;
+}
+
+.leader-profile-no-image-member-div{
+    background-color:rgb(200, 200, 200);
+    width: 80px;
+    height: 80px;
+    margin: auto;
+    border-radius: 50%;
+}
+
+#leader-profile-member-default-img{
+    margin-top: 15px;
+    font-size: 50px;
+    color: rgb(100, 100, 100);
+}
+
+.leader-profile-member-form-leader-members-container-div{
+    float: left;
+    width: 50%;
+}
+
+.leader-profile-other-details-container-block-div{
+    float: right;
+    width: 48%;
+}
+
+.leader-profile-qr-code-container-div{
+    margin-top: 50px;
+    margin-bottom: 50px;
+    margin-left: 190px;
+    width: 55%;
+    text-align: center;
+    border: 1px solid rgb(100, 140, 140);
+    border-radius: 17px;
+}
+
+.leader-profile-qr-code{
+    height: 300px;
+    width: 300px;
+}
+
+.leader-profile-qr-code-header-title{
+    background-color: rgb(20, 50, 50);
+    padding: 20px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    font-family: 'Montserrat';
+    color: beige;
+}
+
+.leader-profile-add-member-form-container-div{
+    width: 75%;
+    margin: 50px;
+    border: 1px solid rgb(50, 100, 100);
+    border-radius: 17px;
+}
+
+.leader-profile-add-member-header-title{
+    background-color: rgb(10, 40, 40);
+    font-family: 'Montserrat';
+    padding: 15px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    color: beige;
+}
+
+.add-new-member-in-leader-field{
+    width: 95%;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 6px;
+    border-radius: 5px;
+    border: 1px solid rgb(100, 100, 100);
+}
+
+.add-new-member-in-leader-field:focus{
+    outline: none;
+}
+
+.add-new-member-in-leader-field-min{
+    width: 95%;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 6px;
+    border-radius: 5px;
+    border: 1px solid rgb(100, 100, 100);
+}
+
+.add-new-member-in-leader-field-min:focus{
+    outline: none;
+}
+
+.leader-profile-add-member-field-and-label-container-min{
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin: 10px;
+    font-family: 'Montserrat';
+    padding: 10px;
+    border-radius: 10px;
+    width: 37%;
+    display: inline-block;
+}
+
+.leader-profile-add-member-form-div{
+    margin: auto;
+    width: 95%;
+}
+
+.leader-profile-add-member-min-fields-container{
+    text-align: center;
+}
+
+.leader-profile-add-member-field-and-label-container{
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin: 10px;
+    font-family: 'Montserrat';
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.leader-profile-add-field-label{
+    margin-bottom: 10px;
+}
+
+.leader-profile-add-new-member-btn-container-div{
+    text-align: center;
+    margin: 15px;
+}
+
+.leader-profile-add-new-member-btn{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    font-family: 'Montserrat';
+    border: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 18px;
+    padding-right: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#leader-profile-leader-detail-float-left{
+    float: left;
+    margin-left: 50px;
+}
+
+#leader-profile-leader-detail-float-right{
+    float: right;
+    margin-right: 50px;
+}
+
+.leader-profile-detail-div{
+    margin: 10px;
+    font-family: 'Montserrat';
+}
+
+.leader-profile-detail-icon-span{
+    color: rgb(50, 50, 50);
+    margin-right: 10px;
+}
+
+.leader-profile-edit-profile-form-container{
+    position: fixed;
+    z-index: 20;
+    top: -500px;
+    right: 0;
+    transition: 1s all ease;
+    font-family: 'Montserrat';
+    background-color: rgb(255,255,255);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.leader-profile-edit-form-header-title-container-div{
+    background-color: rgb(20, 50, 50);
+    color: beige;
+    padding: 10px
+}
+
+#leader-profile-edit-form-header-title-left{
+    margin-right: 50px;
+}
+
+.leader-profile-edit-form-container-div{
+    padding: 10px;
+}
+
+.leader-profile-search-unassociated-member-form{
+    margin-top: 10px;
+}
+
+.show-leader-edit-form{
+    top: 0;
+}
+
+.leader-profile-edit-detail-toggle-btn{
+    float: right;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.leader-profile-hide-edit-form-btn{
+    cursor: pointer;
+}
+
+.edit-leader-field{
+    border: none;
+    border-bottom: 1px solid rgb(100, 100, 100);
+    background: none;
+    width: 90%;
+}
+
+.edit-leader-field:focus{
+    outline: none;
+}
+
+.leader-profile-edit-leader-profile-btn-container-div{
+    text-align: center;
+}
+
+.leader-profile-edit-leader-profile-btn{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    font-family: 'Montserrat';
+    cursor: pointer;
+    border-radius: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin: 10px;
+    border: none;
+}
+
+.leader-profile-no-member-notifier-div{
+    color: rgb(150, 150, 150);
+    font-family: 'Impact';
+    font-size: 60px;
+    transform: rotate(-45deg);
+    transform-origin: 100% 100%;
+    margin-right: 10px;
+    margin-left: 40px;
+    margin-top: -100px;
+}
+
+#leader-profile-edit-form-header-title-right{
+    float: right;
+}
+
+.leader-profile-unassociated-members-block-div{
+    margin: auto;
+    text-align: center;
+    width: 80%;
+    margin-top: 45px;
+    border: 1px solid rgb(100, 100, 100);
+    border-radius: 20px;
+}
+
+.leader-profile-unassociated-members-title-header{
+    background-color: rgb(10, 40, 40);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    color: beige;
+    font-family: 'Montserrat';
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.leader-profile-unassociated-members-container{
+    overflow-y: scroll;
+    height: 400px;
+
+}
+
+.leader-profile-unassociated-members-profile-image-container-div{
+    text-align: center;
+    margin-top: 20px;
+}
+
+.leader-profile-unassociated-members-profile-image{
+    height: 80px;
+    width: 80px;
+    border-radius: 50%;
+}
+
+.leader-profile-unassociated-member-div{
+    display: inline-block;
+    width: 170px;
+    height: 230px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 10px;
+    vertical-align: top;
+    margin: 10px;
+    border: 1px solid rgb(40, 80, 80);
+}
+
+.leader-profile-unassociated-member-details-container{
+    text-align: center;
+    font-family: 'Montserrat';
+}
+
+.leader-profile-unassociated-member-name-div{
+    height: 50px;
+}
+
+.leader-profile-add-member-btn-container-div{
+    margin-top: 20px;
+}
+
+.leader-profile-associate-member-btn{
+    background-color: rgb(10, 100, 100);
+    color: beige;
+    font-family: 'Montserrat';
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 10px;
+}
+
+.leader-profile-remove-member-btn{
+    background-color: rgb(150, 50, 50);
+    color: beige;
+    text-decoration: none;
+    font-family: 'Montserrat';
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.leader-profile-unassociated-member-name{
+    color: rgb(100, 100, 100);
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.leader-profile-unassociated-member-name:hover{
+    text-decoration: underline;
+}
+
+#leader-profile-search-unassociated-members-input{
+    border-radius: 20px;
+    border: 1px solid rgb(100, 100, 100);
+    padding-left: 30px;
+    height: 30px;
+    width:70%;
+}
+
+#leader-profile-search-unassociated-members-input:focus{
+    outline: none;
+}
+
+.leader-profile-unassociated-members-lens-icon{
+    position: absolute;
+    margin-top: 7px;
+    margin-left: 10px;
+}
+
+.leader-profile-no-unassociated-members-notifier{
+    color: rgb(150, 150, 150);
+    font-family: 'Impact';
+    font-size: 30px;
+    transform: rotate(-45deg);
+    transform-origin: 100% 100%;
+    margin-right: 50px;
+}
+
+.leader-profile-logout-span{
+    float: left;
+}
+
+.home-link-to-page{
+    text-decoration: none;
+    color: rgb(100, 100, 100);
+}

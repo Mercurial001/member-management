@@ -59,6 +59,11 @@ body{
     width: 25px;
 }
 
+.active{
+    background-color: blue;
+    color: red;
+}
+
 /* This base-block-content-section-container compresses the width of all pages that is an extension of the base.html. */
 .base-block-content-section-container{
     width:80%;

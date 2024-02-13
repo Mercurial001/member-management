@@ -3,47 +3,84 @@
 {% load static %}
 
 {% block content %}
+    <section class="registrants-utmost-container-section">
+        <div class="registrants-header-page-title-div">
+            registrants
+        </div>
+        <div class="registrants-registrants-container-div">
+            {% for registrant in registrant_objects %}
+                <div class="registrants-registrant-block-div">
+                    <div class="registrants-function-btn-container">
+                        <div class="registrants-function-btn-div">
+                            <a class="registrant-link-to-function"
+                               href="{% url 'confirm-member' registrant.username %}">Verify as Member</a>
+                        </div>
+                        <div class="registrants-function-btn-div">
+                            <a class="registrant-link-to-function"
+                               href="{% url 'confirm-leader' registrant.username %}">Verify as Leader</a>
+                        </div>
+                    </div>
+                    <div class="registrants-registrant-image-container">
+                        {% if registrant.image %}
+                            <div class="registrants-img-container-div">
+                                <img class="registrants-registrant-image-profile"
+                                     id="registrants-registrant-image-profile"
+                                     src="{{ registrant.image.url }}"
+                                >
+                            </div>
+                        {% else %}
+                            <div class="registrants-registrant-default-img-container">
+                                <i id="registrants-registrant-default-profile" class="fa fa-user" aria-hidden="true"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div style="padding: 0.5px;
+                                margin:auto;
+                                width: 70%;
+                                background-color: rgba(150, 150, 150, 0.5);
+                                margin-top: 10px;
+                                margin-bottom: 10px;"></div>
+                    <table>
+                        <tr>
+                            <td>Username:</td>
+                            <td>{{ registrant.username }}</td>
+                        </tr>
+                        <tr>
+                            <td>Full Name:</td>
+                            <td>{{ registrant.name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Email:</td>
+                            <td>{{ registrant.email }}</td>
+                        </tr>
+                        <tr>
+                            <td>Barangay:</td>
+                            <td>{{ registrant.brgy }}</td>
+                        </tr>
+                        <tr>
+                            <td>Sitio:</td>
+                            <td>{{ registrant.sitio }}</td>
+                        </tr>
+                        <tr>
+                            <td>Gender:</td>
+                            <td>{{ registrant.gender }}</td>
+                        </tr>
+                        <tr>
+                            <td>Age:</td>
+                            <td>{{ registrant.age }}</td>
+                        </tr>
+                    </table>
+                    <div class="registrants-deny-registration-btn-container-div">
+                        <a class="registrants-link-to-function"
+                           href="{% url 'deny-registration' registrant.username %}">Deny Registration</a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="registrant-no-registrants-notifier-div">
+                    No registrants
+                </div>
+            {% endfor %}
+        </div>
 
-    {% for registrant in registrant_objects %}
-        <div>
-            <a href="{% url 'confirm-member' registrant.username %}">Verify as Member</a>
-        </div>
-        <div>
-            <a href="{% url 'confirm-leader' registrant.username %}">Verify as Leader</a>
-        </div>
-        <div>
-            {{ registrant.username }}
-        </div>
-        <div>
-            {{ registrant.name }}
-        </div>
-        <div>
-            {{ registrant.brgy }}
-        </div>
-        <div>
-            {{ registrant.sitio }}
-        </div>
-        <div>
-            {{ registrant.gender }}
-        </div>
-        <div>
-            {{ registrant.age }}
-        </div>
-        <div class="leader-profile-leader-profile-photo-container-div">
-            {% if registrant.image %}
-                <div class="leader-profile-photo-image-div">
-                    <img class="leader-profile-leader-image-photo"
-                         id="leader-profile-leader-image-photo"
-                         src="{{ registrant.image.url }}"
-                    >
-                </div>
-            {% else %}
-                <div class="leader-profile-no-leader-image-div">
-                    <i id="leader-profile-default-img" class="fa fa-user" aria-hidden="true"></i>
-                </div>
-            {% endif %}
-        </div>
-    {% empty %}
-        No registrants
-    {% endfor %}
+    </section>
 {% endblock %}

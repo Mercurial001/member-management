@@ -1,10 +1,33 @@
-{% extends 'base.html' %}
-
-{% load static %}
-
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'non-admin-leader-profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}">
+    <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
+    <script src="{% static 'chart.js' %}"></script>
+    <script src="{% static 'swiper-bundle.min.js' %}"></script>
+</head>
+<body>
     <section class="leader-profile-utmost-container-section">
         <div class="leader-profile-page-title-navbar">
+            <span class="leader-profile-logout-span">
+                <a class="home-link-to-page" href="{% url 'logout' %}">
+                    <span class="home-link-icon-container">
+                        <span class="home-link-icon-div">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                        </span>
+                    </span>
+                    <span class="home-link-icon-container">
+                        <span class="home-link-name">
+                            Logout
+                        </span>
+                    </span>
+                </a>
+            </span>
             <span>Leader Profile</span>
             <span class="leader-profile-edit-detail-toggle-btn"><i class="fa fa-edit"></i></span>
         </div>
@@ -364,41 +387,42 @@
                 >
             </div>
         </div>
-</section>
-<script>
-    document.getElementById('leader-edit-brgys').addEventListener('change', function() {
-        // Get the selected value
-        var selectedValue = this.value;
-        console.log(selectedValue);
-        $.ajax({
-            url: '/get_filtered_sitios_using_brgy_id/',  // Update with your actual URL
-            method: 'GET',
-            data: { barangay: selectedValue },
-            success: function(data) {
-                var sitioDropdown = $('#leader-profile-edit-sitio-dropdown');
-                sitioDropdown.empty();
-                $.each(data, function(index, sitio) {
-                    sitioDropdown.append('<option value="' + sitio.id + '">' + sitio.name + '</option>');
-                });
-                sitioDropdown.append('<option value="None">None</option>');
-            },
-            error: function(error) {
-                console.error('Error fetching Sitios:', error);
-            }
+    </section>
+    <script>
+        document.getElementById('leader-edit-brgys').addEventListener('change', function() {
+            // Get the selected value
+            var selectedValue = this.value;
+            console.log(selectedValue);
+            $.ajax({
+                url: '/get_filtered_sitios_using_brgy_id/',  // Update with your actual URL
+                method: 'GET',
+                data: { barangay: selectedValue },
+                success: function(data) {
+                    var sitioDropdown = $('#leader-profile-edit-sitio-dropdown');
+                    sitioDropdown.empty();
+                    $.each(data, function(index, sitio) {
+                        sitioDropdown.append('<option value="' + sitio.id + '">' + sitio.name + '</option>');
+                    });
+                    sitioDropdown.append('<option value="None">None</option>');
+                },
+                error: function(error) {
+                    console.error('Error fetching Sitios:', error);
+                }
+            });
         });
-    });
 
-    const toggleEditLeaderForm = document.querySelector('.leader-profile-edit-detail-toggle-btn');
-    const untoggleEditLeaderForm = document.querySelector('.leader-profile-hide-edit-form-btn');
+        const toggleEditLeaderForm = document.querySelector('.leader-profile-edit-detail-toggle-btn');
+        const untoggleEditLeaderForm = document.querySelector('.leader-profile-hide-edit-form-btn');
 
-    const editLeaderProfileForm = document.querySelector('.leader-profile-edit-profile-form-container');
+        const editLeaderProfileForm = document.querySelector('.leader-profile-edit-profile-form-container');
 
-    toggleEditLeaderForm.addEventListener('click', ()=> {
-        editLeaderProfileForm.classList.add('show-leader-edit-form');
-    });
+        toggleEditLeaderForm.addEventListener('click', ()=> {
+            editLeaderProfileForm.classList.add('show-leader-edit-form');
+        });
 
-    untoggleEditLeaderForm.addEventListener('click', ()=> {
-        editLeaderProfileForm.classList.remove('show-leader-edit-form');
-    });
-</script>
-{% endblock %}
+        untoggleEditLeaderForm.addEventListener('click', ()=> {
+            editLeaderProfileForm.classList.remove('show-leader-edit-form');
+        });
+    </script>
+</body>
+</html>

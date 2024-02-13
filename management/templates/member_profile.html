@@ -16,7 +16,7 @@
             </span>
         </div>
         <div class="member-profile-edit-form-container">
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div>
                     {{ edit_member_detail_form.as_p }}
@@ -187,7 +187,7 @@
                                 {% endif %}
                             </div>
                             <div class="member-profile-associated-leader">
-                                <a href="{% url 'cluster' possible_leaders.leader.name %}">
+                                <a href="{% url 'cluster' possible_leaders.leader.name possible_leaders.leader.user %}">
                                     {{ possible_leaders.leader }}
                                 </a>
                             </div>

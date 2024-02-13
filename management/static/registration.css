@@ -1,0 +1,76 @@
+.registration-page-title-header{
+    text-align: center;
+    font-family: 'Montserrat';
+    font-size: 40px;
+    color: rgb(90, 90, 90);
+}
+
+.registration-field{
+    width: 90%;
+    height: 25px;
+    margin: 10px;
+    border-radius: 10px;
+    border: 1px solid rgb(100, 100, 100);
+    padding: 5px;
+}
+
+.registration-field:focus{
+    outline: none;
+}
+
+.registration-form-container-div{
+    margin:auto;
+    width: 50%;
+    text-align: center;
+    border: 1px solid rgb(80, 120, 120);
+    border-radius: 15px;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.registration-label-and-field-container{
+    padding: 10px;
+    margin: 10px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 10px;
+}
+
+.registration-form-label-div{
+    text-align: left;
+    margin-left: 15px;
+    font-family: 'Montserrat';
+}
+
+.registration-btn{
+    margin: 20px;
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    border: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    font-family: 'Montserrat';
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.registration-form-message-div{
+    background-color: rgba(10, 40, 40, 0.4);
+    color: beige;
+    font-family: 'Montserrat';
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+/* registration_response.html */
+
+.registration-response-message-container-div{
+    font-family: 'Montserrat';
+    font-size: 40px;
+    color: rgb(100, 140, 140);
+    margin:auto:
+    width: 50%;
+    text-align: center;
+    margin-top: 100px;
+}

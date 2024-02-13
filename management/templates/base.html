@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="{% static 'leader-profile.css' %}">
     <link rel="stylesheet" href="{% static 'member-profile.css' %}">
     <link rel="stylesheet" href="{% static 'registrants.css' %}">
+    <link rel="stylesheet" href="{% static 'registration.css' %}">
     <!-- Add this to include Swiper.js -->
 <!--    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->
     <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
@@ -243,7 +244,7 @@
                                     {% for leader in search_engine_result_leader %}
                                         <div class="home-base-member-name-result">
                                             <a class="home-base-member-result-link"
-                                               href="{% url 'cluster' leader.name %}">
+                                               href="{% url 'cluster' leader.name leader.user %}">
                                                 {{ leader.name }}
                                             </a>
                                         </div>

@@ -68,8 +68,13 @@
 .cluster-leader-name-div{
     display: inline-block;
     width: 400px;
-    padding: 20px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    margin: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    border-radius: 10px;
 }
 
 .cluster-leader-profile-link{
@@ -112,6 +117,20 @@
     color: beige;
 }
 
-.cluster-leader-name-div{
-    margin: 20px;
+.cluster-leader-detail-container-div{
+    display: inline-block;
+}
+
+#cluster-leader-image-photo{
+    width:65px;
+    height: 65px;
+    border-radius: 50%;
+    float: left;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.cluster-leader-name-container-div{
+    float: left;
+    margin-top: -40px;
+    margin-left: 20px;
 }

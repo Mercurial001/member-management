@@ -163,14 +163,14 @@ class RegistrantsForm(ModelForm):
         label=_("Password"),
         strip=False,
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
-                                          'class': 'registration_field',
+                                          'class': 'registration-field',
                                           'placeholder': 'Password'}),
         help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
         label=_("Password confirmation"),
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password',
-                                          'class': 'registration_field',
+                                          'class': 'registration-field',
                                           'placeholder': 'Confirm Password'}),
         strip=False,
     )
@@ -192,26 +192,25 @@ class RegistrantsForm(ModelForm):
             }),
             'username': TextInput(attrs={
                 'class': "registration-field",
-                'id': 'registration-brgy-field',
+                'id': 'registration-username-field',
             }),
             'name': TextInput(attrs={
                 'class': "registration-field",
-                'id': 'registration-brgy-field',
+                'id': 'registration-full-name-field',
             }),
             'email': EmailInput(attrs={
                 'class': "registration-field",
-                'id': 'registration-brgy-field',
+                'id': 'registration-email-field',
             }),
             'age': NumberInput(attrs={
                 'class': "registration-field",
-                'id': 'registration-brgy-field',
+                'id': 'registration-age-field',
             }),
             'gender': Select(attrs={
                 'class': "registration-field",
-                'id': 'registration-brgy-field',
+                'id': 'registration-gender-field',
             }),
             'image': FileInput(attrs={
                 'class': "registration-field",
-                'id': 'registration-brgy-field',
             }),
         }

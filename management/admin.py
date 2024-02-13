@@ -10,6 +10,11 @@ from .models import Sitio
 from .models import Individual
 from .models import Registrants
 from .models import Notification
+from .models import EmailMessage
+
+
+class EmailMessageAdmin(admin.ModelAdmin):
+    list_display = ('type', 'subject')
 
 
 class NotificationAdmin(admin.ModelAdmin):
@@ -56,6 +61,7 @@ class CLusterAdmin(admin.ModelAdmin):
     list_display = ('leader',)
 
 
+admin.site.register(EmailMessage, EmailMessageAdmin)
 admin.site.register(Notification, NotificationAdmin)
 admin.site.register(Registrants, RegistrantsAdmin)
 admin.site.register(Individual, IndividualAdmin)
