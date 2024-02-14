@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'enter-token.css' %}">
+</head>
+<body>
+    <section class="enter-token-utmost-container-section">
+        {% if messages %}
+            {% for message in messages %}
+                <div>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="enter-token-title-heading-div">
+            <h2>Enter Token</h2>
+        </div>
+        <div class="enter-token-form-container-div">
+            <form method="post">
+                {% csrf_token %}
+                <!--<label for="token">Token:</label>-->
+                <input class="enter-token-field" type="text" id="token" name="token" required>
+                <input type="hidden" name="email" value="{{ email }}">
+                <div class="enter-token-btn-container-div">
+                    <button class="enter-token-btn" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+
+    </section>
+</body>
+</html>

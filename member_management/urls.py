@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from management import views
 from django.conf.urls.static import static
 from member_management import settings
@@ -64,8 +64,11 @@ urlpatterns = [
     path('seen-notifications/', views.seen_notifications, name='seen-notifications'),
     path('delete-notification/<str:title>/<int:id>/', views.remove_notification, name='delete-notification'),
     path('deny-registration/<str:username>/', views.deny_registration, name='deny-registration'),
-    path('profile/leader/<str:name>/<str:username>/', views.non_admin_leader_profile, name='profile-leader'),
-    path('profile/member/<str:name>/<str:username>/', views.non_admin_member_profile, name='profile-member'),
+    path('profile/leader/<str:username>/', views.non_admin_leader_profile, name='profile-leader'),
+    path('profile/member/<str:username>/', views.non_admin_member_profile, name='profile-member'),
+    path('forgot-password/', views.forgot_password, name='forgot-password'),
+    path('enter-token/<str:email>/', views.enter_token, name='enter-token'),
+    path('change-password/<str:email>/<str:token_str>/', views.change_password, name='change-password'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

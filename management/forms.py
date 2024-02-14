@@ -214,3 +214,29 @@ class RegistrantsForm(ModelForm):
                 'class': "registration-field",
             }),
         }
+
+
+class ForgotPasswordForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['email']
+
+        widgets = {
+            'email': TextInput(attrs={
+                'class': "forgot-password-field",
+                'placeholder': 'Your Email'
+            }),
+        }
+
+
+class ChangePasswordForm(ModelForm):
+    password1 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'change-password-field',
+               'placeholder': 'Password'}))
+    password2 = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'change-password-field',
+               'placeholder': 'Confirm Password'}))
+
+    class Meta:
+        model = User
+        fields = ['password1', 'password2']

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>403 Forbidden</title>
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static '403_forbidden.css' %}">
+</head>
+<body>
+    <div>
+        <div class="forbidden-content-float-left">
+            <i class="fa fa-ban" aria-hidden="true"></i>
+        </div>
+        <div class="forbidden-content-float-right">
+            <div class="forbidden-title">
+                FORBIDDEN
+            </div>
+            <div class="forbidden-four-o-three">
+                403
+            </div>
+            <div class="forbidden-content">
+                Request Forbidden. You don't have an access to this page, or its resource.
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

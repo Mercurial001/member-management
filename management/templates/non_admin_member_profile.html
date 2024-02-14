@@ -27,9 +27,18 @@
                         </span>
                     </span>
                 </a>
+                <a class="member-link-to-page" href="{% url 'profile-member' request.user %}">
+                    <span class="member-profile-link-icon-container">
+                        <span class="member-profile-link-name">
+                            {{ request.user }}
+                        </span>
+                    </span>
+                </a>
             </span>
           Member Profile
-          <span class="member-profile-edit-detail-toggle-btn"><i class="fa fa-edit"></i></span>
+          {% if request.user == member.user %}
+            <span class="member-profile-edit-detail-toggle-btn"><i class="fa fa-edit"></i></span>
+          {% endif %}
       </div>
       <div class="member-profile-edit-member-data-form-container-div">
           <div class="member-profile-edit-detail-form-header">
@@ -39,30 +48,32 @@
               </span>
           </div>
           <div class="member-profile-edit-form-container">
-              <form method="POST" enctype="multipart/form-data">
-                  {% csrf_token %}
-                  <div>
-                      {{ edit_member_detail_form.as_p }}
-                  </div>
-                  <div class="leader-profile-edit-form-field-and-label-container">
-                      <div class="leader-profile-edit-form-label-div">
-                          Sitio
+              {% if request.user == member.user %}
+                  <form method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <div>
+                          {{ edit_member_detail_form.as_p }}
                       </div>
-                      <div class="leader-profile-edit-field-div">
-                          <select class="edit-leader-field"
-                                  name="member-edit-sitio" id="leader-profile-edit-sitio-dropdown">
-                              {% for sitio in sitios %}
-                                  <option value="{{ sitio.id }}">{{ sitio.name }}</option>
-                              {% empty %}
-                                  <option value="None">None</option>
-                              {% endfor %}
-                          </select>
+                      <div class="leader-profile-edit-form-field-and-label-container">
+                          <div class="leader-profile-edit-form-label-div">
+                              Sitio
+                          </div>
+                          <div class="leader-profile-edit-field-div">
+                              <select class="edit-leader-field"
+                                      name="member-edit-sitio" id="leader-profile-edit-sitio-dropdown">
+                                  {% for sitio in sitios %}
+                                      <option value="{{ sitio.id }}">{{ sitio.name }}</option>
+                                  {% empty %}
+                                      <option value="None">None</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
                       </div>
-                  </div>
-                  <div class="member-profile-edit-member-data-btn-container">
-                      <button type="submit" class="member-profile-edit-btn">Save Changes</button>
-                  </div>
-              </form>
+                      <div class="member-profile-edit-member-data-btn-container">
+                          <button type="submit" class="member-profile-edit-btn">Save Changes</button>
+                      </div>
+                  </form>
+              {% endif %}
           </div>
       </div>
       <div style="padding: 1px;"></div>
@@ -132,62 +143,70 @@
           {% endif %}
       </div>
       <div style="box-shadow: inset 0 5px 7px -3px rgba(0, 0, 0, 0.5); padding: 10px; margin-top: 200px;"></div>
+        <!--      {{ member_leader }}-->
       <div class="member-profile-left-block-container-div">
-          <div class="member-profile-qr-code-container-div">
-              <div class="member-profile-member-qr-code-title-header">
-                  {{ member.name }} QR Code
+          {% if request.user == member.user or request.user.is_superuser or request.user.username in member_leader %}
+              <div class="member-profile-qr-code-container-div">
+                  <div class="member-profile-member-qr-code-title-header">
+                      {{ member.name }} QR Code
+                  </div>
+                  <img class="member-profile-qr-code"
+                       src="{% static 'images/qr-codes/' %}QR-Code-{{ member.name }}-{{ member.brgy }}-{{ member.id }}.png">
               </div>
-              <img class="member-profile-qr-code"
-                   src="{% static 'images/qr-codes/' %}QR-Code-{{ member.name }}-{{ member.brgy }}-{{ member.id }}.png">
-          </div>
+          {% endif %}
       </div>
       <div class="member-profile-right-block-container-div">
           <div class="member-profile-member-affiliation-block-div">
               {% if not member.name in no_leader_member_list %}
                   <div class="member-profile-affiliation-block-messages-div">
                       <div class="member-profile-member-not-affiliated-heading-message-div">
-                          Member currently is not associated to any Leader
+                          {% if request.user == member.user %}
+                                You are not currently associated to any Leader
+                          {% else %}
+                                This member is currently not associated with any Leader
+                          {% endif %}
                       </div>
                   </div>
-                  <div class="member-profile-brgy-leader-container-div">
-                      <div class="member-profile-leaders-brgy-message-div">
-                          Leaders in Barangay {{ member.brgy }}
-                      </div>
-                      <div class="member-profile-unaffiliated-member-leaders">
-                          {% for leader in leaders %}
-                              <div class="member-profile-unaffiliated-member-leader">
-                                  <div class="member-profile-leader-image-unaffiliated-member-span">
-                                      {% if leader.image %}
-                                          <div class="member-profile-leader-img-container-span">
-                                              <img class="member-profile-unaffiliated-member-leader-profile-img"
-                                                   src="{{ leader.image.url }}"
-                                              >
-                                          </div>
-                                      {% else %}
-                                          <div class="member-profile-leader-no-img-container-span">
-                                              <i id="member-profile-unaffiliated-member-leader-default-profile-img"
-                                                 class="fa fa-user" aria-hidden="true">
-                                              </i>
-                                          </div>
-                                      {% endif %}
-                                  </div>
-                                  <div class="member-profile-unaffiliated-member-leader-name-div">
-                                      {{ leader.name }}
-                                  </div>
-                                  <div class="member-profile-assign-member-to-leader-btn-container-div">
-                                      <a href="{% url 'tag-leader' member.name leader.name %}">
-                                          <i class="fa fa-tag"></i>
-                                      </a>
-                                  </div>
-                              </div>
-                          {% empty %}
-                              <div class="member-profile-no-leaders-notification">
-                                  No Leaders in this barangay
-                              </div>
-                          {% endfor %}
-                      </div>
-                  </div>
+<!--                  <div class="member-profile-brgy-leader-container-div">-->
+<!--                      <div class="member-profile-leaders-brgy-message-div">-->
+<!--                          Leaders in Barangay {{ member.brgy }}-->
+<!--                      </div>-->
+<!--                      <div class="member-profile-unaffiliated-member-leaders">-->
+<!--                          {% for leader in leaders %}-->
+<!--                              <div class="member-profile-unaffiliated-member-leader">-->
+<!--                                  <div class="member-profile-leader-image-unaffiliated-member-span">-->
+<!--                                      {% if leader.image %}-->
+<!--                                          <div class="member-profile-leader-img-container-span">-->
+<!--                                              <img class="member-profile-unaffiliated-member-leader-profile-img"-->
+<!--                                                   src="{{ leader.image.url }}"-->
+<!--                                              >-->
+<!--                                          </div>-->
+<!--                                      {% else %}-->
+<!--                                          <div class="member-profile-leader-no-img-container-span">-->
+<!--                                              <i id="member-profile-unaffiliated-member-leader-default-profile-img"-->
+<!--                                                 class="fa fa-user" aria-hidden="true">-->
+<!--                                              </i>-->
+<!--                                          </div>-->
+<!--                                      {% endif %}-->
+<!--                                  </div>-->
+<!--                                  <div class="member-profile-unaffiliated-member-leader-name-div">-->
+<!--                                      {{ leader.name }}-->
+<!--                                  </div>-->
+<!--                                  <div class="member-profile-assign-member-to-leader-btn-container-div">-->
+<!--                                      <a href="{% url 'tag-leader' member.name leader.name %}">-->
+<!--                                          <i class="fa fa-tag"></i>-->
+<!--                                      </a>-->
+<!--                                  </div>-->
+<!--                              </div>-->
+<!--                          {% empty %}-->
+<!--                              <div class="member-profile-no-leaders-notification">-->
+<!--                                  No Leaders in this barangay-->
+<!--                              </div>-->
+<!--                          {% endfor %}-->
+<!--                      </div>-->
+<!--                  </div>-->
               {% else %}
+
                   <div class="member-profile-member-associated-leader-container-div">
                       <div class="member-profile-associated-member-header-title">
                           Leader
@@ -210,7 +229,7 @@
                                   {% endif %}
                               </div>
                               <div class="member-profile-associated-leader">
-                                  <a href="{% url 'cluster' possible_leaders.leader.name possible_leaders.leader.user %}">
+                                  <a href="{% url 'profile-leader' possible_leaders.leader.user %}">
                                       {{ possible_leaders.leader }}
                                   </a>
                               </div>

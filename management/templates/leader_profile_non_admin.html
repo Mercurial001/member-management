@@ -27,9 +27,18 @@
                         </span>
                     </span>
                 </a>
+                <a class="home-link-to-page" href="{% url 'profile-member' request.user %}">
+                    <span class="home-link-icon-container">
+                        <span class="home-link-name">
+                            {{ request.user }}
+                        </span>
+                    </span>
+                </a>
             </span>
             <span>Leader Profile</span>
-            <span class="leader-profile-edit-detail-toggle-btn"><i class="fa fa-edit"></i></span>
+            {% if request.user == leader.user %}
+                <span class="leader-profile-edit-detail-toggle-btn"><i class="fa fa-edit"></i></span>
+            {% endif %}
         </div>
         <div class="leader-profile-edit-profile-form-container">
             <div class="leader-profile-edit-form-header-title-container-div">
@@ -41,6 +50,7 @@
                 </span>
             </div>
             <div class="leader-profile-edit-form-container-div">
+                {% if request.user == leader.user %}
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="leader-profile-edit-form-field-and-label-container">
@@ -102,6 +112,7 @@
                         <button class="leader-profile-edit-leader-profile-btn" name="edit-leader-profile-btn" type="submit">Save Changes</button>
                     </div>
                 </form>
+                {% endif %}
             </div>
         </div>
         <div style="padding: 1px;"></div>
@@ -168,66 +179,114 @@
                 </div>
                 <div class="leader-profile-leader-members-div">
                     <div style="padding: 1px;"></div>
-                    {% for member in leaders_cluster.members.all %}
-                        <div class="leader-profile-member">
-                            <div style="padding: 1px;"></div>
-                            <div class="leader-profile-member-profile-photo-container-div">
-                                {% if member.image %}
-                                    <div class="leader-profile-member-photo-image-div">
-                                        <img class="leader-profile-member-image-photo"
-                                             id="leader-profile-member-image-photo"
-                                             src="{{ member.image.url }}"
-                                        >
-                                    </div>
-                                {% else %}
-                                    <div class="leader-profile-no-image-member-div">
-                                        <i id="leader-profile-member-default-img" class="fa fa-user" aria-hidden="true"></i>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="leader-profile-member-name-container-div">
-                                <a class="leader-profile-link-to-member-profile"
-                                   href="{% url 'member-profile' member.name member.id %}">
-                                    {{ member.name }}
-                                </a>
-                            </div>
+                    {% if request.user in members_c or request.user == leader.user %}
+                        {% for member in leaders_cluster.members.all %}
+                            <div class="leader-profile-member">
+                                <div style="padding: 1px;"></div>
+                                <div class="leader-profile-member-profile-photo-container-div">
+                                    {% if member.image %}
+                                        <div class="leader-profile-member-photo-image-div">
+                                            <img class="leader-profile-member-image-photo"
+                                                 id="leader-profile-member-image-photo"
+                                                 src="{{ member.image.url }}"
+                                            >
+                                        </div>
+                                    {% else %}
+                                        <div class="leader-profile-no-image-member-div">
+                                            <i id="leader-profile-member-default-img" class="fa fa-user" aria-hidden="true"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="leader-profile-member-name-container-div">
+                                    <a class="leader-profile-link-to-member-profile"
+                                       href="{% url 'profile-member' member.user %}">
+                                        {{ member.name }}
+                                    </a>
+                                </div>
 
-                            <div class="leader-profile-remove-member-container-div">
-                                <a class="leader-profile-remove-member-btn"
-                                   href="{% url 'unassociated-member' leader.user member.user %}">
-                                    Remove Member
-                                </a>
+                                <div class="leader-profile-remove-member-container-div">
+                                    {% if request.user == leader.user %}
+                                        <a class="leader-profile-remove-member-btn"
+                                           href="{% url 'unassociated-member' leader.user member.user %}">
+                                            Remove Member
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
+                        {% empty %}
+                            <div class="leader-profile-no-member-notifier-div">
+                                No Members
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="leader-profile-no-unassociated-members-notifier">
+                            You are not associated in this cluster
                         </div>
-                    {% empty %}
-                        <div class="leader-profile-no-member-notifier-div">
-                            No Members
-                        </div>
-                    {% endfor %}
+                    {% endif %}
                 </div>
             </div>
         </div>
         <div class="leader-profile-other-details-container-block-div">
-            {{ members }}
-            {% if unassociated_members %}
-                <div class="leader-profile-unassociated-members-block-div">
-                    <div class="leader-profile-unassociated-members-title-header">
-                        Unassociated Members in Brgy. {{ leader.brgy }}
-                    </div>
-                    <div class="leader-profile-unassociated-members-container">
-                        <div class="leader-profile-unassociated-member-search-form-container">
-                            <form class="leader-profile-search-unassociated-member-form"
-                                  method="GET" action="{% url 'cluster' leader.name leader.user %}">
-                                <span class="leader-profile-unassociated-members-lens-icon">
-                                    <i class="fa fa-search"></i>
-                                </span>
-                                <input id="leader-profile-search-unassociated-members-input"
-                                       type="text" name="search" placeholder="Search Members">
-                            </form>
+            {% if request.user == leader.user %}
+                {% if unassociated_members %}
+                    <div class="leader-profile-unassociated-members-block-div">
+                        <div class="leader-profile-unassociated-members-title-header">
+                            Unassociated Members in Brgy. {{ leader.brgy }}
                         </div>
-                        {% if search_engine_field_query %}
-                            {% if not total_results == 0 %}
-                                {% for member in search_engine_result_member %}
+                        <div class="leader-profile-unassociated-members-container">
+                            <div class="leader-profile-unassociated-member-search-form-container">
+                                <form class="leader-profile-search-unassociated-member-form"
+                                      method="GET" action="{% url 'cluster' leader.name leader.user %}">
+                                    <span class="leader-profile-unassociated-members-lens-icon">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                    <input id="leader-profile-search-unassociated-members-input"
+                                           type="text" name="search" placeholder="Search Members">
+                                </form>
+                            </div>
+                            {% if search_engine_field_query %}
+                                {% if not total_results == 0 %}
+                                    {% for member in search_engine_result_member %}
+                                        <div class="leader-profile-unassociated-member-div">
+                                            <div class="leader-profile-unassociated-members-profile-image-container-div">
+                                                {% if member.image %}
+                                                    <div >
+                                                        <img class="leader-profile-unassociated-members-profile-image"
+                                                             src="{{ member.image.url }}"
+                                                        >
+                                                    </div>
+                                                {% else %}
+                                                    <div >
+                                                        <i class="fa fa-user" aria-hidden="true"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="leader-profile-unassociated-member-details-container">
+                                                <div class="leader-profile-unassociated-member-name-div">
+                                                    <a class="leader-profile-unassociated-member-name"
+                                                       href="{% url 'profile-member' member.user %}">
+                                                        {{ member.name }}
+                                                    </a>
+                                                </div>
+                                                <div>
+                                                    {{ member.sitio }}
+                                                </div>
+                                            </div>
+                                            <div class="leader-profile-add-member-btn-container-div">
+                                                <a class="leader-profile-associate-member-btn"
+                                                   href="{% url 'associate-member' leader.user member.user %}">
+                                                    Add as Member
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div>
+                                        No results for "{{ search_engine_field_query }}"
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                {% for member in unassociated_members %}
                                     <div class="leader-profile-unassociated-member-div">
                                         <div class="leader-profile-unassociated-members-profile-image-container-div">
                                             {% if member.image %}
@@ -245,7 +304,7 @@
                                         <div class="leader-profile-unassociated-member-details-container">
                                             <div class="leader-profile-unassociated-member-name-div">
                                                 <a class="leader-profile-unassociated-member-name"
-                                                   href="{% url 'member-profile' member.name member.id %}">
+                                                   href="{% url 'profile-member' member.user %}">
                                                     {{ member.name }}
                                                 </a>
                                             </div>
@@ -260,54 +319,15 @@
                                             </a>
                                         </div>
                                     </div>
+                                {% empty %}
+                                    <div class="leader-profile-no-unassociated-members-notifier">
+                                        Members in this Barangay are associated.
+                                    </div>
                                 {% endfor %}
-                            {% else %}
-                                <div>
-                                    No results for "{{ search_engine_field_query }}"
-                                </div>
                             {% endif %}
-                        {% else %}
-                            {% for member in unassociated_members %}
-                                <div class="leader-profile-unassociated-member-div">
-                                    <div class="leader-profile-unassociated-members-profile-image-container-div">
-                                        {% if member.image %}
-                                            <div >
-                                                <img class="leader-profile-unassociated-members-profile-image"
-                                                     src="{{ member.image.url }}"
-                                                >
-                                            </div>
-                                        {% else %}
-                                            <div >
-                                                <i class="fa fa-user" aria-hidden="true"></i>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="leader-profile-unassociated-member-details-container">
-                                        <div class="leader-profile-unassociated-member-name-div">
-                                            <a class="leader-profile-unassociated-member-name"
-                                               href="{% url 'member-profile' member.name member.id %}">
-                                                {{ member.name }}
-                                            </a>
-                                        </div>
-                                        <div>
-                                            {{ member.sitio }}
-                                        </div>
-                                    </div>
-                                    <div class="leader-profile-add-member-btn-container-div">
-                                        <a class="leader-profile-associate-member-btn"
-                                           href="{% url 'associate-member' leader.user member.user %}">
-                                            Add as Member
-                                        </a>
-                                    </div>
-                                </div>
-                            {% empty %}
-                                <div class="leader-profile-no-unassociated-members-notifier">
-                                    Members in this Barangay are associated.
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             {% endif %}
             <!-- Commented for V. 2 -->
 <!--            <div class="leader-profile-add-member-form-container-div">-->
@@ -378,14 +398,16 @@
 <!--                    </form>-->
 <!--                </div>-->
 <!--            </div>-->
-            <div class="leader-profile-qr-code-container-div">
-                <div class="leader-profile-qr-code-header-title">
-                    {{ leader.name }} QR Code
+            {% if request.user == leader.user %}
+                <div class="leader-profile-qr-code-container-div">
+                    <div class="leader-profile-qr-code-header-title">
+                        {{ leader.name }} QR Code
+                    </div>
+                    <img class="leader-profile-qr-code"
+                         src="{% static 'images/qr-codes/' %}QR-Code-{{ leader.name }}-{{ leader.brgy }}-{{ leader.id }}.png"
+                    >
                 </div>
-                <img class="leader-profile-qr-code"
-                     src="{% static 'images/qr-codes/' %}QR-Code-{{ leader.name }}-{{ leader.brgy }}-{{ leader.id }}.png"
-                >
-            </div>
+            {% endif %}
         </div>
     </section>
     <script>

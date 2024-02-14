@@ -1,20 +1,45 @@
-{% extends 'base.html' %}
-
-{% load static %}
-
-{% block content %}
-
-    <form method="post">
-        {% csrf_token %}
-        <div>
-            <input type="text" name="username" placeholder="Username">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}">
+    <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
+    <script src="{% static 'chart.js' %}"></script>
+    <script src="{% static 'swiper-bundle.min.js' %}"></script>
+</head>
+<body>
+    <section class="login-utmost-container-section">
+        <div class="login-form-container-div">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="login-messages-div">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div>
+                    <input class="login-field" type="text" name="username" placeholder="Username">
+                </div>
+                <div>
+                    <input class="login-field" type="password" name="password" placeholder="Password">
+                </div>
+                <div class="login-registration-link-div">
+                    <a class="login-link-to-registration" href="{% url 'registration' %}">Don't have an Account</a>
+                </div>
+                <div>
+                    <button class="login-btn" type="submit" name="login-btn">Login</button>
+                </div>
+                <div class="login-forgot-password-div">
+                    <a class="login-forgot-password-link" href="{% url 'forgot-password' %}">Forgot Password?</a>
+                </div>
+            </form>
         </div>
-        <div>
-            <input type="password" name="password" placeholder="Password">
-        </div>
-        <div>
-            <button type="submit" name="login-btn">Login</button>
-        </div>
-    </form>
-
-{% endblock %}
+    </section>
+</body>
+</html>

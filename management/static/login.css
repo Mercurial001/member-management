@@ -1,0 +1,77 @@
+body{
+    background-image: linear-gradient(to right,
+                                        rgb(10, 10, 10),
+                                        rgb(10, 40, 40),
+                                        rgb(10, 40, 40),
+                                        rgb(10, 40, 40),
+                                        rgb(10, 10, 10));
+}
+
+.login-form-container-div{
+    margin:auto;
+    width: 40%;
+    text-align: center;
+    background-color: rgba(10, 40, 40, 0.7);
+    border-radius: 15px;
+    border: solid 1px rgb(150, 200, 200);
+    height: 400px;
+    margin-top: 50px;
+    box-shadow: rgba(240, 240, 240, 0.35) 0px 5px 15px;
+}
+
+.login-field{
+    height: 40px;
+    width: 90%;
+    border-radius: 10px;
+    border: none;
+    margin: 30px;
+    padding-left: 5px;
+    margin-left: 22px;
+}
+
+.login-field:focus{
+    outline: none;
+}
+
+.login-btn{
+    background-color: rgb(100, 140, 140);
+    color: beige;
+    font-family: 'Montserrat';
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.login-registration-link-div{
+    margin: 30px;
+    font-family: 'Montserrat';
+}
+
+.login-link-to-registration{
+    text-decoration: none;
+    color: beige;
+}
+
+.login-link-to-registration:hover{
+    text-decoration: underline;
+}
+
+.login-messages-div{
+    padding: 10px;
+    font-family: 'Montserrat';
+    color: beige;
+}
+
+.login-forgot-password-div{
+    margin-top: 10px;
+    font-family: 'Montserrat';
+}
+
+.login-forgot-password-link{
+    text-decoration: none;
+    color: beige;
+}

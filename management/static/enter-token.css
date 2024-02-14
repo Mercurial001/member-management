@@ -1,0 +1,65 @@
+/* enter_token */
+
+body{
+    background-color: rgb(10, 40, 40);
+}
+
+.enter-token-title-heading-div{
+    text-align: center;
+    color: beige;
+    text-transform: uppercase;
+    font-weight: 800;
+    font-family: Lato, 'Montserrat';
+    letter-spacing: 2px;
+}
+
+.enter-token-form-container-div{
+    background-color: rgba(100, 200, 200, 0.3);
+    border: 1px solid rgb(10, 200, 200);
+    margin: auto;
+    margin-top: 100px;
+    width: 40%;
+    height: 200px;
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.enter-token-field{
+    margin-top: 50px;
+    width: 500px;
+    height: 18px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    text-align: left;
+}
+
+.enter-token-field:focus{
+    outline: none;
+}
+
+.enter-token-btn-container-div{
+    margin-top: 40px;
+}
+
+.enter-token-btn{
+    background-color: rgba(100, 200, 200, 0.4);
+    border: 1px solid rgb(100, 200, 200);
+    color: beige;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 10px;
+    font-family: Lato, 'Montserrat';
+    font-weight: 800;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.7s ease;
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 5px 15px;
+}
+
+.enter-token-btn:hover{
+    box-shadow: rgba(200, 200, 200, 0.5) 0px 5px 15px;
+}

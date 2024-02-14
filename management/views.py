@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm, AddMemberRegistrationForm, \
-    ChangeBarangayNameForm, AddSitioForm, LeaderRegistrationEditForm, MemberRegistrationEditForm, RegistrantsForm
+    ChangeBarangayNameForm, AddSitioForm, LeaderRegistrationEditForm, MemberRegistrationEditForm, RegistrantsForm, \
+    ChangePasswordForm, ForgotPasswordForm
 from django.contrib import messages
 from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants, \
-    Notification, EmailMessage
+    Notification, EmailMessage, PasswordResetToken
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
@@ -27,9 +28,12 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from .decorators import authenticated_user, allowed_users
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+import six
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def homepage(request):
     member_brgy = Member.objects.exclude(name=None).values('brgy__brgy_name').distinct()
     leader_brgy = Leader.objects.exclude(name=None).values('brgy__brgy_name').distinct()
@@ -88,6 +92,8 @@ def homepage(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def barangay_members(request, brgy_name):
     brgy = Barangay.objects.get(brgy_name=brgy_name)
     member_brgy = Member.objects.filter(brgy__brgy_name=brgy_name)
@@ -122,6 +128,8 @@ def barangay_members(request, brgy_name):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def barangay_leader(request, brgy_name):
     # brgy = Barangay.objects.get(brgy_name=brgy_name)
     leader_brgy = Leader.objects.filter(brgy__brgy_name=brgy_name)
@@ -130,6 +138,8 @@ def barangay_leader(request, brgy_name):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def barangay_leaders(request, brgy_name):
     name_brgy = Barangay.objects.get(brgy_name=brgy_name)
     brgy_clusters = Cluster.objects.filter(leader__brgy=name_brgy)
@@ -145,6 +155,8 @@ def get_marker_color(percentage):
     return 'gray'
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def dashboard(request):
     # Percentage Data
     percentage_data = Individual.objects.values('brgy__brgy_name', 'brgy__brgy_voter_population').annotate(
@@ -231,6 +243,8 @@ def dashboard(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def leader_cluster(request, name, username):
     leader_user = User.objects.get(username=username)
     leader = Leader.objects.get(name=name, user=leader_user)
@@ -380,6 +394,8 @@ def leader_cluster(request, name, username):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def add_barangay(request):
     # member_brgy = Member.objects.exclude(name=None).values('brgy__brgy_name').distinct()
     member_brgy = Barangay.objects.all()
@@ -426,6 +442,8 @@ def add_barangay(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def add_sitio(request):
     sitios = Sitio.objects.all()
     sitio_form = AddSitioForm()
@@ -440,6 +458,8 @@ def add_sitio(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def clusters(request):
     barangays = Barangay.objects.all()
     leaders = {}
@@ -454,6 +474,8 @@ def clusters(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def add_leader(request):
     leader_form = LeaderRegistrationForm()
     brgys = Barangay.objects.all()
@@ -517,6 +539,8 @@ def add_leader(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def add_members(request):
     member_form = AddMemberRegistrationForm()
     brgys = Barangay.objects.all()
@@ -584,6 +608,8 @@ def add_members(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def member_profile(request, name, id):
     member = Member.objects.get(id=id, name=name)
     members = Cluster.objects.values('members__name')
@@ -640,12 +666,16 @@ def member_profile(request, name, id):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def reports(request):
     return render(request, 'reports.html', {
 
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def no_member_barangays(request):
     member_brgys = Individual.objects.values('brgy__brgy_name').distinct()
 
@@ -666,6 +696,8 @@ def no_member_barangays(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def member_count_per_brgy(request):
     brgys_member_count = Individual.objects.values(
         'brgy__brgy_name',
@@ -690,6 +722,8 @@ def member_count_per_brgy(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def no_members_leader(request):
     no_members = Cluster.objects.filter(members=None)
     return render(request, 'no_member_leaders.html', {
@@ -697,6 +731,8 @@ def no_members_leader(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def leaderless_members(request):
     members = Member.objects.all().order_by('brgy__brgy_name')
     leaderless_member = Cluster.objects.values('members__name')
@@ -717,6 +753,8 @@ def leaderless_members(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def get_filtered_sitios(request):
     selected_brgy = request.GET.get('barangay')
     if selected_brgy:
@@ -747,6 +785,8 @@ def get_filtered_leaders(request):
         return JsonResponse([], safe=False)
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def tag_leader_member(request, member_name, leader_name):
     member = Member.objects.get(name=member_name)
     leader = Leader.objects.get(name=leader_name)
@@ -763,6 +803,8 @@ def tag_leader_member(request, member_name, leader_name):
         return redirect('function', member_name=member.name, leader_name=leader.name)
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def change_brgy_name(request):
     barangays = Barangay.objects.all()
     change_brgy_name_form = ChangeBarangayNameForm()
@@ -777,6 +819,8 @@ def change_brgy_name(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 @csrf_exempt
 def qr_code_scanner(request):
     if request.method == 'POST':
@@ -830,6 +874,8 @@ def qr_code_scanner(request):
     return render(request, 'qr_code_attendance.html')
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def promote_to_leader(request, name):
     member = Member.objects.get(name=name)
 
@@ -860,11 +906,11 @@ def authentication(request):
             elif user.groups.filter(name='Leaders').exists():
                 user_object = User.objects.get(username=username)
                 leader_user = Leader.objects.get(user=user_object)
-                return redirect('profile-leader', name=leader_user.name, username=username)
+                return redirect('profile-leader', username=username)
             elif user.groups.filter(name='Members').exists():
                 user_object = User.objects.get(username=username)
                 member_user = Member.objects.get(user=user_object)
-                return redirect('profile-member', name=member_user.name, username=username)
+                return redirect('profile-member', username=username)
         else:
             messages.error(request, 'Invalid Form Data')
 
@@ -878,6 +924,8 @@ def logout_user(request):
     return redirect('login')
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def create_individuals(request):
     leaders = Leader.objects.all()
     members = Member.objects.all()
@@ -978,6 +1026,8 @@ def registration_validation(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def registrants(request):
     registrant_objects = Registrants.objects.all()
     return render(request, 'registrants.html', {
@@ -985,6 +1035,8 @@ def registrants(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def confirm_registration_member(request, username):
     registrant = Registrants.objects.get(username=username)
     email_message = EmailMessage.objects.get(type='Member Verification')
@@ -1082,6 +1134,8 @@ def confirm_registration_member(request, username):
         return redirect('homepage')
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def confirm_registration_leader(request, username):
     registrant = Registrants.objects.get(username=username)
     email_message = EmailMessage.objects.get(type='Member Verification')
@@ -1181,6 +1235,8 @@ def confirm_registration_leader(request, username):
         return redirect('homepage')
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def confirm_registrant_as_admin_and_leader(request, username):
     registrant = Registrants.objects.get(username=username)
     email_message = EmailMessage.objects.get(type='Member Verification')
@@ -1280,6 +1336,8 @@ def confirm_registrant_as_admin_and_leader(request, username):
         return redirect('homepage')
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def deny_registration(request, username):
     registrant = Registrants.objects.get(username=username)
     email_message = EmailMessage.objects.get(type='Denied Registration')
@@ -1329,6 +1387,8 @@ def deny_registration(request, username):
         return redirect('homepage')
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin', 'Leaders'])
 def associate_member_to_leader(request, leader_username, member_username):
     leader_user = User.objects.get(username=leader_username)
     member_user = User.objects.get(username=member_username)
@@ -1350,6 +1410,8 @@ def associate_member_to_leader(request, leader_username, member_username):
         return redirect('homepage')
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin', 'Leaders'])
 def remove_member_from_leader(request, leader_username, member_username):
     leader_user = User.objects.get(username=leader_username)
     member_user = User.objects.get(username=member_username)
@@ -1396,6 +1458,7 @@ def notifications_async(request):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def remove_notification(request, title, id):
     notification = Notification.objects.get(title=title, id=id)
     notification.removed = True
@@ -1405,9 +1468,11 @@ def remove_notification(request, title, id):
     return JsonResponse({'message': 'Notification removed successfully'})
 
 
-def non_admin_leader_profile(request, name, username):
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin', 'Leaders', 'Members'])
+def non_admin_leader_profile(request, username):
     leader_user = User.objects.get(username=username)
-    leader = Leader.objects.get(name=name, user=leader_user)
+    leader = Leader.objects.get(user=leader_user)
     leaders_cluster = Cluster.objects.get(leader=leader)
     barangays = Barangay.objects.all()
     sitios = Sitio.objects.filter(brgy=leader.brgy)
@@ -1447,6 +1512,12 @@ def non_admin_leader_profile(request, name, username):
             if member_name not in members_b:
                 members_b.append(member_name)
 
+    members_c = []
+    for members in leaders_cluster.members.all():
+        members_user = members.user
+        if members_user not in members_c:
+            members_c.append(members_user)
+
     unassociated_members = []
     for member in members_brgy:
         member_name = member.name
@@ -1466,9 +1537,9 @@ def non_admin_leader_profile(request, name, username):
     signing_key = b'Cold'
     signer = Signer(key=signing_key)
 
-    encrypted_username = signer.sign(leader.name)  # 1st Encrypt the username
-    data = encrypted_username.encode('utf-8')  # 2 Convert encrypted_username to bytes
-    encrypted_data = cipher_suite.encrypt(data)  # Final
+    encrypted_username = signer.sign(leader.name) # 1st Encrypt the username
+    data = encrypted_username.encode('utf-8') # 2 Convert encrypted_username to bytes
+    encrypted_data = cipher_suite.encrypt(data) # Final
 
     qr.add_data(encrypted_data)
     qr.make(fit=True)
@@ -1497,6 +1568,96 @@ def non_admin_leader_profile(request, name, username):
             leader_profile.save()
             messages.success(request, 'Editted!')
             return redirect('cluster', name=leader_profile.name)
+    # leader_user = User.objects.get(username=username)
+    # leader = Leader.objects.get(user=leader_user)
+    # leaders_cluster = Cluster.objects.get(leader=leader)
+    # barangays = Barangay.objects.all()
+    # sitios = Sitio.objects.filter(brgy=leader.brgy)
+    # selected_sitio = request.POST.get('added-member-sitio')
+    #
+    # leader_brgy_unassociated_members = Member.objects.filter(brgy=leader.brgy)
+    #
+    # members_brgy = [member for member in leader_brgy_unassociated_members]
+    #
+    # # First let's retrieve the search field in the base.html
+    # search_engine_field_query = request.GET.get('search')
+    #
+    # # Now that we have retrieve the search engine field in the base.html, it's time to delve into the login of it
+    #
+    # if search_engine_field_query:
+    #     search_engine_result_member = Member.objects.filter(
+    #         Q(name__icontains=search_engine_field_query, brgy=leader.brgy) |
+    #         Q(sitio__name__icontains=search_engine_field_query, brgy=leader.brgy))
+    #
+    #     search_result_count_member = search_engine_result_member.annotate(count=Count('name'))
+    #     search_result_sum_member = search_result_count_member.aggregate(sum=Sum('count'))['sum']
+    #
+    #     if search_result_sum_member is None:
+    #         total_results = 0
+    #     else:
+    #         total_results = search_result_sum_member
+    #
+    # else:
+    #     search_engine_result_member = []
+    #     total_results = []
+    #
+    # brgy_members = Cluster.objects.all()
+    # members_b = []
+    # for members in leaders_cluster.members.all():
+    #         member_name = members.user
+    #         if member_name not in members_b:
+    #             members_b.append(member_name)
+    #
+    # unassociated_members = []
+    # for member in members_brgy:
+    #     member_name = member.name
+    #     if member_name not in members_b:
+    #         unassociated_members.append(member)
+    #
+    # # Create QR Code for each user
+    # qr = qrcode.QRCode(
+    #     version=1,
+    #     error_correction=qrcode.constants.ERROR_CORRECT_L,
+    #     box_size=10,
+    #     border=2,
+    # )
+    #
+    # key = b'bSKEk2cT2V8vllCpMtQWsO2FxUVQdl3S_IHwBbEE4eQ='
+    # cipher_suite = Fernet(key)
+    # signing_key = b'Cold'
+    # signer = Signer(key=signing_key)
+    #
+    # encrypted_username = signer.sign(leader.name)  # 1st Encrypt the username
+    # data = encrypted_username.encode('utf-8')  # 2 Convert encrypted_username to bytes
+    # encrypted_data = cipher_suite.encrypt(data)  # Final
+    #
+    # qr.add_data(encrypted_data)
+    # qr.make(fit=True)
+    #
+    # img = qr.make_image(fill_color="black", back_color="white")
+    #
+    # img.save(f'management/static/images/qr-codes/QR-Code-{leader.name}-{leader.brgy}-{leader.id}.png')
+    #
+    # member_registration_form = MemberRegistrationForm()
+    # edit_leader_profile_form = LeaderRegistrationEditForm(instance=leader)
+    #
+    # if request.method == 'POST':
+    #     # Added for V.2, 2/10/ 2024
+    #     edit_profile_leader_profile_form = LeaderRegistrationEditForm(request.POST, request.FILES, instance=leader)
+    #     if edit_profile_leader_profile_form.is_valid():
+    #
+    #         # external_data
+    #         edit_selected_sitio = request.POST.get('leader-profile-edit-sitio')
+    #
+    #         leader_profile = edit_profile_leader_profile_form.save(commit=False)
+    #         if edit_selected_sitio != 'None':
+    #             selected_sitio_edit = Sitio.objects.get(id=edit_selected_sitio)
+    #             leader_profile.sitio = selected_sitio_edit
+    #         else:
+    #             leader_profile.sitio = None
+    #         leader_profile.save()
+    #         messages.success(request, 'Editted!')
+    #         return redirect('profile-leader', name=leader_profile.name, username=leader_profile.user)
 
         # Commented for V.2, 2/10/2024
         # if 'add-new-member-btn' in request.POST:
@@ -1522,7 +1683,9 @@ def non_admin_leader_profile(request, name, username):
         #
         #         messages.success(request, 'Member Added')
         # elif 'edit-leader-profile-btn' in request.POST:
-        #     edit_profile_leader_profile_form = LeaderRegistrationEditForm(request.POST, request.FILES, instance=leader)
+        #     edit_profile_leader_profile_form = LeaderRegistrationEditForm(request.POST,
+        #                                                                   request.FILES,
+        #                                                                   instance=leader)
         #     if edit_profile_leader_profile_form.is_valid():
         #
         #         # external_data
@@ -1547,6 +1710,7 @@ def non_admin_leader_profile(request, name, username):
         'barangays': barangays,
         'brgy_members': brgy_members,
         'members_b': members_b,
+        'members_c': members_c,
         'unassociated_members': unassociated_members,
         'search_engine_result_member': search_engine_result_member,
         'search_engine_field_query': search_engine_field_query,
@@ -1554,12 +1718,19 @@ def non_admin_leader_profile(request, name, username):
     })
 
 
-def non_admin_member_profile(request, name, username):
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin', 'Leaders', 'Members'])
+def non_admin_member_profile(request, username):
     member_user = User.objects.get(username=username)
-    member = Member.objects.get(user=member_user, name=name)
+    member = Member.objects.get(user=member_user)
     members = Cluster.objects.values('members__name')
     leaders = Leader.objects.filter(brgy=member.brgy)
     get_member_leader = Cluster.objects.filter(members__name=member.name)
+
+    get_member_leader_filter = Cluster.objects.filter(members__name=member.name).values('leader__user__username')
+
+    member_leader = [leader['leader__user__username'] for leader in get_member_leader_filter]
+
     no_leader_member_list = [name['members__name'] for name in members]
 
     sitios = Sitio.objects.filter(brgy=member.brgy)
@@ -1608,10 +1779,135 @@ def non_admin_member_profile(request, name, username):
         'get_member_leader': get_member_leader,
         'edit_member_detail_form': edit_member_detail_form,
         "sitios": sitios,
+        'member_leader': member_leader,
+    })
+
+
+class MyTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, user, timestamp):
+        try:
+            email_confirmed = user.profile.email_confirmed
+        except AttributeError:
+            email_confirmed = ''
+
+        return (
+            six.text_type(user.pk) + six.text_type(timestamp) +
+            six.text_type(email_confirmed)
+        )
+
+
+token_generator = MyTokenGenerator()
+
+
+def create_password_reset_token(user):
+    # Generate a unique token for the user
+    token = token_generator.make_token(user)
+
+    # Create a PasswordResetToken object and save it to the database
+    password_reset_token = PasswordResetToken.objects.create(
+        user=user,
+        token=token,
+        expires_at=timezone.now() + timezone.timedelta(minutes=10)
+    )
+
+    return password_reset_token
+
+
+@authenticated_user
+def forgot_password(request):
+    forgot_password_form = ForgotPasswordForm()
+    if request.method == 'POST':
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            if User.objects.filter(email=email).exists():
+                user = User.objects.get(email=email)
+                individual = Individual.objects.get(user=user)
+                # Generate a unique token for the user
+                password_reset_token = create_password_reset_token(user)
+
+                # Send email
+                from_email = 'LMS'
+                name = individual.name
+                to_email = [user.email]
+                message = 'Your Token Is'
+                subject = 'Change Password'
+                html_message = render_to_string('forgot_password_message_to_email.html', {
+                    'name': name,
+                    'message': message,
+                    'token': password_reset_token.token,
+                    'username': user.username,
+                    'email': user.email,
+                })
+
+                send_mail(
+                    subject,
+                    message,
+                    'LMS <dandan321321321@gmail.com>',
+                    to_email,
+
+                    html_message=html_message,
+                    fail_silently=False,
+                )
+                # End send email
+                messages.success(request, 'Email sent!')
+            else:
+                messages.error(request, 'Email not found')
+
+    return render(request, 'forgot_password.html', {
+        'form': forgot_password_form,
+    })
+
+
+@authenticated_user
+def enter_token(request, email):
+    if request.method == 'POST':
+        token = request.POST.get('token')
+        user = User.objects.get(email=email)
+
+        # Check if the token is valid
+        if PasswordResetToken.objects.filter(user=user, token=token).exists():
+            return redirect('change-password', email=email, token_str=token)
+        else:
+            # Check if there are any expired tokens for the user
+            expired_tokens = PasswordResetToken.objects.filter(user=user, expires_at__lt=timezone.now())
+            if expired_tokens.exists():
+                # Delete the expired tokens
+                expired_tokens.delete()
+                messages.error(request, 'Token is expired. Please request a new one.')
+                return redirect('forgot-password')
+            else:
+                messages.error(request, 'Invalid token. Please try again.')
+
+    return render(request, 'enter_token.html')
+
+
+@authenticated_user
+def change_password(request, email, token_str):
+    user = User.objects.get(email=email)
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['password1'] == form.cleaned_data['password2']:
+                hashed_password = make_password(form.cleaned_data['password1'])
+                user.password = hashed_password
+                user.save()
+                messages.success(request, "You've successfully reset your password")
+                token = PasswordResetToken.objects.get(user=user, token=token_str)
+                token.delete()
+                return redirect('login')
+            else:
+                messages.error(request, "Password does not match")
+
+    form = ChangePasswordForm()
+
+    return render(request, 'change_password.html', {
+        'form': form,
     })
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def seen_notifications(request):
     try:
         notifications = Notification.objects.all()
@@ -1630,6 +1926,8 @@ def seen_notifications(request):
         return JsonResponse({'status': 'error', 'message': str(e)})
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def create_json(request):
     member_objects = Member.objects.all()
     leader_objects = Leader.objects.all()
@@ -1652,6 +1950,8 @@ def create_json(request):
     return redirect('homepage')
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def load_json(request):
     with open('Individual_model.json', 'r') as f:
         for obj in deserialize('json', f):
