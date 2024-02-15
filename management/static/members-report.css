@@ -1,0 +1,28 @@
+.members-report-utmost-container-section{
+    font-family: 'Montserrat';
+}
+
+.members-report-title-header-div{
+    text-align: center;
+    margin: 30px;
+    font-size:30px;
+    font-weight: 800;
+    color: rgb(80, 80, 80);
+}
+
+.members-report-table-container-div{
+    margin: auto;
+    width: 50%;
+}
+
+.members-report-table-head{
+    background-color: rgb(80, 160, 160);
+    padding: 10px;
+    color: beige;
+    width: 300px;
+}
+
+.members-report-table-data{
+    background-color: rgb(200, 200, 200);
+    padding: 10px;
+}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<section class="leaders-report-utmost-container-section">
+    <div class="leader-report-title-header-div">
+        Leaders
+    </div>
+    <div>
+        <a href="{% url 'leaders-report-pdf' %}">Download PDF</a>
+    </div>
+    <div class="leader-report-table-container-div">
+        <table class="leader-report-table">
+            <tr class="leader-report-table-row">
+                <th class="leader-report-table-head">Name</th>
+                <th class="leader-report-table-head">Barangay</th>
+                <th class="leader-report-table-head">Sitio</th>
+                <th class="leader-report-table-head">Members Count</th>
+            </tr>
+            {% for leader, count in leader_list.items %}
+                <tr class="leader-report-table-row">
+                    <td class="leader-report-table-data">{{ leader.leader.name }}</td>
+                    <td class="leader-report-table-data">{{ leader.leader.brgy }}</td>
+                    <td class="leader-report-table-data">{{ leader.leader.sitio }}</td>
+                    <td class="leader-report-table-data">{{ count }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}

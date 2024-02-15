@@ -1,14 +1,57 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .leaderless-members-header-title-div{
+            text-align: center;
+            margin: 20px;
+            font-family: 'Montserrat';
+            font-size: 25px;
+            color: rgb(50, 50, 50);
 
-{% load static %}
+        }
 
-{% block content %}
+        .leaderless-members-table-container-div{
+            margin: auto;
+            width: 85%;
+        }
+
+        .leader-members-table{
+            border-collapse: collapse;
+        }
+
+        .leader-members-table-head{
+            border: 1px solid rgb(20, 20, 20);
+            padding-top: 15px;
+            padding-bottom: 15px;
+            width: 300px;
+            font-family: 'Montserrat';
+        }
+
+        .leaderless-members-table-data{
+            border: 1px solid rgb(20, 20, 20);
+            font-family: 'Montserrat';
+            padding-top: 15px;
+            padding-bottom: 15px;
+            padding-left: 15px;
+        }
+
+        .leaderless-members-table-link-to-page{
+            text-decoration: none;
+            color: rgb(70, 70, 70);
+        }
+
+        .leaderless-members-table-link-to-page:hover{
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
     <section class="leaderless-members-utmost-container-section">
         <div class="leaderless-members-header-title-div">
             Leaderless Members Report
-        </div>
-        <div>
-            <a href="{% url 'leaderless-members-pdf' %}">Download PDF</a>
         </div>
         <div class="leaderless-members-table-container-div">
             <table class="leaderless-members-table">
@@ -36,4 +79,5 @@
             </table>
         </div>
     </section>
-{% endblock %}
+</body>
+</html>

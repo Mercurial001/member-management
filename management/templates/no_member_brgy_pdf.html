@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .no-member-brgys-table{
+            font-family: 'montserrat';
+            border-collapse: collapse;
+        }
+
+        .no-member-brgys-table-head{
+            border: 1px solid rgb(20, 20, 20);
+            width: 500px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border: 1px solid rgb(20, 20, 20);
+        }
+
+        .no-member-brgys-table-data{
+            border: 1px solid rgb(20, 20, 20);
+            padding-left: 40px;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+
+        .no-member-brgys-table-link{
+            color: rgb(40, 40, 40);
+            text-decoration: none;
+        }
+
+        .no-member-brgys-table-link:hover{
+            text-decoration: underline;
+        }
+
+        .no-member-brgy-title-header-div{
+            text-align: center;
+            font-size: 35px;
+            font-family: 'Montserrat';
+            margin: 20px;
+        }
+
+        .no-member-brgy-table-container-div{
+            margin: auto;
+            width: 85%;
+            margin-top: 40px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <section class="no-member-brgy-utmost-container-section">
+        <div class="no-member-brgy-title-header-div">
+            No Members Barangay Report
+        </div>
+        <div class="no-member-brgy-table-container-div">
+            <table class="no-member-brgys-table">
+                <tr class="no-member-brgys-table-row">
+                    <th class="no-member-brgys-table-head">Barangay Name</th>
+                </tr>
+                {% for brgy, no_mem_brgy in no_member_brgy_list.items %}
+                    <tr class="no-member-brgys-table-row">
+                        <td class="no-member-brgys-table-data">
+                            <a class="no-member-brgys-table-link" href="{% url 'member-brgy' brgy %}">{{ brgy }}</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="no-member-brgys-table-row">
+                        <td class="no-member-brgys-table-data">All Barangays have members</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </section>
+</body>
+</html>

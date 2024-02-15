@@ -1,0 +1,54 @@
+.leader-members-report-utmost-container-section{
+    font-family: 'Montserrat';
+}
+
+.leader-members-report-title-header-div{
+    text-align: center;
+    margin: 30px;
+    font-weight: 800;
+    color: rgb(90, 90, 90);
+    font-size: 35px;
+}
+
+.leader-members-report-table-container{
+    margin: auto;
+    width: 50%;
+}
+
+.leader-member-report-table{
+    margin: 40px;
+}
+
+.leader-member-report-table-head{
+    width: 600px;
+    background-color: rgb(40, 130, 130);
+    padding:10px;
+    color: beige;
+}
+
+.leader-members-leader-table-head-span{
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.leader-member-report-member-table-head{
+    width: 600px;
+    background-color: rgb(60, 180, 180);
+    padding:10px;
+    color: beige;
+}
+
+.leader-member-report-table-data{
+    padding: 15px;
+    background-color: rgb(200, 200, 200);
+    width: 100px;
+    text-align: center;
+}
+
+.leader-member-report-no-cluster-filtered-div{
+    text-align: center;
+    margin-top: 50px;
+    font-weight: 800;
+    color: rgb(80, 80, 80);
+    font-size: 50px;
+}

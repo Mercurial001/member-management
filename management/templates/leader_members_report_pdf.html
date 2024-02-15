@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+          .leader-members-report-utmost-container-section{
+              font-family: 'Montserrat';
+          }
+
+          .leader-members-report-title-header-div{
+              text-align: center;
+              margin: 30px;
+              font-weight: 800;
+              color: rgb(90, 90, 90);
+              font-size: 35px;
+          }
+
+          .leader-members-report-table-container{
+              margin: auto;
+              width: 80%;
+          }
+
+          .leader-member-report-table{
+              margin: 40px;
+              border-collapse: collapse;
+          }
+
+          .leader-member-report-table-head{
+              width: 600px;
+              border: 1px solid rgb(20, 20, 20);
+              padding:10px;
+          }
+
+          .leader-members-leader-table-head-span{
+              margin-left: 20px;
+              margin-right: 20px;
+          }
+
+          .leader-member-report-member-table-head{
+              border: 1px solid rgb(20, 20, 20);
+              padding:10px;
+          }
+
+          .leader-member-report-table-data{
+              border: 1px solid rgb(20, 20, 20);
+              width: 100px;
+              text-align: center;
+          }
+    </style>
+</head>
+<body>
+    <section class="leader-members-report-utmost-container-section">
+        <div class="leader-members-report-title-header-div">
+            Leader's Members Report
+        </div>
+        <div class="leader-members-report-table-container">
+            {% for leader in cluster %}
+                <table class="leader-member-report-table">
+                    <tr class="leader-member-report-table-row">
+                        <th class="leader-member-report-table-head" colspan="3">
+                            <span class="leader-members-leader-table-head-span">{{ leader.leader.name }}</span>
+                            <span class="leader-members-leader-table-head-span">{{ leader.leader.brgy }}</span>
+                        </th>
+                    </tr>
+                    <tr class="leader-member-report-table-row">
+                        <th class="leader-member-report-member-table-head">Name</th>
+                        <th class="leader-member-report-member-table-head">Barangay</th>
+                        <th class="leader-member-report-member-table-head">Sitio</th>
+                    </tr>
+                    {% for member in leader.members.all %}
+                        <tr class="leader-member-report-table-row">
+                            <td class="leader-member-report-table-data">{{ member.name }}</td>
+                            <td class="leader-member-report-table-data">{{ member.brgy }}</td>
+                            <td class="leader-member-report-table-data">{{ member.sitio }}</td>
+                        </tr>
+                    {% empty %}
+                        <td colspan="3" class="leader-member-report-table-data">No Members</td>
+                    {% endfor %}
+                </table>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>

@@ -105,6 +105,8 @@ class Individual(models.Model):
     brgy = models.ForeignKey(Barangay, related_name='individual_brgy', on_delete=models.PROTECT)
     sitio = models.ForeignKey(Sitio, related_name='individual_sitio', on_delete=models.PROTECT, null=True, blank=True)
     date_registered = models.DateTimeField(auto_now_add=True)
+    group = models.CharField(max_length=255)
+    image = models.ImageField(null=True, blank=True, upload_to="images/")
 
     def __str__(self):
         return self.name

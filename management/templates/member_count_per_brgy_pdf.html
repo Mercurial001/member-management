@@ -1,14 +1,49 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .member-count-per-brgy-title-header-div{
+            text-align: center;
+            font-size: 35px;
+            font-family: 'Montserrat';
+            color: rgb(90, 90, 90);
+            margin: 40px;
+        }
 
-{% load static %}
+        .member-count-per-brgy-table-container-div{
+            margin:auto;
+            width: 85%;
+            margin-top: 20px;
+            margin-bottom: 50px;
+        }
 
-{% block content %}
+        .member-count-per-brgy-table{
+            border-collapse: collapse;
+        }
+
+        .member-count-per-brgy-table-head{
+            border: 1px solid rgb(20, 20, 20);
+            font-family: 'Montserrat';
+            width: 270px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .member-count-per-brgy-table-data{
+            padding-top: 12px;
+            padding-bottom: 12px;
+            padding-left: 15px;
+            font-family: 'Montserrat';
+            border: 1px solid rgb(20, 20, 20);
+        }
+    </style>
+</head>
+<body>
     <section class="member-count-per-brgy-utmost-container-section">
         <div class="member-count-per-brgy-title-header-div">
             Members per Barangay Report
-        </div>
-        <div>
-            <a href="{% url 'member-count-brgy-pdf' %}">Download PDF</a>
         </div>
         <div class="member-count-per-brgy-table-container-div">
             <table class="member-count-per-brgy-table">
@@ -41,4 +76,5 @@
             </table>
         </div>
     </section>
-{% endblock %}
+</body>
+</html>

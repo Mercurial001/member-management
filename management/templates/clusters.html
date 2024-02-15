@@ -19,7 +19,7 @@
     <div class="cluster-brgy-leaders-section-div">
         {% for leaders, brgys in leaders.items %}
             <div class="cluster-brgy-name-header-div" id="brgy-{{ brgys }}">
-                <a class="cluster-hyper-link-brgy-cluster" href="{% url 'brgy-leaders' brgys %}">
+                <a class="cluster-hyper-link-brgy-cluster" href="{% url 'member-brgy' brgys %}">
                     {{ brgys }}
                 </a>
             </div>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .member-per-brgy-report-utmost-container-section{
+            font-family: 'Montserrat';
+        }
+
+        .member-per-brgy-report-title-header-div{
+            text-align: center;
+            font-size: 30px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: rgb(80, 80, 80);
+            margin: 30px;
+        }
+
+        .member-per-brgy-table-container-div{
+            margin: auto;
+            width: 80%;
+        }
+
+        .member-per-brgy-table{
+            margin: 20px;
+            border-collapse: collapse;
+        }
+
+        .member-per-brgy-table-head{
+            width: 500px;
+            background-color: rgb(40, 90, 90);
+            color: beige;
+            padding: 15px;
+        }
+
+        .member-per-table-head{
+            padding: 12px;
+            border: 1px solid rgb(20, 20, 20);
+        }
+
+        .member-per-table-data{
+            padding: 10px;
+            border: 1px solid rgb(20, 20, 20);
+        }
+    </style>
+</head>
+<body>
+    <section class="member-per-brgy-report-utmost-container-section">
+        <div class="member-per-brgy-report-title-header-div">
+            Barangay Members
+        </div>
+        <div class="member-per-brgy-table-container-div">
+            {% for brgy, members in member_filtered_per_brgy_list.items %}
+                <table class="member-per-brgy-table">
+                    <tr class="member-per-brgy-table-row">
+                        <th class="member-per-brgy-table-head" colspan="2">{{ brgy }}</th>
+                    </tr>
+                    <tr class="member-per-brgy-table-row">
+                        <th class="member-per-table-head">Name</th>
+                        <th class="member-per-table-head">Status</th>
+                    </tr>
+                    {% for member in members %}
+                        <tr class="member-per-brgy-table-row">
+                            <td class="member-per-table-data">{{ member.name }}</td>
+                            <td class="member-per-table-data">{{ member.group }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>

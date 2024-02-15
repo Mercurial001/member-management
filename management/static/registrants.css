@@ -9,14 +9,40 @@
 
 .registrants-registrant-block-div{
     width: 35%;
-    height: 390px;
-    margin: 40px;
+    height: 480px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    margin-left: 40px;
+    margin-right: 40px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     border-radius: 10px;
     padding: 15px;
     font-family: 'Montserrat';
     display: inline-block;
     border: 1px solid rgb(100, 150, 150);
+    word-wrap: break-word;
+    hyphens:auto;
+    text-overflow: ellipsis;
+    vertical-align: top;
+}
+
+.registrant-data-table{
+    word-wrap: break-word;
+    hyphens:auto;
+    text-overflow: ellipsis;
+    table-layout: fixed;
+    width: 100%
+}
+
+#registration-email-row{
+}
+
+.registrant-data-table-data-label{
+    width:45px;
+}
+
+.registrant-data-table-data{
+    width: 120px;
 }
 
 .registrants-function-btn-container{
@@ -26,6 +52,7 @@
 
 .registrants-function-btn-div{
     display: inline-block;
+    margin: 10px;
 }
 
 .registrants-registrant-image-container{
@@ -49,14 +76,18 @@
     padding-left: 5px;
     border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-    margin: 10px;
     font-size: 12px;
+}
+
+#registrant-verify-as-admin{
+    margin-top: 20px;
 }
 
 .registrants-deny-registration-btn-container-div{
     text-align: center;
     font-size: 12px;
     margin-top: 25px;
+    display: inline-block;
 }
 
 .registrants-link-to-function{
@@ -68,8 +99,8 @@
     color: beige;
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-right: 20px;
-    padding-left: 20px;
+    padding-right: 5px;
+    padding-left: 5px;
     border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }

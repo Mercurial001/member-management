@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<section class="all-member-report-utmost-container-section">
+    <div class="all-member-report-header-title-container-div">
+        Total Members Report
+    </div>
+    <div>
+        <a href="{% url 'all-members-report-pdf' %}">Download PDF</a>
+    </div>
+    <div class="all-member-report-total-member-table-container">
+        <table class="all-member-report-table">
+            <tr class="all-member-report-table-row">
+                <th class="all-member-report-table-head">Name</th>
+                <th class="all-member-report-table-head">Barangay</th>
+            </tr>
+            {% for individual in individuals %}
+                <tr class="all-member-report-table-row">
+                    <td class="all-member-report-table-data">{{ individual.name }}</td>
+                    <td class="all-member-report-table-data">{{ individual.brgy }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+
+
+{% endblock %}

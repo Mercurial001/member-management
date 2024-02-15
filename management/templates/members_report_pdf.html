@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .members-report-utmost-container-section{
+            font-family: 'Montserrat';
+        }
+
+        .members-report-title-header-div{
+            text-align: center;
+            margin: 30px;
+            font-size:30px;
+            font-weight: 800;
+            color: rgb(80, 80, 80);
+        }
+
+        .members-report-table{
+            border-collapse: collapse;
+        }
+
+        .members-report-table-container-div{
+            margin: auto;
+            width: 85%;
+        }
+
+        .members-report-table-head{
+            border: 1px solid rgb(30, 30, 30);
+            padding: 10px;
+            width: 300px;
+        }
+
+        .members-report-table-data{
+            border: 1px solid rgb(30, 30, 30);
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <section class="members-report-utmost-container-section">
+        <div class="members-report-title-header-div">
+            Members
+        </div>
+
+        <div class="members-report-table-container-div">
+            <table class="members-report-table">
+                <tr class="members-report-table-row">
+                    <th class="members-report-table-head">Name</th>
+                    <th class="members-report-table-head">Barangay</th>
+                    <th class="members-report-table-head">Sitio</th>
+                </tr>
+                {% for member in members %}
+                    <tr class="members-report-table-row">
+                        <td class="members-report-table-data">{{ member.name }}</td>
+                        <td class="members-report-table-data">{{ member.brgy }}</td>
+                        <td class="members-report-table-data">{{ member.sitio }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+
+    </section>
+</body>
+</html>

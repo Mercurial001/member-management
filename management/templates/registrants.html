@@ -19,6 +19,10 @@
                             <a class="registrant-link-to-function"
                                href="{% url 'confirm-leader' registrant.username %}">Verify as Leader</a>
                         </div>
+                        <div class="registrants-function-btn-div" id="registrant-verify-as-admin">
+                            <a class="registrant-link-to-function"
+                               href="{% url 'confirm-admin' registrant.username %}">Verify as Admin</a>
+                        </div>
                     </div>
                     <div class="registrants-registrant-image-container">
                         {% if registrant.image %}
@@ -40,39 +44,55 @@
                                 background-color: rgba(150, 150, 150, 0.5);
                                 margin-top: 10px;
                                 margin-bottom: 10px;"></div>
-                    <table>
-                        <tr>
-                            <td>Username:</td>
-                            <td>{{ registrant.username }}</td>
+                    <table class="registrant-data-table">
+                        <tr class="registrant-data-table-row">
+                            <td class="registrant-data-table-data-label">Username:</td>
+                            <td class="registrant-data-table-data">{{ registrant.username }}</td>
                         </tr>
-                        <tr>
-                            <td>Full Name:</td>
-                            <td>{{ registrant.name }}</td>
+                        <tr class="registrant-data-table-row">
+                            <td class="registrant-data-table-data-label">Full Name:</td>
+                            <td class="registrant-data-table-data">{{ registrant.name }}</td>
                         </tr>
-                        <tr>
-                            <td>Email:</td>
-                            <td>{{ registrant.email }}</td>
+                        <tr class="registrant-data-table-row" id="registration-email-row">
+                            <td class="registrant-data-table-data-label">Email:</td>
+                            <td class="registrant-data-table-data">
+                                {{ registrant.email }}
+                            </td>
                         </tr>
-                        <tr>
-                            <td>Barangay:</td>
-                            <td>{{ registrant.brgy }}</td>
+                        <tr class="registrant-data-table-row">
+                            <td class="registrant-data-table-data-label">Barangay:</td>
+                            <td class="registrant-data-table-data">{{ registrant.brgy }}</td>
                         </tr>
-                        <tr>
-                            <td>Sitio:</td>
-                            <td>{{ registrant.sitio }}</td>
+                        <tr class="registrant-data-table-row">
+                            <td class="registrant-data-table-data-label">Sitio:</td>
+                            <td class="registrant-data-table-data">{{ registrant.sitio }}</td>
                         </tr>
-                        <tr>
-                            <td>Gender:</td>
-                            <td>{{ registrant.gender }}</td>
+                        <tr class="registrant-data-table-row">
+                            <td class="registrant-data-table-data-label">Gender:</td>
+                            <td class="registrant-data-table-data">{{ registrant.gender }}</td>
                         </tr>
-                        <tr>
-                            <td>Age:</td>
-                            <td>{{ registrant.age }}</td>
+                        <tr class="registrant-data-table-row">
+                            <td class="registrant-data-table-data-label">Age:</td>
+                            <td class="registrant-data-table-data">{{ registrant.age }}</td>
                         </tr>
                     </table>
-                    <div class="registrants-deny-registration-btn-container-div">
-                        <a class="registrants-link-to-function"
-                           href="{% url 'deny-registration' registrant.username %}">Deny Registration</a>
+                    <div class="registrants-deny-registration-btns-container">
+                        <div class="registrants-deny-registration-btn-container-div">
+                            <a class="registrants-link-to-function"
+                               href="{% url 'deny-registration' registrant.username %}">Deny Registration</a>
+                        </div>
+                        <div class="registrants-deny-registration-btn-container-div">
+                            <a class="registrants-link-to-function"
+                               href="{% url 'deny-registration-illegible-image' registrant.username %}">
+                                Illegible Image
+                            </a>
+                        </div>
+                        <div class="registrants-deny-registration-btn-container-div">
+                            <a class="registrants-link-to-function"
+                               href="{% url 'deny-registration-invalid-email' registrant.username %}">
+                                Invalid Email
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% empty %}

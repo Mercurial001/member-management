@@ -30,6 +30,7 @@ from django.core.mail import send_mail
 from .decorators import authenticated_user, allowed_users
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import six
+import pdfkit
 
 
 @login_required(login_url='login')
@@ -125,27 +126,6 @@ def barangay_members(request, brgy_name):
         'brgy_individual_sum': brgy_individual_sum,
         'brgy_sitio_sum': brgy_sitio_sum,
         'brgy_cluster': brgy_cluster,
-    })
-
-
-@login_required(login_url='login')
-@allowed_users(allowed_roles=['Admin'])
-def barangay_leader(request, brgy_name):
-    # brgy = Barangay.objects.get(brgy_name=brgy_name)
-    leader_brgy = Leader.objects.filter(brgy__brgy_name=brgy_name)
-    return render(request, 'leader_brgy.html', {
-        'leader_brgy': leader_brgy
-    })
-
-
-@login_required(login_url='login')
-@allowed_users(allowed_roles=['Admin'])
-def barangay_leaders(request, brgy_name):
-    name_brgy = Barangay.objects.get(brgy_name=brgy_name)
-    brgy_clusters = Cluster.objects.filter(leader__brgy=name_brgy)
-    return render(request, 'brgy_leaders.html', {
-        'brgy_clusters': brgy_clusters,
-        'name_brgy': name_brgy,
     })
 
 
@@ -336,7 +316,7 @@ def leader_cluster(request, name, username):
                 leader_profile.sitio = None
             leader_profile.save()
             messages.success(request, 'Editted!')
-            return redirect('cluster', name=leader_profile.name)
+            return redirect('cluster', name=leader_profile.name, username=username)
 
         # Commented for V.2, 2/10/2024
         # if 'add-new-member-btn' in request.POST:
@@ -674,6 +654,342 @@ def reports(request):
     })
 
 
+def members_per_brgy_report(request):
+    member_per_brgy_list = {}
+    member_filtered_per_brgy_list = {}
+    members = Individual.objects.all()
+
+    brgys = Barangay.objects.all()
+
+    selected_brgy = request.GET.get('selected-brgy')
+    if selected_brgy:  # Check if a date is selected
+        members_filter = Individual.objects.filter(brgy=selected_brgy)
+        the_brgy = Barangay.objects.get(id=selected_brgy)
+
+        for member in members_filter:
+            member_brgy = member.brgy
+            if member_brgy not in member_filtered_per_brgy_list:
+                member_filtered_per_brgy_list[member_brgy] = [member]
+            else:
+                member_filtered_per_brgy_list[member_brgy].append(member)
+    else:
+        the_brgy = None
+
+    for member in members:
+        member_brgy = member.brgy
+        if member_brgy not in member_per_brgy_list:
+            member_per_brgy_list[member_brgy] = [member]
+        else:
+            member_per_brgy_list[member_brgy].append(member)
+
+    return render(request, 'member_per_brgy_report.html', {
+        'member_per_brgy_list': member_per_brgy_list,
+        'brgys': brgys,
+        'selected_brgy': selected_brgy,
+        'the_brgy': the_brgy,
+        'member_filtered_per_brgy_list': member_filtered_per_brgy_list,
+    })
+
+
+def members_per_brgy_report_pdf(request):
+    member_per_brgy_list = {}
+    members = Individual.objects.all()
+    for member in members:
+        member_brgy = member.brgy
+        if member_brgy not in member_per_brgy_list:
+            member_per_brgy_list[member_brgy] = [member]
+        else:
+            member_per_brgy_list[member_brgy].append(member)
+
+    html = render_to_string('member_per_brgy_report_pdf.html', {
+        'member_per_brgy_list': member_per_brgy_list,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="members_per_brgy.pdf"'
+    return response
+
+
+def members_filtered_per_brgy_report_pdf(request):
+    member_filtered_per_brgy_list = {}
+    brgys = Barangay.objects.all()
+
+    selected_brgy = request.GET.get('selected-brgy')
+    if selected_brgy:  # Check if a date is selected
+        members_filter = Individual.objects.filter(brgy=selected_brgy)
+        the_brgy = Barangay.objects.get(id=selected_brgy)
+
+        for member in members_filter:
+            member_brgy = member.brgy
+            if member_brgy not in member_filtered_per_brgy_list:
+                member_filtered_per_brgy_list[member_brgy] = [member]
+            else:
+                member_filtered_per_brgy_list[member_brgy].append(member)
+    else:
+        the_brgy = None
+
+    html = render_to_string('member_filtered_per_brgy_report_pdf.html', {
+        'brgys': brgys,
+        'selected_brgy': selected_brgy,
+        'the_brgy': the_brgy,
+        'member_filtered_per_brgy_list': member_filtered_per_brgy_list,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="members_{the_brgy}_brgy.pdf"'
+    return response
+
+
+def leader_members_report(request):
+    cluster = Cluster.objects.all()
+
+    brgys = Barangay.objects.all()
+
+    selected_brgy = request.GET.get('selected-brgy')
+    if selected_brgy:  # Check if a date is selected
+        cluster_filter = Cluster.objects.filter(leader__brgy=selected_brgy)
+        the_brgy = Barangay.objects.get(id=selected_brgy)
+    else:
+        cluster_filter = []
+        the_brgy = None
+
+    return render(request, 'leader_members_report.html', {
+        'cluster': cluster,
+        'brgys': brgys,
+        'cluster_filter': cluster_filter,
+        'selected_brgy': selected_brgy,
+        'the_brgy': the_brgy,
+    })
+
+
+def leader_members_report_pdf(request):
+    cluster = Cluster.objects.all()
+
+    html = render_to_string('leader_members_report_pdf.html', {
+        'cluster': cluster,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="leader_members_report.pdf"'
+    return response
+
+
+def leader_members_report_filtered_pdf(request):
+    brgys = Barangay.objects.all()
+
+    selected_brgy = request.GET.get('selected-brgy')
+    if selected_brgy:  # Check if a date is selected
+        cluster_filter = Cluster.objects.filter(leader__brgy=selected_brgy)
+        the_brgy = Barangay.objects.get(id=selected_brgy)
+    else:
+        cluster_filter = []
+        the_brgy = None
+
+    html = render_to_string('leader_members_filtered_report_pdf.html', {
+        'brgys': brgys,
+        'cluster_filter': cluster_filter,
+        'selected_brgy': selected_brgy,
+        'the_brgy': the_brgy,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="leader_members_{the_brgy}_cluster_report.pdf"'
+    return response
+
+
+def all_members_individuals_report(request):
+    individuals = Individual.objects.all().order_by('brgy')
+    return render(request, 'all_member_report.html', {
+        'individuals': individuals,
+    })
+
+
+def all_members_individuals_report_pdf(request):
+    individuals = Individual.objects.all().order_by('brgy')
+
+    html = render_to_string('all_member_report_pdf.html', {
+        'individuals': individuals,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="all_members_individuals_report.pdf"'
+    return response
+
+
+def all_leaders_report(request):
+    leaders = Cluster.objects.all()
+
+    leader_list = {}
+    for leader in leaders:
+        if leader not in leader_list:
+            leader_list[leader] = len(leader.members.all())
+        else:
+            leader_list[leader].append(len(leader.members.all()))
+
+    return render(request, 'leaders_report.html', {
+        'leaders': leaders,
+        'leader_list': leader_list,
+    })
+
+
+def all_leaders_report_pdf(request):
+    leaders = Cluster.objects.all()
+
+    leader_list = {}
+    for leader in leaders:
+        if leader not in leader_list:
+            leader_list[leader] = len(leader.members.all())
+        else:
+            leader_list[leader].append(len(leader.members.all()))
+
+    html = render_to_string('leaders_report_pdf.html', {
+        'leaders': leaders,
+        'leader_list': leader_list,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="all_leaders_report.pdf"'
+    return response
+
+
+def all_members_report(request):
+    members = Member.objects.all()
+    return render(request, 'members_report.html', {
+        'members': members,
+    })
+
+
+def all_members_report_pdf(request):
+    members = Member.objects.all()
+
+    html = render_to_string('members_report_pdf.html', {
+        'members': members,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="members_report.pdf"'
+    return response
+
+
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def no_member_barangays(request):
@@ -694,6 +1010,49 @@ def no_member_barangays(request):
         'brgys': brgys,
         'no_member_brgy_list': no_member_brgy_list,
     })
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def no_member_barangays_pdf(request):
+    member_brgys = Individual.objects.values('brgy__brgy_name').distinct()
+
+    brgys = [brgy['brgy__brgy_name'] for brgy in member_brgys]
+    # Barangay w/o members
+
+    no_member_brgy_list = {}
+    brgys_for_members = Barangay.objects.all()
+    for no_mem_brgy in brgys_for_members:
+        brgy = no_mem_brgy.brgy_name
+        if brgy not in brgys:
+            no_member_brgy_list[brgy] = brgy
+
+    html = render_to_string('no_member_brgy_pdf.html', {
+        'member_brgys': member_brgys,
+        'brgys': brgys,
+        'no_member_brgy_list': no_member_brgy_list,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="no_member_barangays.pdf"'
+    return response
 
 
 @login_required(login_url='login')
@@ -724,11 +1083,89 @@ def member_count_per_brgy(request):
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
+def member_count_per_brgy_pdf(request):
+    brgys_member_count = Individual.objects.values(
+        'brgy__brgy_name',
+        'brgy__brgy_voter_population'
+    ).annotate(member_count=Count('name'))
+
+    member_sum = [count['member_count'] for count in brgys_member_count]
+    member_brgy = [brgy['brgy__brgy_name'] for brgy in brgys_member_count]
+    member_percentage = [round(((count['member_count'] / count['brgy__brgy_voter_population']) * 100)) for count in brgys_member_count]
+
+    member_per_brgy_list = {}
+    for sum, brgy, percentage in zip(member_sum, member_brgy, member_percentage):
+        if brgy not in member_per_brgy_list:
+            member_per_brgy_list[brgy] = [(sum, percentage)]
+        else:
+            member_per_brgy_list[brgy].append((sum, percentage))
+
+    html = render_to_string('member_count_per_brgy_pdf.html', {
+        'brgys_member_count': brgys_member_count,
+        'member_sum': member_sum,
+        'member_per_brgy_list': member_per_brgy_list,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="member_count_per_brgy.pdf"'
+    return response
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def no_members_leader(request):
     no_members = Cluster.objects.filter(members=None)
     return render(request, 'no_member_leaders.html', {
         'no_members': no_members,
     })
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def no_members_leader_pdf(request):
+    no_members = Cluster.objects.filter(members=None)
+
+    html = render_to_string('no_member_leaders_pdf.html', {
+        'no_members': no_members,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="no_members_leader.pdf"'
+    return response
 
 
 @login_required(login_url='login')
@@ -751,6 +1188,49 @@ def leaderless_members(request):
         'leaderless': leaderless,
         'cluster_members_filter': cluster_members_filter,
     })
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def leaderless_members_pdf(request):
+    members = Member.objects.all().order_by('brgy__brgy_name')
+    leaderless_member = Cluster.objects.values('members__name')
+
+    cluster_members_filter = [members['members__name'] for members in leaderless_member]
+
+    leaderless = {}
+    for member in members:
+        member_name = member.name
+        if member_name not in cluster_members_filter:
+            leaderless[member] = member.brgy
+
+    html = render_to_string('leaderless_members_pdf.html', {
+        'members': members,
+        'leaderless_member': leaderless_member,
+        'leaderless': leaderless,
+        'cluster_members_filter': cluster_members_filter,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="leaderless_members.pdf"'
+    return response
 
 
 @login_required(login_url='login')
@@ -876,21 +1356,41 @@ def qr_code_scanner(request):
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
-def promote_to_leader(request, name):
-    member = Member.objects.get(name=name)
+def promote_to_leader(request, username):
+    user = User.objects.get(username=username)
+    member = Member.objects.get(user=user)
 
-    leader, created = Leader.objects.get_or_create(name=member.name,
-                                                           gender=member.gender,
-                                                           age=member.age,
-                                                           brgy=member.brgy)
+    new_filename = f"leader-{member.user.username}.jpg"
+
+    # Save the image with the new filename
+    old_image_path = member.image.path
+    new_image_path = os.path.join(default_storage.location, new_filename)
+    default_storage.save(new_filename, default_storage.open(old_image_path))
+
+    leader, created = Leader.objects.get_or_create(user=user,
+                                                   name=member.name,
+                                                   gender=member.gender,
+                                                   age=member.age,
+                                                   brgy=member.brgy,
+                                                   image=new_image_path)
+
+    leader_group = Group.objects.get(name='Leaders')
+    member_group = Group.objects.get(name='Members')
+    user.groups.remove(member_group)
+    user.groups.add(leader_group)
+
+    individual_user = Individual.objects.get(user=user)
+    individual_user.group = "Leader"
+    individual_user.save()
 
     cluster, created = Cluster.objects.get_or_create(leader=leader)
     cluster.save()
 
     leader.save()
+    user.save()
     member.delete()
 
-    return redirect('cluster', name=leader.name)
+    return redirect('cluster', name=leader.name, username=user.username)
 
 
 @authenticated_user
@@ -1004,6 +1504,25 @@ def registration_validation(request):
                 )
                 registrant_notification.save()
 
+                name = registrant.name
+                from_email = 'Autodidacticism'
+                subject = f'{email_message.subject}, {registrant.name}'
+                message = email_message.content
+                to_email = [registrant.email]
+                html_message = render_to_string('confirmed_registration_message.html', {
+                    'name': name,
+                    'subject': subject,
+                    'message': message,
+                })
+                send_mail(
+                    subject=subject,
+                    from_email=from_email,
+                    recipient_list=to_email,
+                    message=message,
+                    html_message=html_message,
+                    fail_silently=False
+                )
+
                 rendered_template = render(request, 'registration_response.html', {'variable': 'value'})
 
                 # Create an HttpResponse with the rendered template as content
@@ -1040,7 +1559,7 @@ def registrants(request):
 def confirm_registration_member(request, username):
     registrant = Registrants.objects.get(username=username)
     email_message = EmailMessage.objects.get(type='Member Verification')
-    new_filename = f"member-{registrant.username}"
+    new_filename = f"member-{registrant.username}.jpg"
 
     # Save the image with the new filename
     old_image_path = registrant.image.path
@@ -1083,6 +1602,8 @@ def confirm_registration_member(request, username):
         age=registrant.age,
         brgy=registrant.brgy,
         sitio=registrant.sitio,
+        group='Member',
+        image=new_filename,
     )
     individual.save()
 
@@ -1138,8 +1659,8 @@ def confirm_registration_member(request, username):
 @allowed_users(allowed_roles=['Admin'])
 def confirm_registration_leader(request, username):
     registrant = Registrants.objects.get(username=username)
-    email_message = EmailMessage.objects.get(type='Member Verification')
-    new_filename = f"leader-{registrant.username}"
+    email_message = EmailMessage.objects.get(type='Leader Verification')
+    new_filename = f"leader-{registrant.username}.jpg"
 
     # Save the image with the new filename
     old_image_path = registrant.image.path
@@ -1185,6 +1706,8 @@ def confirm_registration_leader(request, username):
         age=registrant.age,
         brgy=registrant.brgy,
         sitio=registrant.sitio,
+        group='Leader',
+        image=new_filename,
     )
     individual.save()
 
@@ -1239,8 +1762,8 @@ def confirm_registration_leader(request, username):
 @allowed_users(allowed_roles=['Admin'])
 def confirm_registrant_as_admin_and_leader(request, username):
     registrant = Registrants.objects.get(username=username)
-    email_message = EmailMessage.objects.get(type='Member Verification')
-    new_filename = f"leader-{registrant.username}"
+    email_message = EmailMessage.objects.get(type='Admin Verification')
+    new_filename = f"leader-{registrant.username}.jpg"
 
     # Save the image with the new filename
     old_image_path = registrant.image.path
@@ -1286,6 +1809,8 @@ def confirm_registrant_as_admin_and_leader(request, username):
         age=registrant.age,
         brgy=registrant.brgy,
         sitio=registrant.sitio,
+        group='Admin',
+        image=new_filename,
     )
     individual.save()
 
@@ -1351,6 +1876,109 @@ def deny_registration(request, username):
         title=f'Registrant {registrant.name} registration denied by {acting_user} ',
         message=f"This is to notify you that the registrant, {registrant.name}"
                 f'has been denied registration on {formatted_time}',
+        identifier=f' Registrant Verified as Leader Identifier: {registrant.name}-{registrant.id}',
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    denied_registration_notification.save()
+
+    name = registrant.name
+    from_email = 'Autodidacticism'
+    subject = f'{email_message.subject}, {registrant.name}'
+    message = email_message.content
+    to_email = [registrant.email]
+    html_message = render_to_string('confirmed_registration_message.html', {
+        'name': name,
+        'subject': subject,
+        'message': message,
+    })
+    send_mail(
+        subject=subject,
+        from_email=from_email,
+        recipient_list=to_email,
+        message=message,
+        html_message=html_message,
+        fail_silently=False
+    )
+    registrant.delete()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def deny_registration_invalid_image(request, username):
+    registrant = Registrants.objects.get(username=username)
+    email_message = EmailMessage.objects.get(type='Denied Registration (Image)')
+    acting_user = request.user
+    current_time = timezone.now()
+
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+
+    denied_registration_notification, created = Notification.objects.get_or_create(
+        title=f'Registrant {registrant.name} registration denied by {acting_user} ',
+        message=f"This is to notify you that the registrant, {registrant.name}"
+                f'has been denied registration on {formatted_time} for passing illegible photographic '
+                f'identification data',
+        identifier=f' Registrant Verified as Leader Identifier: {registrant.name}-{registrant.id}',
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    denied_registration_notification.save()
+
+    name = registrant.name
+    from_email = 'Autodidacticism'
+    subject = f'{email_message.subject}, {registrant.name}'
+    message = email_message.content
+    to_email = [registrant.email]
+    html_message = render_to_string('confirmed_registration_message.html', {
+        'name': name,
+        'subject': subject,
+        'message': message,
+    })
+    send_mail(
+        subject=subject,
+        from_email=from_email,
+        recipient_list=to_email,
+        message=message,
+        html_message=html_message,
+        fail_silently=False
+    )
+    registrant.delete()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def deny_registration_invalid_email(request, username):
+    registrant = Registrants.objects.get(username=username)
+    email_message = EmailMessage.objects.get(type='Denied Registration (Email)')
+    acting_user = request.user
+    current_time = timezone.now()
+
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+
+    denied_registration_notification, created = Notification.objects.get_or_create(
+        title=f'Registrant {registrant.name} registration denied by {acting_user} ',
+        message=f"This is to notify you that the registrant, {registrant.name}"
+                f'has been denied registration on {formatted_time} for passing an invalid email address',
         identifier=f' Registrant Verified as Leader Identifier: {registrant.name}-{registrant.id}',
         date=timezone.now(),
         date_time=timezone.now(),

@@ -57,7 +57,7 @@
 #member-profile-detail-float-right{
     float: right;
     margin-right: 40px;
-    margin-top: 25px;
+    margin-top: 10px;
 }
 
 #member-profile-detail-float-left{
@@ -69,6 +69,15 @@
 .member-profile-detail{
     font-family: 'Montserrat';
     margin: 10px;
+}
+
+.member-profile-promote-to-leader{
+    text-decoration: none;
+    color: rgb(60, 60, 60);
+}
+
+.member-profile-promote-to-leader:hover{
+    text-decoration: underline;
 }
 
 .member-profile-no-image-member-div{

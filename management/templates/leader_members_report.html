@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<section class="leader-members-report-utmost-container-section">
+    <div class="leader-members-report-title-header-div">
+        Leader's Members Report
+    </div>
+    <form method="GET" action="{% url 'cluster-report' %}">
+        <select name="selected-brgy" id="leader-members-report-dropdown">
+            <option value="">Select a Barangay</option>
+            {% for brgy in brgys %}
+                <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
+            {% endfor %}
+        </select>
+        <div>
+            <button type="submit">Filter</button>
+        </div>
+    </form>
+    {% if selected_brgy %}
+        <div>
+            <a href="{% url 'cluster-filtered-report-pdf' %}?selected-brgy={{ selected_brgy }}">Download PDF</a>
+        </div>
+        {% for leader in cluster_filter %}
+            <table class="leader-member-report-table">
+                <tr class="leader-member-report-table-row">
+                    <th class="leader-member-report-table-head" colspan="3">
+                        <span class="leader-members-leader-table-head-span">{{ leader.leader.name }}</span>
+                        <span class="leader-members-leader-table-head-span">{{ leader.leader.brgy }}</span>
+                    </th>
+                </tr>
+                <tr class="leader-member-report-table-row">
+                    <th class="leader-member-report-member-table-head">Name</th>
+                    <th class="leader-member-report-member-table-head">Barangay</th>
+                    <th class="leader-member-report-member-table-head">Sitio</th>
+                </tr>
+                {% for member in leader.members.all %}
+                    <tr class="leader-member-report-table-row">
+                        <td class="leader-member-report-table-data">{{ member.name }}</td>
+                        <td class="leader-member-report-table-data">{{ member.brgy }}</td>
+                        <td class="leader-member-report-table-data">{{ member.sitio }}</td>
+                    </tr>
+                {% empty %}
+                    <td colspan="3" class="leader-member-report-table-data">No Members</td>
+                {% endfor %}
+            </table>
+        {% empty %}
+            <div class="leader-member-report-no-cluster-filtered-div">
+                No Cluster for Barangay {{ the_brgy }}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div>
+            <a href="{% url 'cluster-report-pdf' %}">Download PDF</a>
+        </div>
+        <div class="leader-members-report-table-container">
+            {% for leader in cluster %}
+                <table class="leader-member-report-table">
+                    <tr class="leader-member-report-table-row">
+                        <th class="leader-member-report-table-head" colspan="3">
+                            <span class="leader-members-leader-table-head-span">{{ leader.leader.name }}</span>
+                            <span class="leader-members-leader-table-head-span">{{ leader.leader.brgy }}</span>
+                        </th>
+                    </tr>
+                    <tr class="leader-member-report-table-row">
+                        <th class="leader-member-report-member-table-head">Name</th>
+                        <th class="leader-member-report-member-table-head">Barangay</th>
+                        <th class="leader-member-report-member-table-head">Sitio</th>
+                    </tr>
+                    {% for member in leader.members.all %}
+                        <tr class="leader-member-report-table-row">
+                            <td class="leader-member-report-table-data">{{ member.name }}</td>
+                            <td class="leader-member-report-table-data">{{ member.brgy }}</td>
+                            <td class="leader-member-report-table-data">{{ member.sitio }}</td>
+                        </tr>
+                    {% empty %}
+                        <td colspan="3" class="leader-member-report-table-data">No Members</td>
+                    {% endfor %}
+                </table>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+{% endblock %}

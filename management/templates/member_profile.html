@@ -92,6 +92,15 @@
                     {{ member.gender }}
                 </span>
             </div>
+            <div class="member-profile-detail">
+                <span class="member-profile-detail-icon-span">
+                    <i class="fas fa-user-check" aria-hidden="true"></i>
+                </span>
+                <span class="member-profile-detail-data-span">
+                    <a class="member-profile-promote-to-leader"
+                       href="{% url 'promote-member-to-leader' member.user %}">Promote to Leader</a>
+                </span>
+            </div>
         </div>
     </div>
     <div class="member-profile-member-image-container-div">
@@ -201,7 +210,7 @@
 <!--    <div id="memberDetailsBlock">-->
 <!--        <div class="member-details-member-id">-->
 <!--            <div>-->
-<!--                {{ member.name }}<a href="{% url 'promote-member-to-leader' member.name %}">Promote to Leader</a>-->
+<!--                {{ member.name }}<a href="{% url 'promote-member-to-leader' member.user %}">Promote to Leader</a>-->
 <!--            </div>-->
 <!--            <div>-->
 <!--                {{ member.age }}-->

@@ -1,0 +1,28 @@
+.leaders-report-utmost-container-section{
+    font-family: 'Montserrat';
+}
+
+.leader-report-title-header-div{
+    text-align: center;
+    font-weight: 800;
+    margin: 40px;
+    font-size: 30px;
+    color: rgb(100, 100, 100);
+}
+
+.leader-report-table-container-div{
+    margin: auto;
+    width: 70%;
+}
+
+.leader-report-table-head{
+    width: 300px;
+    background-color: rgb(80, 160, 160);
+    color: beige;
+    padding: 10px;
+}
+
+.leader-report-table-data{
+    background-color: rgb(200, 200, 200);
+    padding: 10px;
+}

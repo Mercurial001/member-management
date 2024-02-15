@@ -29,6 +29,31 @@
                 Members w/o Leader
             </div>
         </a>
+        <a class="reports-report-block-div" href="{% url 'all-members-report' %}">
+            <div class="reports-block-report-title-div">
+                Total Members
+            </div>
+        </a>
+        <a class="reports-report-block-div" href="{% url 'per-brgy-members' %}">
+            <div class="reports-block-report-title-div">
+                Members per Barangay
+            </div>
+        </a>
+        <a class="reports-report-block-div" href="{% url 'cluster-report' %}">
+            <div class="reports-block-report-title-div">
+                Clusters
+            </div>
+        </a>
+        <a class="reports-report-block-div" href="{% url 'members-report' %}">
+            <div class="reports-block-report-title-div">
+                Members
+            </div>
+        </a>
+        <a class="reports-report-block-div" href="{% url 'leaders-report' %}">
+            <div class="reports-block-report-title-div">
+                Leaders
+            </div>
+        </a>
     </div>
 </section>
 {% endblock %}
