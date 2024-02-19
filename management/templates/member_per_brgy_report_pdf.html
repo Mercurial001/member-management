@@ -6,11 +6,12 @@
     <style>
         .member-per-brgy-report-utmost-container-section{
             font-family: 'Montserrat';
+            font-size: 12px;
         }
 
         .member-per-brgy-report-title-header-div{
             text-align: center;
-            font-size: 30px;
+            font-size: 12px;
             text-transform: uppercase;
             font-weight: 800;
             color: rgb(80, 80, 80);
@@ -31,16 +32,16 @@
             width: 500px;
             background-color: rgb(40, 90, 90);
             color: beige;
-            padding: 15px;
+            padding: 5px;
         }
 
         .member-per-table-head{
-            padding: 12px;
+            padding: 5px;
             border: 1px solid rgb(20, 20, 20);
         }
 
         .member-per-table-data{
-            padding: 10px;
+            padding: 5px;
             border: 1px solid rgb(20, 20, 20);
         }
     </style>
@@ -54,7 +55,17 @@
             {% for brgy, members in member_per_brgy_list.items %}
                 <table class="member-per-brgy-table">
                     <tr class="member-per-brgy-table-row">
-                        <th class="member-per-brgy-table-head" colspan="2">{{ brgy }}</th>
+                        <th class="member-per-brgy-table-head" colspan="2">
+                            <span style="float: left;">
+                                {{ brgy }}
+                            </span>
+                            <span>
+                                Member Percentage: {{ members.1.1 }}%
+                            </span>
+                            <span style="float: right;">
+                                Voter Population:{{ members.1.2 }}
+                            </span>
+                        </th>
                     </tr>
                     <tr class="member-per-brgy-table-row">
                         <th class="member-per-table-head">Name</th>
@@ -62,8 +73,8 @@
                     </tr>
                     {% for member in members %}
                         <tr class="member-per-brgy-table-row">
-                            <td class="member-per-table-data">{{ member.name }}</td>
-                            <td class="member-per-table-data">{{ member.group }}</td>
+                            <td class="member-per-table-data">{{ forloop.counter }}. {{ member.0.name }}</td>
+                            <td class="member-per-table-data">{{ member.0.group }}</td>
                         </tr>
                     {% endfor %}
                 </table>

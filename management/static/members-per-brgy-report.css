@@ -13,7 +13,7 @@
 
 .member-per-brgy-table-container-div{
     margin: auto;
-    width: 40%;
+    width: 62%;
 }
 
 .member-per-brgy-table{
@@ -21,19 +21,64 @@
 }
 
 .member-per-brgy-table-head{
-    width: 500px;
+    width:800px;
     background-color: rgb(40, 90, 90);
     color: beige;
     padding: 15px;
 }
 
 .member-per-table-head{
-    background-color: rgb(6, 200, 200);
-    color: rgb(40, 40, 40);
+    background-color: rgb(60, 180, 180);
+    padding:10px;
+    color: beige;
     padding: 12px;
 }
 
 .member-per-table-data{
     background-color: rgb(200, 200, 200);
     padding: 10px;
+}
+
+.member-per-brgy-filter-form-container-div{
+    text-align: center;
+}
+
+.member-per-brgy-filter-brgy-container-div{
+    display: inline-block;
+}
+
+.member-per-brgy-download-pdf-download-container{
+    text-align: center;
+    margin: 40px;
+}
+
+#member-per-brgy-brgy-dropdown{
+    width: 200px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+.member-per-brgy-download-pdf{
+    background-color: rgba(100, 150, 150, 0.8);
+    font-family: 'Montserrat';
+    color: beige;
+    text-decoration: none;
+    padding-top:10px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    border-radius: 10px;
+    border: solid 1px rgb(150, 200, 200);
+}
+
+.member-per-brgy-filter-btn{
+    height: 30px;
+    border-radius: 10px;
+    border: 1px solid rgb(100, 100, 100);
+    cursor: pointer;
+
+}
+
+.member-per-brgy-filter-btn:active{
+    background-color: rgb(80, 80, 80);
 }

@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
 from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm, AddMemberRegistrationForm, \
     ChangeBarangayNameForm, AddSitioForm, LeaderRegistrationEditForm, MemberRegistrationEditForm, RegistrantsForm, \
-    ChangePasswordForm, ForgotPasswordForm
+    ChangePasswordForm, ForgotPasswordForm, ChangeSitioDetailsForm, TotalVoterPopulationEditForm
 from django.contrib import messages
 from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants, \
-    Notification, EmailMessage, PasswordResetToken
+    Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
@@ -129,6 +129,31 @@ def barangay_members(request, brgy_name):
     })
 
 
+def sitio_profile(request, id):
+    sitio = Sitio.objects.get(id=id)
+    sitio_members = Member.objects.filter(sitio=sitio)
+    sitio_leaders = Leader.objects.filter(sitio=sitio)
+
+    edit_sitio_details_form = ChangeSitioDetailsForm(instance=sitio)
+
+    sitio_individual_count = Individual.objects.filter(sitio=sitio).annotate(count=Count('name'))
+    sitio_individual_sum = sitio_individual_count.aggregate(sum=Sum('count'))['sum']
+
+    if request.method == 'POST':
+        form = ChangeSitioDetailsForm(request.POST, instance=sitio)
+        if form.is_valid():
+            sitio_edited = form.save(commit=False)
+            sitio_edited.save()
+            return redirect('sitio-profile', id=sitio.id)
+    return render(request, 'sitio_profile.html', {
+        'sitio_members': sitio_members,
+        'sitio_leaders': sitio_leaders,
+        'sitio': sitio,
+        'edit_sitio_details_form': edit_sitio_details_form,
+        'sitio_individual_sum': sitio_individual_sum,
+    })
+
+
 def get_marker_color(percentage):
     if percentage is not None:
         return 'green' if percentage > 55 else 'red'
@@ -165,12 +190,21 @@ def dashboard(request):
     count_brgy_sum = count_brgy.aggregate(total_brgy_sum=Sum('brgy_count'))['total_brgy_sum']
 
     # Total Number of Members
-    members_count = Member.objects.all().annotate(member_count=Count('name'))
+    members_count = Member.objects.all().annotate(member_count=Count('user'))
     member_sum = members_count.aggregate(total_members=Sum('member_count'))['total_members']
 
     # Total Number of Leaders
-    leaders_count = Leader.objects.all().annotate(leader_count=Count('name'))
+    leaders_count = Leader.objects.all().annotate(leader_count=Count('user'))
     leaders_sum = leaders_count.aggregate(total_leaders=Sum('leader_count'))['total_leaders']
+
+    # Total Number of Individuals
+    individuals_count = Individual.objects.all().annotate(count=Count('user'))
+    individuals_sum = individuals_count.aggregate(sum=Sum('count'))['sum']
+
+    total_voter_population_object = TotalVoterPopulation.objects.get(id=1)
+    total_voter_population = total_voter_population_object.population
+
+    total_voter_percentage = ((individuals_sum / total_voter_population) * 100).__round__()
 
     # Assuming you have a queryset of Barangay objects
     barangays = Barangay.objects.filter(lat__isnull=False, long__isnull=False)
@@ -205,6 +239,9 @@ def dashboard(request):
     else:
         map_html = None
 
+    # if request.method == 'POST':
+    #     form = TotalVoterPopulationEditForm(request.POST, instance=)
+
     return render(request, 'dashboard.html', {
         'brgys': brgys,
         'brgy_member_count': brgy_member_count,
@@ -220,6 +257,9 @@ def dashboard(request):
         'population_map': population_map,
         'absolute_pop_map': absolute_pop_map,
         'percentage_data': percentage_data,
+        'individuals_sum': individuals_sum,
+        'total_voter_population': total_voter_population,
+        'total_voter_percentage': total_voter_percentage,
     })
 
 
@@ -657,9 +697,10 @@ def reports(request):
 def members_per_brgy_report(request):
     member_per_brgy_list = {}
     member_filtered_per_brgy_list = {}
-    members = Individual.objects.all()
 
     brgys = Barangay.objects.all()
+    member_list = []
+    members = Individual.objects.all()
 
     selected_brgy = request.GET.get('selected-brgy')
     if selected_brgy:  # Check if a date is selected
@@ -668,19 +709,36 @@ def members_per_brgy_report(request):
 
         for member in members_filter:
             member_brgy = member.brgy
+
             if member_brgy not in member_filtered_per_brgy_list:
-                member_filtered_per_brgy_list[member_brgy] = [member]
+                member_filtered_per_brgy_list[member_brgy] = [(
+                    member,
+                    round((1 / member.brgy.brgy_voter_population) * 100),
+                    member.brgy.brgy_voter_population,
+                )]
             else:
-                member_filtered_per_brgy_list[member_brgy].append(member)
+                member_filtered_per_brgy_list[member_brgy].append((
+                    member,
+                    round((1 / member.brgy.brgy_voter_population) * 100),
+                    member.brgy.brgy_voter_population,
+                ))
     else:
         the_brgy = None
 
     for member in members:
         member_brgy = member.brgy
         if member_brgy not in member_per_brgy_list:
-            member_per_brgy_list[member_brgy] = [member]
+            member_per_brgy_list[member_brgy] = [(
+                member,
+                round((1 / member.brgy.brgy_voter_population) * 100),
+                member.brgy.brgy_voter_population,
+            )]
         else:
-            member_per_brgy_list[member_brgy].append(member)
+            member_per_brgy_list[member_brgy].append((
+                member,
+                round((1 / member.brgy.brgy_voter_population) * 100),
+                member.brgy.brgy_voter_population,
+            ))
 
     return render(request, 'member_per_brgy_report.html', {
         'member_per_brgy_list': member_per_brgy_list,
@@ -688,18 +746,28 @@ def members_per_brgy_report(request):
         'selected_brgy': selected_brgy,
         'the_brgy': the_brgy,
         'member_filtered_per_brgy_list': member_filtered_per_brgy_list,
+        'member_list': member_list,
     })
 
 
 def members_per_brgy_report_pdf(request):
     member_per_brgy_list = {}
     members = Individual.objects.all()
+
     for member in members:
         member_brgy = member.brgy
         if member_brgy not in member_per_brgy_list:
-            member_per_brgy_list[member_brgy] = [member]
+            member_per_brgy_list[member_brgy] = [(
+                member,
+                round((1 / member.brgy.brgy_voter_population) * 100),
+                member.brgy.brgy_voter_population,
+            )]
         else:
-            member_per_brgy_list[member_brgy].append(member)
+            member_per_brgy_list[member_brgy].append((
+                member,
+                round((1 / member.brgy.brgy_voter_population) * 100),
+                member.brgy.brgy_voter_population,
+            ))
 
     html = render_to_string('member_per_brgy_report_pdf.html', {
         'member_per_brgy_list': member_per_brgy_list,
@@ -738,10 +806,19 @@ def members_filtered_per_brgy_report_pdf(request):
 
         for member in members_filter:
             member_brgy = member.brgy
+
             if member_brgy not in member_filtered_per_brgy_list:
-                member_filtered_per_brgy_list[member_brgy] = [member]
+                member_filtered_per_brgy_list[member_brgy] = [(
+                    member,
+                    round((1 / member.brgy.brgy_voter_population) * 100),
+                    member.brgy.brgy_voter_population,
+                )]
             else:
-                member_filtered_per_brgy_list[member_brgy].append(member)
+                member_filtered_per_brgy_list[member_brgy].append((
+                    member,
+                    round((1 / member.brgy.brgy_voter_population) * 100),
+                    member.brgy.brgy_voter_population,
+                ))
     else:
         the_brgy = None
 
@@ -1758,6 +1835,9 @@ def confirm_registration_leader(request, username):
         return redirect('homepage')
 
 
+# Palompon Total Voters 43,065
+
+
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def confirm_registrant_as_admin_and_leader(request, username):
@@ -1780,7 +1860,9 @@ def confirm_registrant_as_admin_and_leader(request, username):
     user_created.save()
 
     group = Group.objects.get(name='Admin')
+    leader_group = Group.objects.get(name='Leaders')
     user_created.groups.add(group)
+    user_created.groups.add(leader_group)
     user_created.save()
 
     new_user = User.objects.get(username=user_created.username)
@@ -2106,6 +2188,9 @@ def non_admin_leader_profile(request, username):
     sitios = Sitio.objects.filter(brgy=leader.brgy)
     selected_sitio = request.POST.get('added-member-sitio')
 
+    authenticated_user_request = request.user
+    authenticated_leader = Leader.objects.filter(user=authenticated_user_request).exists()
+
     leader_brgy_unassociated_members = Member.objects.filter(brgy=leader.brgy)
 
     members_brgy = [member for member in leader_brgy_unassociated_members]
@@ -2343,6 +2428,7 @@ def non_admin_leader_profile(request, username):
         'search_engine_result_member': search_engine_result_member,
         'search_engine_field_query': search_engine_field_query,
         'total_results': total_results,
+        'authenticated_leader': authenticated_leader,
     })
 
 
@@ -2362,6 +2448,9 @@ def non_admin_member_profile(request, username):
     no_leader_member_list = [name['members__name'] for name in members]
 
     sitios = Sitio.objects.filter(brgy=member.brgy)
+
+    authenticated_user_request = request.user
+    authenticated_member = Member.objects.filter(user=authenticated_user_request).exists()
 
     # Create QR Code for each user
     qr = qrcode.QRCode(
@@ -2408,6 +2497,7 @@ def non_admin_member_profile(request, username):
         'edit_member_detail_form': edit_member_detail_form,
         "sitios": sitios,
         'member_leader': member_leader,
+        'authenticated_member': authenticated_member,
     })
 
 

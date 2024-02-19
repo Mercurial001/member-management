@@ -12,6 +12,11 @@ from .models import Registrants
 from .models import Notification
 from .models import EmailMessage
 from .models import PasswordResetToken
+from .models import TotalVoterPopulation
+
+
+class TotalVoterPopulationAdmin(admin.ModelAdmin):
+    list_display = ('date', 'population')
 
 
 class PasswordResetTokenAdmin(admin.ModelAdmin):
@@ -66,6 +71,7 @@ class CLusterAdmin(admin.ModelAdmin):
     list_display = ('leader',)
 
 
+admin.site.register(TotalVoterPopulation, TotalVoterPopulationAdmin)
 admin.site.register(PasswordResetToken, PasswordResetTokenAdmin)
 admin.site.register(EmailMessage, EmailMessageAdmin)
 admin.site.register(Notification, NotificationAdmin)

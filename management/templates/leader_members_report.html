@@ -7,20 +7,29 @@
     <div class="leader-members-report-title-header-div">
         Leader's Members Report
     </div>
-    <form method="GET" action="{% url 'cluster-report' %}">
-        <select name="selected-brgy" id="leader-members-report-dropdown">
-            <option value="">Select a Barangay</option>
-            {% for brgy in brgys %}
-                <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
-            {% endfor %}
-        </select>
-        <div>
-            <button type="submit">Filter</button>
-        </div>
-    </form>
+    <div class="leader-member-filter-cluster-form-container">
+        <form class="leader-members-filter-brgy-cluster-form" method="GET" action="{% url 'cluster-report' %}">
+            <div class="leader-member-filter-cluster-form-element">
+                <select name="selected-brgy" id="leader-members-report-dropdown">
+                    <option value="">Select a Barangay</option>
+                    {% for brgy in brgys %}
+                        <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="leader-member-filter-cluster-form-element">
+                <div class="leader-members-filter-btn-container-div">
+                    <button class="leader-members-filter-btn" type="submit"><i class="fa fa-filter"></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
     {% if selected_brgy %}
-        <div>
-            <a href="{% url 'cluster-filtered-report-pdf' %}?selected-brgy={{ selected_brgy }}">Download PDF</a>
+        <div class="leader-members-download-pdf-container-div">
+            <a class="leader-members-download-pdf"
+               href="{% url 'cluster-filtered-report-pdf' %}?selected-brgy={{ selected_brgy }}">
+                Download PDF
+            </a>
         </div>
         {% for leader in cluster_filter %}
             <table class="leader-member-report-table">
@@ -51,8 +60,8 @@
             </div>
         {% endfor %}
     {% else %}
-        <div>
-            <a href="{% url 'cluster-report-pdf' %}">Download PDF</a>
+        <div class="leader-members-download-pdf-container-div">
+            <a class="leader-members-download-pdf" href="{% url 'cluster-report-pdf' %}">Download PDF</a>
         </div>
         <div class="leader-members-report-table-container">
             {% for leader in cluster %}

@@ -1,0 +1,29 @@
+@media only screen and (max-width: 1279px){
+    .registration-form-container-div{
+        width: 70%;
+    }
+}
+
+@media only screen and (max-width: 925px){
+    .registration-form-container-div{
+        width: 80%;
+    }
+}
+
+@media only screen and (max-width: 543px){
+    .registration-form-container-div{
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 330px){
+    .registration-field{
+        width: 80%;
+    }
+    .registration-field-min{
+        width: 80%;
+    }
+    .registration-field-super-min{
+        width: 80%;
+    }
+}

@@ -1,4 +1,4 @@
-from .models import Gender, Barangay, Leader, Member, Cluster, Barangay, Sitio, Registrants
+from .models import Gender, Barangay, Leader, Member, Cluster, Barangay, Sitio, Registrants, TotalVoterPopulation
 from django.forms import Select, DateInput, Textarea, TextInput, ModelForm, SelectMultiple, NumberInput, EmailInput, FileInput
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
@@ -6,6 +6,15 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.contrib.auth import password_validation
 from django.utils.translation import gettext_lazy as _
+
+
+class TotalVoterPopulationEditForm(forms.ModelForm):
+    class Meta:
+        model = TotalVoterPopulation
+        fields = ['date']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'number', 'min': '1900', 'max': '2100'})
+        }
 
 
 class AddSitioForm(ModelForm):
@@ -27,13 +36,42 @@ class AddSitioForm(ModelForm):
 class ChangeBarangayNameForm(ModelForm):
     class Meta:
         model = Barangay
-        fields = ['brgy_name', 'brgy_voter_population']
+        fields = ['brgy_name', 'brgy_voter_population', 'lat', 'long']
         widgets = {
             'brgy_name': TextInput(attrs={
                 'class': "brgy-profile-edit-field",
             }),
             'brgy_voter_population': NumberInput(attrs={
                 'class': "brgy-profile-edit-field",
+            }),
+            'lat': NumberInput(attrs={
+                'class': "brgy-profile-edit-field",
+            }),
+            'long': NumberInput(attrs={
+                'class': "brgy-profile-edit-field",
+            }),
+        }
+
+
+class ChangeSitioDetailsForm(ModelForm):
+    class Meta:
+        model = Sitio
+        fields = ['name', 'population', 'brgy', 'lat', 'long']
+        widgets = {
+            'name': TextInput(attrs={
+                'class': "sitio-profile-edit-field",
+            }),
+            'population': NumberInput(attrs={
+                'class': "sitio-profile-edit-field",
+            }),
+            'brgy': Select(attrs={
+                'class': "sitio-profile-edit-field",
+            }),
+            'lat': NumberInput(attrs={
+                'class': "sitio-profile-edit-field",
+            }),
+            'long': NumberInput(attrs={
+                'class': "sitio-profile-edit-field",
             }),
         }
 
@@ -187,31 +225,38 @@ class RegistrantsForm(ModelForm):
 
         widgets = {
             'brgy': Select(attrs={
-                'class': "registration-field",
+                'class': "registration-field-min",
                 'id': 'registration-brgy-field',
+                'placeholder': 'Barangay'
             }),
             'username': TextInput(attrs={
                 'class': "registration-field",
                 'id': 'registration-username-field',
+                'placeholder': 'Username'
             }),
             'name': TextInput(attrs={
                 'class': "registration-field",
                 'id': 'registration-full-name-field',
+                'placeholder': 'Full Name'
             }),
             'email': EmailInput(attrs={
                 'class': "registration-field",
                 'id': 'registration-email-field',
+                'placeholder': 'Active Email Address'
             }),
             'age': NumberInput(attrs={
-                'class': "registration-field",
+                'class': "registration-field-super-min",
                 'id': 'registration-age-field',
+                'placeholder': 'Age'
             }),
             'gender': Select(attrs={
-                'class': "registration-field",
+                'class': "registration-field-super-min",
                 'id': 'registration-gender-field',
+                'placeholder': 'Gender'
             }),
             'image': FileInput(attrs={
-                'class': "registration-field",
+                'class': "registration-field-super-min",
+                'id': 'registration-image-field',
             }),
         }
 

@@ -23,7 +23,10 @@ from member_management import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.homepage, name='homepage'),
+
     path('brgy/<str:brgy_name>/', views.barangay_members, name='member-brgy'),
+    path('sitio/<int:id>/', views.sitio_profile, name='sitio-profile'),
+
     path('dashboard/', views.dashboard, name='dashboard'),
     path('leader/profile/<str:name>/<str:username>/', views.leader_cluster, name='cluster'),
     path('member-profile/<str:name>/<int:id>/', views.member_profile, name='member-profile'),

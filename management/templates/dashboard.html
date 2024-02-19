@@ -24,7 +24,7 @@
                         {{ member_sum }}
                     </div>
                     <div>
-                        Total Number of Members
+                        Number of Members
                     </div>
                 </div>
             </div>
@@ -34,7 +34,35 @@
                         {{ leaders_sum }}
                     </div>
                     <div>
-                        Total Number of Leaders
+                        Number of Leaders
+                    </div>
+                </div>
+            </div>
+            <div class="dashboard-statistic-block">
+                <div class="dashboard-statistics-block-detail-div">
+                    <div class="dashboard-statistics-number-div">
+                        {{ individuals_sum }}
+                    </div>
+                    <div>
+                        Total Number of Members & Leaders
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="graph-div" id="percentage-graph-div">
+            <div class="skill-display-div-loop">
+                <div class="skill-box-div" >
+                    <div class="skill-name-div">
+                        <h4>Total Member Percentage</h4>
+                    </div>
+                    <div>
+                        {{ individuals_sum }} of {{ total_voter_population }}
+                    </div>
+                    <h4 class="skill-percentage" data-percentage="{{ total_member_percentage }}"></h4>
+                    <div class="container">
+                        <div class="circular-progress-py">
+                            <div class="value-container-py">0%</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -117,5 +145,31 @@
                 }
             }
         });
+    </script>
+    <script>
+        const skillPercentageElements = document.querySelectorAll('.skill-percentage');
+        const skillColorElements = document.querySelectorAll('.skill-color');
+
+        let progressPy = 0;
+        let speedPy = 20;
+
+        let progressIntervalPy = setInterval(() => {
+            skillPercentageElements.forEach((skillPercentageElement, index) => {
+                const skillPercentage = parseInt(skillPercentageElement.getAttribute('data-percentage'));
+                const progressBarPy = skillPercentageElement.nextElementSibling.querySelector('.circular-progress-py');
+                const valueContainerPy = skillPercentageElement.nextElementSibling.querySelector('.value-container-py');
+
+                if (progressPy < skillPercentage) {
+                    progressPy++;
+                    valueContainerPy.textContent = `${progressPy}%`;
+                    progressBarPy.style.background = `conic-gradient(
+                        rgb(7, 114, 181) ${progressPy * 3.6}deg,
+                        rgb(30, 30, 30) ${progressPy * 3.6}deg
+                    )`;
+                } else {
+                    clearInterval(progressIntervalPy);
+                }
+            });
+        }, speedPy);
     </script>
 {% endblock %}

@@ -58,6 +58,42 @@
                             </div>
                         </div>
                     </div>
+                    <div class="brgy-profile-data-and-field-div">
+                        <div class="brgy-profile-label-and-edit-div">
+                            <span class="brgy-profile-label">
+                                Latitude:
+                            </span>
+                            <span class="brgy-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="brgy-profile-product-data-and-field-container-div">
+                            <div class="brgy-profile-product-data-div">
+                                {{ brgy.lat }}
+                            </div>
+                            <div class="brgy-profile-field-div">
+                                {{ brgy_edit_form.lat }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="brgy-profile-data-and-field-div">
+                        <div class="brgy-profile-label-and-edit-div">
+                            <span class="brgy-profile-label">
+                                Longitude:
+                            </span>
+                            <span class="brgy-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="brgy-profile-product-data-and-field-container-div">
+                            <div class="brgy-profile-product-data-div">
+                                {{ brgy.long }}
+                            </div>
+                            <div class="brgy-profile-field-div">
+                                {{ brgy_edit_form.long }}
+                            </div>
+                        </div>
+                    </div>
                     <div class="brgy-profile-save-changes-btn">
                         <button type="submit">Save Changes</button>
                     </div>
@@ -135,7 +171,7 @@
                     <div class="brgy-profile-details-div">
                         {% for sitio in sitios %}
                             <div class="brgy-profile-data-detail">
-                                {{ sitio.name }}
+                                <a href="{% url 'sitio-profile' sitio.id %}">{{ sitio.name }}</a>
                             </div>
                         {% empty %}
                             <div class="brgy-profile-empty-detail-notifier">

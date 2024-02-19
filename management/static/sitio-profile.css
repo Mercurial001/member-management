@@ -1,0 +1,299 @@
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.sitio-profile-sitio-header-title-div{
+    font-family:'Montserrat';
+    position:fixed;
+    z-index:1;
+    background-color: rgb(255, 255, 255);
+    box-shadow: rgba(50, 50, 50, 0.35) 0px 5px 15px;
+    padding: 20px;
+    text-align: center;
+    width: 77%;
+}
+
+.sitio-edit-profile-toggle-btn{
+    float: right;
+    cursor: pointer;
+}
+
+.sitio-edit-profile-toggle-btn{
+    color: rgb(100, 100, 100);
+}
+
+.sitio-profile-sitio-header-title{
+    font-family: 'Montserrat';
+    font-weight: 800;
+}
+
+.sitio-profile-field-div{
+    display: none;
+}
+
+.sitio-name-visibility{
+    display: none
+}
+
+.sitio-name-field-visibility{
+    display: block;
+}
+
+.sitio-profile-save-changes-btn{
+    display: none;
+}
+
+.sitio-save-btn-visibility{
+    display: block;
+}
+
+.sitio-profile-edit-form-barangay-data-container{
+    font-family:'Montserrat';
+    position:fixed;
+    z-index:15;
+    top:-500px;
+    right:0;
+    transition:0.5s;
+    background-color: rgb(240, 240, 240);
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    width: 300px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.sitio-profile-edit-form-header-title-div{
+    background-color: rgb(10, 40, 40);
+    padding: 10px;
+    color: beige;
+}
+
+.sitio-profile-hide-edit-form-btn{
+    float: right;
+    cursor: pointer;
+}
+
+.sitio-profile-edit-form-container-div{
+    padding: 10px;
+}
+
+.sitio-profile-label{
+    font-weight: 800;
+}
+
+.show-sitio-edit-profile-toggle{
+    top:0px;
+}
+
+.sitio-profile-sitio-details-container-div{
+    margin-top:50px;
+}
+
+.sitio-profile-product-data-div{
+    margin-left: 20px;
+    color: rgb(10, 10, 10);
+}
+
+.sitio-profile-field-div{
+    margin-left: 20px;
+}
+
+.sitio-profile-edit-btn-div{
+    cursor: pointer;
+    color: rgb(100, 100, 100);
+    float: right;
+}
+
+.sitio-profile-edit-field{
+    border: none;
+    background: none;
+    border-bottom: 1px solid rgb(100, 100, 100);
+    margin: 0;
+}
+
+.sitio-profile-edit-field:focus{
+    outline: none;
+}
+
+.sitio-profile-sitio-name-showcase-div{
+    text-align: center;
+    font-size: 50px;
+    font-family: 'Montserrat';
+    text-transform: uppercase;
+    padding: 50px;
+    background-color: rgb(255, 255,255);
+    margin-top: -20px;
+    color: rgb(90, 90, 90);
+}
+
+.sitio-profile-showcase-underline{
+    padding: 1px;
+    background-image: linear-gradient(to right, rgb(10, 10, 10), rgba(255,0,0,0), rgb(10, 10, 10));
+}
+
+.sitio-profile-sitio-details-block-container-div{
+    text-align: center;
+    margin-top: 20px;
+}
+
+.sitio-profile-showcase-details-block-div{
+    display: inline-block;
+    width: 30%;
+    vertical-align: top;
+    margin: 10px;
+}
+
+.sitio-profile-details-block-header-title{
+    background-color: rgb(10, 40, 40);
+    font-family: 'Montserrat';
+    font-weight: 800;
+    color: beige;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    text-align: center;
+}
+
+.sitio-profile-details-div{
+    height: 300px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow-y: scroll;
+}
+
+.sitio-profile-empty-detail-notifier{
+    color: rgb(150, 150, 150);
+    font-family: 'Impact';
+    font-size: 20px;
+    transform: rotate(-45deg);
+    transform-origin: 100% 100%;
+    margin-right: 50px;
+}
+
+.sitio-profile-sitio-showcase-container-div{
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+
+.sitio-profile-data-detail{
+    margin: 10px;
+    width: 87%;
+    text-align: left;
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.sitio-profile-link-page{
+    text-decoration: none;
+    font-family: 'Montserrat';
+}
+
+.sitio-profile-data-detail{
+    text-decoration: none;
+    font-family: 'Montserrat';
+}
+
+.sitio-profile-link-page:hover{
+    text-decoration: underline;
+}
+
+.sitio-profile-analytics-block-container-div{
+    text-align: center;
+}
+
+.sitio-profile-analytics-block-div{
+    display: inline-block;
+    vertical-align: top;
+    font-family: 'Montserrat';
+    width: 250px;
+}
+
+.sitio-profile-analytics-block-title{
+    font-weight: 800;
+    color: rgb(80, 80, 80);
+    height: 50px;
+}
+
+.sitio-profile-analytics-coordinate-div{
+    display: inline-block;
+}
+
+.sitio-profile-analytics-data{
+    font-size: 20px;
+}
+
+.sitio-profile-analytics-link{
+    text-decoration: none;
+    color: rgb(40, 40, 40);
+}
+
+.sitio-profile-analytics-link:hover{
+    text-decoration: underline;
+    color: rgb(40, 40, 40);
+}
+
+.sitio-profile-details-title-header-div{
+    font-family: 'Montserrat';
+    color: rgb(50, 50, 50);
+    font-size: 30px;
+    margin: 50px;
+    text-align: center;
+}
+
+.sitio-profile-sitio-clusters-container-div{
+    text-align: center;
+}
+
+.sitio-profile-cluster-title-header-div{
+    text-align: center;
+    font-family: 'Montserrat';
+    font-size: 30px;
+    color: rgb(50, 50, 50);
+    margin: 50px;
+}
+
+.sitio-profile-cluster-block-div{
+    display: inline-block;
+    vertical-align: top;
+    width: 320px;
+    margin: 10px;
+}
+
+.sitio-profile-cluster-leader-header{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-family: 'Montserrat';
+    font-weight: 800;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.sitio-profile-cluster-members-div{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    background-color: rgb(255, 255, 255);
+    height: 300px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    overflow-y: scroll;
+}
+
+.sitio-profile-empty-member-cluster-notifier{
+    color: rgb(150, 150, 150);
+    font-family: 'Impact';
+    font-size: 20px;
+    transform: rotate(-45deg);
+    transform-origin: 100% 100%;
+    margin-right: 50px;
+}

@@ -7,26 +7,43 @@
     <div class="member-per-brgy-report-title-header-div">
         Barangay Members
     </div>
-    <form method="get" action="{% url 'per-brgy-members' %}">
-        <select name="selected-brgy" id="member-per-brgy-brgy-dropdown">
-            <option value="">Select a Barangay</option>
-            {% for brgy in brgys %}
-                <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
-            {% endfor %}
-        </select>
-        <div>
-            <button type="submit">Filter</button>
-        </div>
-    </form>
+    <div class="member-per-brgy-filter-form-container-div">
+        <form class="member-per-brgy-filter-brgy" method="get" action="{% url 'per-brgy-members' %}">
+            <div class="member-per-brgy-filter-brgy-container-div">
+                <select name="selected-brgy" id="member-per-brgy-brgy-dropdown">
+                    <option value="">Select a Barangay</option>
+                    {% for brgy in brgys %}
+                        <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="member-per-brgy-filter-brgy-container-div">
+                <button class="member-per-brgy-filter-btn" type="submit"><i class="fa fa-filter"></i></button>
+            </div>
+        </form>
+    </div>
     <div class="member-per-brgy-table-container-div">
         {% if selected_brgy %}
-            <div>
-                <a href="{% url 'per-filtered-brgy-members-pdf' %}?selected-brgy={{ selected_brgy }}">Download PDF</a>
+            <div class="member-per-brgy-download-pdf-download-container">
+                <a class="member-per-brgy-download-pdf"
+                   href="{% url 'per-filtered-brgy-members-pdf' %}?selected-brgy={{ selected_brgy }}">
+                    Download PDF
+                </a>
             </div>
             {% for brgy, members in member_filtered_per_brgy_list.items %}
                 <table class="member-per-brgy-table">
                     <tr class="member-per-brgy-table-row">
-                        <th class="member-per-brgy-table-head" colspan="2">{{ brgy }}</th>
+                        <th class="member-per-brgy-table-head" colspan="2">
+                            <span style="float: left;">
+                                {{ brgy }}
+                            </span>
+                            <span>
+                                Member Percentage: {{ members.1.1 }}%
+                            </span>
+                            <span style="float: right;">
+                                Voter Population:{{ members.1.2 }}
+                            </span>
+                        </th>
                     </tr>
                     <tr class="member-per-brgy-table-row">
                         <th class="member-per-table-head">Name</th>
@@ -34,24 +51,37 @@
                     </tr>
                     {% for member in members %}
                         <tr class="member-per-brgy-table-row">
-                            <td class="member-per-table-data">{{ member.name }}</td>
-                            <td class="member-per-table-data">{{ member.group }}</td>
+                            <td class="member-per-table-data">{{ forloop.counter }}. {{ member.0.name }}</td>
+                            <td class="member-per-table-data">{{ member.0.group }}</td>
                         </tr>
                     {% endfor %}
                 </table>
             {% empty %}
-                <div>
+                <div class="member-per-table-">
                     No Data for Barangay {{ the_brgy }}
                 </div>
             {% endfor %}
         {% else %}
-            <div>
-                <a href="{% url 'per-brgy-members-pdf' %}">Download PDF</a>
+            <div class="member-per-brgy-download-pdf-download-container">
+                <a class="member-per-brgy-download-pdf"
+                   href="{% url 'per-brgy-members-pdf' %}">
+                    Download PDF
+                </a>
             </div>
             {% for brgy, members in member_per_brgy_list.items %}
                 <table class="member-per-brgy-table">
                     <tr class="member-per-brgy-table-row">
-                        <th class="member-per-brgy-table-head" colspan="2">{{ brgy }}</th>
+                        <th class="member-per-brgy-table-head" colspan="2">
+                            <span style="float: left;">
+                                {{ brgy }}
+                            </span>
+                            <span>
+                                Member Percentage: {{ members.1.1 }}%
+                            </span>
+                            <span style="float: right;">
+                                Voter Population:{{ members.1.2 }}
+                            </span>
+                        </th>
                     </tr>
                     <tr class="member-per-brgy-table-row">
                         <th class="member-per-table-head">Name</th>
@@ -59,8 +89,8 @@
                     </tr>
                     {% for member in members %}
                         <tr class="member-per-brgy-table-row">
-                            <td class="member-per-table-data">{{ member.name }}</td>
-                            <td class="member-per-table-data">{{ member.group }}</td>
+                            <td class="member-per-table-data">{{ forloop.counter }}. {{ member.0.name }}</td>
+                            <td class="member-per-table-data">{{ member.0.group }}</td>
                         </tr>
                     {% endfor %}
                 </table>

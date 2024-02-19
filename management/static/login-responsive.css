@@ -1,0 +1,50 @@
+@media only screen and (max-width: 1021px){
+    .login-form-container-div{
+        width: 60%;
+    }
+}
+
+@media only screen and (max-width: 703px){
+    .login-form-container-div{
+        width: 70%;
+    }
+}
+
+@media only screen and (max-width: 631px){
+    .login-form-container-div{
+        width: 80%;
+    }
+}
+
+@media only screen and (max-width: 509px){
+    .login-form-container-div{
+        width: 90%;
+    }
+
+    .login-field{
+        width: 90%;
+        margin-left: 20px;
+    }
+}
+
+@media only screen and (max-width: 419px){
+    .login-form-container-div{
+        width: 90%;
+    }
+
+    .login-field{
+        width: 90%;
+        margin-left: 15px;
+    }
+}
+
+@media only screen and (max-width: 373px){
+    .login-form-container-div{
+        width: 90%;
+    }
+
+    .login-field{
+        width: 90%;
+        margin-left: 10px;
+    }
+}

@@ -37,3 +37,21 @@
 .leaderless-members-table-link-to-page:hover{
     text-decoration: underline;
 }
+
+.leaderless-members-download-pdf-container-div{
+    text-align: center;
+    margin: 20px;
+}
+
+.leaderless-members-download-pdf{
+    background-color: rgba(100, 150, 150, 0.8);
+    font-family: 'Montserrat';
+    color: beige;
+    text-decoration: none;
+    padding-top:10px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    border-radius: 10px;
+    border: solid 1px rgb(150, 200, 200);
+}

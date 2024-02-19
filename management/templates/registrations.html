@@ -3,8 +3,11 @@
 <head>
     {% load static %}
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Title</title>
     <link rel="stylesheet" href="{% static 'registration.css' %}">
+    <link rel="stylesheet" href="{% static 'registrations-responsive.css' %}">
     <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
 </head>
 <body>
@@ -24,60 +27,45 @@
             {% endif %}
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Username:
-                    </div>
+                <div >
                     <div class="registration-form-field-div">
                         {{ registrant_form.username }}
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Email:
-                    </div>
+                <div >
                     <div class="registration-form-field-div">
                         {{ registrant_form.email }}
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Password:
-                    </div>
+                <div >
                     <div class="registration-form-field-div">
                         {{ registrant_form.password1 }}
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Confirm Password:
-                    </div>
+                <div >
                     <div class="registration-form-field-div">
                         {{ registrant_form.password2 }}
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Full Name:
-                    </div>
+                <div >
                     <div class="registration-form-field-div">
                         {{ registrant_form.name }}
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Barangay:
+                <div class="registration-form-field-div-brgy-sitio">
+                    <div class="registration-field-min-label-div">
+                        Barangay
                     </div>
-                    <div class="registration-form-label-div">
+                    <div class="registration-field-min-div">
                         {{ registrant_form.brgy }}
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Sitio:
+                <div class="registration-form-field-div-brgy-sitio">
+                    <div class="registration-field-min-label-div">
+                        Sitio
                     </div>
-                    <div class="registration-form-field-div">
-                        <select class="registration-field"
+                    <div class="registration-field-min-div">
+                        <select class="registration-field-min"
                                 name="registrant-sitio" id="registrant-sitio-dropdown">
                             {% for sitio in sitios %}
                                 <option value="{{ sitio.id }}">{{ sitio.name }}</option>
@@ -87,32 +75,45 @@
                         </select>
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Age:
+                <div class="registration-form-field-div-age-gender-image-field-container">
+                    <div class="registration-field-super-min-label-div">
+                        Age
                     </div>
-                    <div class="registration-form-field-div">
+                    <div class="registration-field-super-min-div">
                         {{ registrant_form.age }}
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Gender:
+                <div class="registration-form-field-div-age-gender-image-field-container">
+                    <div class="registration-field-super-min-label-div">
+                        Gender
                     </div>
-                    <div class="registration-form-field-div">
+                    <div class="registration-field-super-min-div">
                         {{ registrant_form.gender }}
                     </div>
                 </div>
-                <div class="registration-label-and-field-container">
-                    <div class="registration-form-label-div">
-                        Profile Image:
+                <div class="registration-form-field-div-age-gender-image-field-container">
+                    <div class="registration-field-super-min-label-div">
+                        Profile Image
                     </div>
-                    <div class="registration-form-field-div">
+                    <div class="registration-field-super-min-div">
                         {{ registrant_form.image }}
                     </div>
                 </div>
-                <div class="registration-btn-container">
+                <div >
                     <button class="registration-btn" type="submit">Register</button>
+                </div>
+                <div style="background-color: rgba(200, 200, 200, 0.6);
+                            padding: 0.5px;
+                            margin: auto;
+                            width: 30%;
+                            margin-bottom: 10px;">
+
+                </div>
+                <div style="margin-bottom: 10px;" >
+                    <a style="color: beige;
+                            text-decoration: none; margin-bottom: 10px;" href="{% url 'login' %}">
+                        Already Have an Account?
+                    </a>
                 </div>
             </form>
         </div>

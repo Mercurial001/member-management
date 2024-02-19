@@ -1,8 +1,14 @@
+body{
+    font-family: 'Montserrat';
+    background-image: linear-gradient(to right, rgb(10, 10, 10), rgb(10, 40, 40), rgb(10, 10, 10));
+    color: beige;
+}
+
 .registration-page-title-header{
     text-align: center;
     font-family: 'Montserrat';
     font-size: 40px;
-    color: rgb(90, 90, 90);
+    color: rgb(200, 200, 200);
 }
 
 .registration-field{
@@ -18,13 +24,74 @@
     outline: none;
 }
 
+.registration-form-field-div-brgy-sitio{
+    display: inline-block;
+    width: 48%;
+}
+
+.registration-form-label-div-min{
+    display: inline-block;
+    width: 200px;
+}
+
+.registration-field-min-label-div{
+    text-align: left;
+    margin-left: 18px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.registration-field-min{
+    width: 90%;
+    height: 35px;
+    border-radius: 10px;
+    border: 1px solid rgb(100, 100, 100);
+    padding: 5px;
+    display: inline-block;
+}
+
+.registration-form-field-div-age-gender-image-field-container{
+    display: inline-block;
+    width: 31%;
+}
+
+.registration-field-super-min-label-div{
+    text-align: left;
+    margin-left: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+}
+
+.registration-field-super-min{
+    width: 90%;
+    height: 35px;
+    border-radius: 10px;
+    border: 1px solid rgb(100, 100, 100);
+    padding: 5px;
+    display: inline-block;
+}
+
+.registration-field-super-min:focus{
+    outline: none;
+}
+
+
+#registration-age-field{
+    height: 24px;
+}
+
+#registration-image-field{
+    height: 24px;
+}
+
 .registration-form-container-div{
     margin:auto;
     width: 50%;
     text-align: center;
     border: 1px solid rgb(80, 120, 120);
     border-radius: 15px;
-    margin-top: 50px;
+    margin-top: 10px;
     margin-bottom: 50px;
 }
 
@@ -43,7 +110,7 @@
 
 .registration-btn{
     margin: 20px;
-    background-color: rgb(10, 40, 40);
+    background-color: rgb(100, 150, 150);
     color: beige;
     border: none;
     padding-top: 10px;

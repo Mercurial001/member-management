@@ -12,7 +12,7 @@
 
 .leader-members-report-table-container{
     margin: auto;
-    width: 50%;
+    width: 62%;
 }
 
 .leader-member-report-table{
@@ -21,9 +21,9 @@
 
 .leader-member-report-table-head{
     width: 600px;
-    background-color: rgb(40, 130, 130);
-    padding:10px;
+    background-color: rgb(40, 90, 90);
     color: beige;
+    padding:10px;
 }
 
 .leader-members-leader-table-head-span{
@@ -51,4 +51,44 @@
     font-weight: 800;
     color: rgb(80, 80, 80);
     font-size: 50px;
+}
+
+.leader-member-filter-cluster-form-container{
+    text-align: center;
+}
+
+.leader-member-filter-cluster-form-element{
+    display: inline-block;
+}
+
+.leader-members-download-pdf-container-div{
+    text-align: center;
+    margin: 40px;
+}
+
+.leader-members-download-pdf{
+    background-color: rgba(100, 150, 150, 0.8);
+    font-family: 'Montserrat';
+    color: beige;
+    text-decoration: none;
+    padding-top:10px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    border-radius: 10px;
+    border: solid 1px rgb(150, 200, 200);
+}
+
+#leader-members-report-dropdown{
+    width: 200px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+.leader-members-filter-btn{
+    height: 30px;
+    color: rgb(100, 100, 100);
+    border-radius: 10px;
+    border: 1px solid rgb(100, 100, 100);
+    cursor: pointer;
 }

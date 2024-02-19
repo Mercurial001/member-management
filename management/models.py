@@ -145,3 +145,8 @@ class EmailMessage(models.Model):
     subject = models.CharField(max_length=255)
     content = models.TextField()
 
+
+class TotalVoterPopulation(models.Model):
+    date = models.DateField()
+    population = models.IntegerField()
+

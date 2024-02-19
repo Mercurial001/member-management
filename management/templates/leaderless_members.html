@@ -7,8 +7,8 @@
         <div class="leaderless-members-header-title-div">
             Leaderless Members Report
         </div>
-        <div>
-            <a href="{% url 'leaderless-members-pdf' %}">Download PDF</a>
+        <div class="leaderless-members-download-pdf-container-div">
+            <a class="leaderless-members-download-pdf" href="{% url 'leaderless-members-pdf' %}">Download PDF</a>
         </div>
         <div class="leaderless-members-table-container-div">
             <table class="leaderless-members-table">
@@ -30,6 +30,12 @@
                         <td class="leaderless-members-table-data">
                             <a href="{% url 'member-brgy' brgy %}"
                                class="leaderless-members-table-link-to-page">{{ brgy }}</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td class="leaderless-members-table-data" colspan="2">
+                            All Members are Associated with a Leader
                         </td>
                     </tr>
                 {% endfor %}

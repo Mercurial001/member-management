@@ -12,7 +12,7 @@
 
 .members-report-table-container-div{
     margin: auto;
-    width: 50%;
+    width: 64%;
 }
 
 .members-report-table-head{
@@ -25,4 +25,22 @@
 .members-report-table-data{
     background-color: rgb(200, 200, 200);
     padding: 10px;
+}
+
+.members-report-download-pdf-container{
+    text-align: center;
+    margin: 40px;
+}
+
+.members-report-download-pdf{
+    background-color: rgba(100, 150, 150, 0.8);
+    font-family: 'Montserrat';
+    color: beige;
+    text-decoration: none;
+    padding-top:10px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    border-radius: 10px;
+    border: solid 1px rgb(150, 200, 200);
 }

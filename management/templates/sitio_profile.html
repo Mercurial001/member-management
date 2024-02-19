@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="sitio-profile-sitio-header-title-div">
+        <span class="sitio-profile-sitio-header-title">SITIO PROFILE</span>
+        <span class="sitio-edit-profile-toggle-btn">
+            <i class="fas fa-edit"></i>
+        </span>
+    </section>
+    <section class="sitio-profile-sitio-details-container-div">
+        <div class="sitio-profile-edit-form-barangay-data-container">
+            <div class="sitio-profile-edit-form-header-title-div">
+                <span class="sitio-profile-edit-form-header-title">
+                    EDIT SITIO DETAILS
+                </span>
+                <span class="sitio-profile-hide-edit-form-btn">
+                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                </span>
+            </div>
+            <div class="stiio-profile-edit-form-container-div">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="sitio-profile-data-and-field-div">
+                        <div class="sitio-profile-label-and-edit-div">
+                            <span class="sitio-profile-label">
+                                Sitio Name:
+                            </span>
+                            <span class="sitio-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="sitio-profile-product-data-and-field-container-div">
+                            <div class="sitio-profile-product-data-div">
+                                {{ sitio.name }}
+                            </div>
+                            <div class="sitio-profile-field-div">
+                                {{ edit_sitio_details_form.name }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sitio-profile-data-and-field-div">
+                        <div class="sitio-profile-label-and-edit-div">
+                            <span class="sitio-profile-label">
+                                Barangay:
+                            </span>
+                            <span class="sitio-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="sitio-profile-product-data-and-field-container-div">
+                            <div class="sitio-profile-product-data-div">
+                                {{ sitio.brgy }}
+                            </div>
+                            <div class="sitio-profile-field-div">
+                                {{ edit_sitio_details_form.brgy }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sitio-profile-data-and-field-div">
+                        <div class="sitio-profile-label-and-edit-div">
+                            <span class="sitio-profile-label">
+                                Voter Population:
+                            </span>
+                            <span class="sitio-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="sitio-profile-product-data-and-field-container-div">
+                            <div class="sitio-profile-product-data-div">
+                                {{ sitio.population }}
+                            </div>
+                            <div class="sitio-profile-field-div">
+                                {{ edit_sitio_details_form.population }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sitio-profile-data-and-field-div">
+                        <div class="sitio-profile-label-and-edit-div">
+                            <span class="sitio-profile-label">
+                                Latitude:
+                            </span>
+                            <span class="sitio-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="sitio-profile-product-data-and-field-container-div">
+                            <div class="brgy-profile-product-data-div">
+                                {{ sitio.lat }}
+                            </div>
+                            <div class="sitio-profile-field-div">
+                                {{ edit_sitio_details_form.lat }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sitio-profile-data-and-field-div">
+                        <div class="sitio-profile-label-and-edit-div">
+                            <span class="sitio-profile-label">
+                                Longitude:
+                            </span>
+                            <span class="sitio-profile-edit-btn-div">
+                                <i class="fa fa-edit"></i>
+                            </span>
+                        </div>
+                        <div class="sitio-profile-product-data-and-field-container-div">
+                            <div class="sitio-profile-product-data-div">
+                                {{ sitio.long }}
+                            </div>
+                            <div class="sitio-profile-field-div">
+                                {{ edit_sitio_details_form.long }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sitio-profile-save-changes-btn">
+                        <button type="submit">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <section class="sitio-profile-details-section">
+            <div class="sitio-profile-sitio-showcase-container-div">
+                <div class="sitio-profile-sitio-name-showcase-div">
+                    {{ sitio.name }}
+                </div>
+                <div class="sitio-profile-analytics-block-container-div">
+                    <div class="sitio-profile-analytics-block-div">
+                        <div class="sitio-profile-analytics-block-title">
+                            Total Members in {{ sitio.name }}
+                        </div>
+                        <div class="sitio-profile-analytics-data">
+                            {{ sitio_individual_sum }}
+                        </div>
+                    </div>
+                    <div class="sitio-profile-analytics-block-div">
+                        <div class="sitio-profile-analytics-block-title">
+                            Total Voter Population in {{ sitio.name }}
+                        </div>
+                        <div class="sitio-profile-analytics-data">
+                            {{ sitio.population }}
+                        </div>
+                    </div>
+                    <div class="sitio-profile-analytics-block-div">
+                        <div class="sitio-profile-analytics-block-title">
+                            {{ sitio.name }} Barangay
+                        </div>
+                        <div class="sitio-profile-analytics-data">
+                            <a class="sitio-profile-analytics-link"
+                               href="{% url 'member-brgy' sitio.brgy %}">{{ sitio.brgy }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sitio-profile-showcase-underline"></div>
+            <div class="sitio-profile-sitio-details-block-container-div">
+                <div class="sitio-profile-details-title-header-div">
+                    Data List
+                </div>
+                <div class="sitio-profile-showcase-details-block-div">
+                    <div class="sitio-profile-details-block-header-title">
+                        Sitio {{ sitio.name }} Leaders
+                    </div>
+                    <div class="sitio-profile-details-div">
+                        {% for leader in sitio_leaders %}
+                            <div class="sitio-profile-data-detail">
+                                <a class="sitio-profile-link-page"
+                                   href="{% url 'cluster' leader.name leader.user %}">{{ leader.name }}</a>
+                            </div>
+                        {% empty %}
+                            <div class="sitio-profile-empty-detail-notifier">
+                                No Leaders in this BRGY
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="sitio-profile-showcase-details-block-div">
+                    <div class="sitio-profile-details-block-header-title">
+                        Brgy. {{ brgy.brgy_name }} Members
+                    </div>
+                    <div class="sitio-profile-details-div">
+                        {% for member in sitio_members %}
+                            <div class="sitio-profile-data-detail">
+                                <a class="sitio-profile-link-page" href="{% url 'member-profile' member.name member.id %}">
+                                    {{ member.name }}
+                                </a>
+                            </div>
+                        {% empty %}
+                            <div class="sitio-profile-empty-detail-notifier">
+                                No Members in this BRGY
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+<!--            <div class="sitio-profile-sitio-clusters-container-div">-->
+<!--                <div class="sitio-profile-cluster-title-header-div">-->
+<!--                    Brgy. {{ brgy.name }} Clusters-->
+<!--                </div>-->
+<!--                {% for cluster in brgy_cluster %}-->
+<!--                    <div class="sitio-profile-cluster-block-div">-->
+<!--                        <div class="sitio-profile-cluster-leader-header">-->
+<!--                            {{ cluster.leader }}-->
+<!--                        </div>-->
+<!--                        <div class="sitio-profile-cluster-members-div">-->
+<!--                            {% for member in cluster.members.all %}-->
+<!--                                <div class="sitio-profile-cluster-member">-->
+<!--                                    <a href="{% url 'member-profile' member.name member.id %}">{{ member }}</a>-->
+<!--                                </div>-->
+<!--                            {% empty %}-->
+<!--                                <div class="sitio-profile-empty-member-cluster-notifier">-->
+<!--                                    No Members in this Cluster-->
+<!--                                </div>-->
+<!--                            {% endfor %}-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                {% endfor %}-->
+<!--            </div>-->
+        </section>
+
+    </section>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all elements with the class "brgy-profile-edit-btn-div"
+            var editButtons = document.querySelectorAll('.sitio-profile-edit-btn-div');
+
+            // Loop through each edit button
+            editButtons.forEach(function (button) {
+                // Add a click event listener to each edit button
+                button.addEventListener('click', function () {
+                    // Find the parent element with the class "product-profile-data-and-field-div"
+                    var dataAndFieldDiv = button.closest('.sitio-profile-data-and-field-div');
+
+
+                    // Find the child elements with classes "product-profile-product-data-div" and "product-profile-field-div"
+                    var productDataDiv = dataAndFieldDiv.querySelector('.sitio-profile-product-data-div');
+                    var fieldDiv = dataAndFieldDiv.querySelector('.sitio-profile-field-div');
+                    var saveChangesBtn = document.querySelector('.sitio-profile-save-changes-btn');
+
+                    var isProductDataVisible = productDataDiv.classList.contains('sitio-name-visibility');
+                    var isFieldVisible = fieldDiv.classList.contains('sitio-name-field-visibility');
+
+                    // Toggle the display property
+                    productDataDiv.classList.toggle('sitio-name-visibility'); // Hide product data
+                    fieldDiv.classList.toggle('sitio-name-field-visibility'); // Show field
+
+                    if (productDataDiv.classList.contains('sitio-name-visibility') || fieldDiv.classList.contains('sitio-name-field-visibility')) {
+                        saveChangesBtn.style.display = 'block';
+                    }
+                });
+            });
+        });
+
+        const toggleProfileDetails = document.querySelector('.sitio-edit-profile-toggle-btn');
+        const editForm = document.querySelector('.sitio-profile-edit-form-barangay-data-container');
+        const unToggleBtn = document.querySelector('.sitio-profile-hide-edit-form-btn');
+
+        toggleProfileDetails.addEventListener('click', ()=> {
+            editForm.classList.add('show-sitio-edit-profile-toggle');
+        });
+
+        unToggleBtn.addEventListener('click', ()=> {
+            editForm.classList.remove('show-sitio-edit-profile-toggle');
+        });
+    </script>
+{% endblock %}
