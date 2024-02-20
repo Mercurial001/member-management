@@ -1,0 +1,42 @@
+body{
+    font-family: 'Montserrat';
+}
+
+.qr-code-scanner-attendance-body{
+    background-color: rgb(10, 35, 35);
+}
+
+.qr-code-scanner-attendance-heading-div{
+    color: beige;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.qr-code-camera-scanner-container-div{
+    background-color: rgba(100, 140, 140, 0.3);
+    border: rgb(100, 190, 190) solid 1px;
+    padding: 20px;
+    margin:auto;
+    width: 40%;
+    border-radius: 10px;
+}
+
+#qr-code-scanner-camera{
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: rgba(255, 255, 255, 0.50) 0px 5px 10px;
+}
+
+#qr-code-attendance-message-container{
+    text-align: center;
+    font-weight: 800;
+    height: 30px;
+}
+
+.success-message {
+    color: rgb(100, 180, 180);
+}
+
+.error-message {
+    color: rgb(200, 50, 50);
+}

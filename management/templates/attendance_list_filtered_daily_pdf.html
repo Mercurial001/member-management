@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .attendance-title-heading-div{
+            letter-spacing: 1px;
+            padding: 1px;
+            text-align: center;
+        }
+
+        .attendance-table{
+            border-radius: 5px;
+            border-collapse: collapse;
+            margin: auto;
+            margin-top: 40px;
+            width: 90%;
+        }
+
+        .attendance-table-head{
+            background-color: rgb(3, 40, 40);
+            color: beige;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .attendance-table-head p{
+            text-align: center;
+        }
+
+        .attendance-table-head,.attendance-table-data{
+            text-align: left;
+            padding: 8px;
+        }
+
+        .attendance-table-data{
+            border: 1px solid rgb(30, 30, 30);
+        }
+
+        .attendance-filtered-message-div{
+            font-family: Lato, 'Montserrat';
+            font-weight: 800;
+            font-size: 20px;
+            margin-top: 20px;
+            margin-left: 50px;
+        }
+
+        .attendance-form-content-div{
+            display: inline-block;
+        }
+
+        .attendance-date-filter-btn{
+            border: none;
+            background-color: rgb(10, 67, 67);
+            color: beige;
+            font-weight: 800;
+            font-family: Lato, 'Montserrat';
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .attendance-date-input{
+            border: none;
+            font-family: 'Montserrat';
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-weight: 800;
+        }
+
+        .attendance-date-input:focus{
+            outline: none;
+        }
+
+        .attendance-date-filter-btn:hover{
+            background-color: rgb(20, 20, 20);
+        }
+
+        #attendance-date-filter-icon{
+            margin-right: 10px;
+        }
+
+        .attendance-date-filter-label{
+            font-weight: 800;
+            font-family: Lato;
+            color: beige;
+            background-color: rgb(10, 30, 30);
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 15px;
+            padding-right: 15px;
+            border-top-left-radius: 10px;
+            border-bottom-left-radius: 10px;
+        }
+
+        #attendance-no-record-date{
+            text-align: center;
+            font-size: 20px;
+            font-weight: 800;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="attendance-list-table-div">
+        <table class="attendance-table">
+            <tr class="attendance-table-row">
+                <th class="attendance-table-head">
+                    <p>Name</p>
+                </th>
+                <th class="attendance-table-head">
+                    <p>Barangay</p>
+                </th>
+                <th class="attendance-table-head">
+                    <p>Sitio</p>
+                </th>
+                <th class="attendance-table-head">
+                    <p>Status</p>
+                </th>
+                <th class="attendance-table-head">
+                    <p>Attendance Date</p>
+                </th>
+            </tr>
+            {% if attendances %}
+                <div class="attendance-filtered-message-div">
+                    Attendance Record for {{ selected_date }}
+                </div>
+                {% for attendance in attendances %}
+                    <tr class="attendance-table-row">
+                        <td class="attendance-table-data">
+                            {{ attendance.name }}
+                        </td>
+                        <td class="attendance-table-data">
+                            {{ attendance.brgy }}
+                        </td>
+                        <td class="attendance-table-data">
+                            {{ attendance.sitio }}
+                        </td>
+                        <td class="attendance-table-data">
+                            {{ attendance.group }}
+                        </td>
+                        <td class="attendance-table-data">
+                            {{ attendance.date_time }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
+    </div>
+</body>
+</html>

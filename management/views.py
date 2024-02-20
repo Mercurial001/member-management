@@ -4,7 +4,7 @@ from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm,
     ChangePasswordForm, ForgotPasswordForm, ChangeSitioDetailsForm, TotalVoterPopulationEditForm
 from django.contrib import messages
 from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants, \
-    Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation
+    Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation, QRCodeAttendance
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
@@ -21,6 +21,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .decorators import authenticated_user
 from django.utils import timezone
+from datetime import datetime, timedelta
+from datetime import date
 from django.core.serializers import serialize, deserialize
 from django.core.files.storage import default_storage
 import os
@@ -40,6 +42,9 @@ def homepage(request):
     leader_brgy = Leader.objects.exclude(name=None).values('brgy__brgy_name').distinct()
 
     # Let's create a search engine in the homepage to fill the void as it should
+
+    user = request.user
+    logged_user = Individual.objects.get(user__username=user)
 
     # First let's retrieve the search field in the base.html
     search_engine_field_query = request.GET.get('search')
@@ -90,12 +95,16 @@ def homepage(request):
         'search_result_sum_member': search_result_sum_member,
         'search_result_sum_leader': search_result_sum_leader,
         'total_results': total_results,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def barangay_members(request, brgy_name):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     brgy = Barangay.objects.get(brgy_name=brgy_name)
     member_brgy = Member.objects.filter(brgy__brgy_name=brgy_name)
     brgy_leader = Leader.objects.filter(brgy__brgy_name=brgy_name)
@@ -126,10 +135,14 @@ def barangay_members(request, brgy_name):
         'brgy_individual_sum': brgy_individual_sum,
         'brgy_sitio_sum': brgy_sitio_sum,
         'brgy_cluster': brgy_cluster,
+        'logged_user': logged_user,
     })
 
 
 def sitio_profile(request, id):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     sitio = Sitio.objects.get(id=id)
     sitio_members = Member.objects.filter(sitio=sitio)
     sitio_leaders = Leader.objects.filter(sitio=sitio)
@@ -151,6 +164,7 @@ def sitio_profile(request, id):
         'sitio': sitio,
         'edit_sitio_details_form': edit_sitio_details_form,
         'sitio_individual_sum': sitio_individual_sum,
+        'logged_user': logged_user,
     })
 
 
@@ -163,6 +177,9 @@ def get_marker_color(percentage):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def dashboard(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     # Percentage Data
     percentage_data = Individual.objects.values('brgy__brgy_name', 'brgy__brgy_voter_population').annotate(
         member_popu_count=Count('name')
@@ -260,12 +277,16 @@ def dashboard(request):
         'individuals_sum': individuals_sum,
         'total_voter_population': total_voter_population,
         'total_voter_percentage': total_voter_percentage,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def leader_cluster(request, name, username):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     leader_user = User.objects.get(username=username)
     leader = Leader.objects.get(name=name, user=leader_user)
     leaders_cluster = Cluster.objects.get(leader=leader)
@@ -326,7 +347,8 @@ def leader_cluster(request, name, username):
     signing_key = b'Cold'
     signer = Signer(key=signing_key)
 
-    encrypted_username = signer.sign(leader.name) # 1st Encrypt the username
+    # encrypted_username = signer.sign(leader.name) # 1st Encrypt the username # Commented 2/20/2024
+    encrypted_username = signer.sign(leader.user) # 1st Encrypt the username
     data = encrypted_username.encode('utf-8') # 2 Convert encrypted_username to bytes
     encrypted_data = cipher_suite.encrypt(data) # Final
 
@@ -411,12 +433,16 @@ def leader_cluster(request, name, username):
         'search_engine_result_member': search_engine_result_member,
         'search_engine_field_query': search_engine_field_query,
         'total_results': total_results,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def add_barangay(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     # member_brgy = Member.objects.exclude(name=None).values('brgy__brgy_name').distinct()
     member_brgy = Barangay.objects.all()
     brgy_add_form = BarangayForm()
@@ -459,12 +485,16 @@ def add_barangay(request):
         'brgy_add_form': brgy_add_form,
         'member_brgy': member_brgy,
         'add_sitio_form': add_sitio_form,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def add_sitio(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     sitios = Sitio.objects.all()
     sitio_form = AddSitioForm()
     if request.method == 'POST':
@@ -475,12 +505,16 @@ def add_sitio(request):
     return render(request, 'add_sitio.html', {
         'sitio_form': sitio_form,
         'sitios': sitios,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def clusters(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     barangays = Barangay.objects.all()
     leaders = {}
     for brgys in barangays:
@@ -491,12 +525,16 @@ def clusters(request):
     return render(request, 'clusters.html', {
         'leaders': leaders,
         'barangays': barangays,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def add_leader(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     leader_form = LeaderRegistrationForm()
     brgys = Barangay.objects.all()
     selected_brgy = request.GET.get('leader-brgy')
@@ -556,12 +594,16 @@ def add_leader(request):
         'filtered_sitios': filtered_sitios,
         'sitios_exist': sitios_exist,
         'brgys': brgys,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def add_members(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     member_form = AddMemberRegistrationForm()
     brgys = Barangay.objects.all()
     selected_brgy = request.GET.get('member-brgy')
@@ -625,12 +667,16 @@ def add_members(request):
         'filtered_leaders': filtered_leaders,
         'selected_brgy': selected_brgy,
         'sitios_exist': sitios_exist,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def member_profile(request, name, id):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     member = Member.objects.get(id=id, name=name)
     members = Cluster.objects.values('members__name')
     leaders = Leader.objects.filter(brgy=member.brgy)
@@ -652,7 +698,8 @@ def member_profile(request, name, id):
     signing_key = b'Cold'
     signer = Signer(key=signing_key)
 
-    encrypted_username = signer.sign(member.name) # 1st Encrypt the username
+    # Commented 2/20/2024 encrypted_username = signer.sign(member.name) # 1st Encrypt the username
+    encrypted_username = signer.sign(member.user) # 1st Encrypt the username
     data = encrypted_username.encode('utf-8') # 2 Convert encrypted_username to bytes
     encrypted_data = cipher_suite.encrypt(data) # Final
 
@@ -683,18 +730,25 @@ def member_profile(request, name, id):
         'get_member_leader': get_member_leader,
         'edit_member_detail_form': edit_member_detail_form,
         "sitios": sitios,
+        'logged_user': logged_user,
     })
 
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def reports(request):
-    return render(request, 'reports.html', {
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
 
+    return render(request, 'reports.html', {
+        'logged_user': logged_user,
     })
 
 
 def members_per_brgy_report(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     member_per_brgy_list = {}
     member_filtered_per_brgy_list = {}
 
@@ -747,6 +801,7 @@ def members_per_brgy_report(request):
         'the_brgy': the_brgy,
         'member_filtered_per_brgy_list': member_filtered_per_brgy_list,
         'member_list': member_list,
+        'logged_user': logged_user,
     })
 
 
@@ -852,6 +907,9 @@ def members_filtered_per_brgy_report_pdf(request):
 
 
 def leader_members_report(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     cluster = Cluster.objects.all()
 
     brgys = Barangay.objects.all()
@@ -870,6 +928,7 @@ def leader_members_report(request):
         'cluster_filter': cluster_filter,
         'selected_brgy': selected_brgy,
         'the_brgy': the_brgy,
+        'logged_user': logged_user,
     })
 
 
@@ -943,9 +1002,13 @@ def leader_members_report_filtered_pdf(request):
 
 
 def all_members_individuals_report(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     individuals = Individual.objects.all().order_by('brgy')
     return render(request, 'all_member_report.html', {
         'individuals': individuals,
+        'logged_user': logged_user,
     })
 
 
@@ -979,6 +1042,9 @@ def all_members_individuals_report_pdf(request):
 
 
 def all_leaders_report(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     leaders = Cluster.objects.all()
 
     leader_list = {}
@@ -991,6 +1057,7 @@ def all_leaders_report(request):
     return render(request, 'leaders_report.html', {
         'leaders': leaders,
         'leader_list': leader_list,
+        'logged_user': logged_user,
     })
 
 
@@ -1032,9 +1099,13 @@ def all_leaders_report_pdf(request):
 
 
 def all_members_report(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     members = Member.objects.all()
     return render(request, 'members_report.html', {
         'members': members,
+        'logged_user': logged_user,
     })
 
 
@@ -1070,6 +1141,9 @@ def all_members_report_pdf(request):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def no_member_barangays(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     member_brgys = Individual.objects.values('brgy__brgy_name').distinct()
 
     brgys = [brgy['brgy__brgy_name'] for brgy in member_brgys]
@@ -1086,6 +1160,7 @@ def no_member_barangays(request):
         'member_brgys': member_brgys,
         'brgys': brgys,
         'no_member_brgy_list': no_member_brgy_list,
+        'logged_user': logged_user,
     })
 
 
@@ -1135,6 +1210,9 @@ def no_member_barangays_pdf(request):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def member_count_per_brgy(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     brgys_member_count = Individual.objects.values(
         'brgy__brgy_name',
         'brgy__brgy_voter_population'
@@ -1155,6 +1233,7 @@ def member_count_per_brgy(request):
         'brgys_member_count': brgys_member_count,
         'member_sum': member_sum,
         'member_per_brgy_list': member_per_brgy_list,
+        'logged_user': logged_user,
     })
 
 
@@ -1208,9 +1287,13 @@ def member_count_per_brgy_pdf(request):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def no_members_leader(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     no_members = Cluster.objects.filter(members=None)
     return render(request, 'no_member_leaders.html', {
         'no_members': no_members,
+        'logged_user': logged_user,
     })
 
 
@@ -1248,6 +1331,9 @@ def no_members_leader_pdf(request):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def leaderless_members(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     members = Member.objects.all().order_by('brgy__brgy_name')
     leaderless_member = Cluster.objects.values('members__name')
 
@@ -1264,6 +1350,7 @@ def leaderless_members(request):
         'leaderless_member': leaderless_member,
         'leaderless': leaderless,
         'cluster_members_filter': cluster_members_filter,
+        'logged_user': logged_user,
     })
 
 
@@ -1402,33 +1489,264 @@ def qr_code_scanner(request):
         my_string = plain_text.decode('utf-8')  # 2
         decrypted_username = signer.unsign(my_string)  # 3
         print(decrypted_username)
-        if Member.objects.filter(name=decrypted_username).exists() or Leader.objects.filter(name=decrypted_username).exists():
-            # if User.objects.filter(username=decrypted_username).exists():
-            #     user_instance = User.objects.get(username=decrypted_username)
-            #
-            #     # Create Attendance Instance
-            #     attendance_object = Attendance.objects.create(
-            #         name=user_instance.username,
-            #         department=user_instance.department,
-            #         course=user_instance.course,
-            #         position=user_instance.position
-            #     )
-            #     attendance_object.save()
-            #
-            #     attendance_data = AttendanceGraph.objects.create(name=decrypted_username)
-            #     attendance_data.save()
-            #
-            #     # For example, return a JSON response
-            #     # messages.success(request, f'Welcome, {decrypted_username}')
-            #     # return redirect('qr-code-attendance') and JsonResponse({decrypted_username: True})
+        if Individual.objects.filter(user__username=decrypted_username).exists():
+            individual_object = Individual.objects.get(user__username=decrypted_username)
+
+            attendance = QRCodeAttendance.objects.create(
+                user=decrypted_username,
+                name=individual_object.name,
+                brgy=individual_object.brgy.brgy_name,
+                sitio=individual_object.sitio.name,
+                group=individual_object.group,
+                date=timezone.now(),
+                date_time=timezone.now(),
+            )
+
+            attendance.save()
             return JsonResponse({'status': 'success', 'message': f'Welcome, {decrypted_username}'})
-        elif not Member.objects.filter(name=decrypted_username).exists() or Leader.objects.filter(name=decrypted_username).exists():
-            # messages.error(request, 'Scanned Data Does not Exists')
-            # return redirect('qr-code-attendance') and JsonResponse({decrypted_username: True})
+        elif not Individual.objects.filter(user__username=decrypted_username).exists():
+
             return JsonResponse({'status': 'error', 'message': 'Scanned Data Does not Exist'})
         # return JsonResponse({decrypted_username: True})
 
     return render(request, 'qr_code_attendance.html')
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def attendance_list(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
+    default_date = date.today()
+    attendances_default = QRCodeAttendance.objects.all()
+
+    selected_date_str = request.GET.get('date')
+    if selected_date_str:
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+    else:
+        selected_date = None
+
+    if selected_date:  # Check if a date is selected
+        attendances = QRCodeAttendance.objects.filter(date=selected_date)
+    else:
+        attendances = []
+
+    return render(request, 'attendance_list.html', {
+        'attendances': attendances,
+        'selected_date': selected_date,
+        'attendances_default': attendances_default,
+        'default_date': default_date,
+        'logged_user': logged_user,
+    })
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def attendance_list_pdf(request):
+    attendances_default = QRCodeAttendance.objects.all()
+
+    html = render_to_string('attendance_list_pdf.html', {
+        'attendances_default': attendances_default,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="attendance_list.pdf"'
+    return response
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def attendance_list_filtered_daily_pdf(request):
+    default_date = date.today()
+    attendances_default = QRCodeAttendance.objects.all()
+
+    selected_date_str = request.GET.get('date')
+    if selected_date_str:
+        selected_date = datetime.strptime(selected_date_str, '%b. %d, %Y').date()
+    else:
+        selected_date = None
+
+    if selected_date:  # Check if a date is selected
+        attendances = QRCodeAttendance.objects.filter(date=selected_date)
+    else:
+        attendances = []
+
+    html = render_to_string('attendance_list_filtered_daily_pdf.html', {
+        # 'selected_date_str': selected_date_str,
+        'attendances': attendances,
+        'attendances_default': attendances_default,
+        'default_date': default_date,
+        'selected_date': selected_date,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="attendance_list_daily-{selected_date}.pdf"'
+    return response
+
+
+def sitios_report(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
+    brgys = Barangay.objects.all()
+    selected_brgy = request.GET.get('sitio-brgy')
+
+    individuals = Individual.objects.all()
+    individual_per_sitio_list = {}
+    for individual in individuals:
+        sitio = individual.sitio
+        if not sitio in individual_per_sitio_list:
+            individual_per_sitio_list[sitio] = [individual]
+        else:
+            individual_per_sitio_list[sitio].append(individual)
+
+    individual_filtered_per_sitio_list = {}
+    if selected_brgy == 'None':
+        individuals = Individual.objects.filter(sitio=None)
+        for individual in individuals:
+            sitio = individual.sitio
+            if not sitio in individual_filtered_per_sitio_list:
+                individual_filtered_per_sitio_list[sitio] = [individual]
+            else:
+                individual_filtered_per_sitio_list[sitio].append(individual)
+    elif selected_brgy:
+        individuals = Individual.objects.filter(sitio__brgy__id=selected_brgy)
+        for individual in individuals:
+            sitio = individual.sitio
+            if not sitio in individual_filtered_per_sitio_list:
+                individual_filtered_per_sitio_list[sitio] = [individual]
+            else:
+                individual_filtered_per_sitio_list[sitio].append(individual)
+
+    return render(request, 'sitios_report.html', {
+        'individual_per_sitio_list': individual_per_sitio_list,
+        'individual_filtered_per_sitio_list': individual_filtered_per_sitio_list,
+        'brgys': brgys,
+        'logged_user': logged_user,
+        'selected_brgy': selected_brgy,
+    })
+
+
+def sitios_report_pdf(request):
+    individuals = Individual.objects.all()
+    individual_per_sitio_list = {}
+    for individual in individuals:
+        sitio = individual.sitio
+        if not sitio in individual_per_sitio_list:
+            individual_per_sitio_list[sitio] = [individual]
+        else:
+            individual_per_sitio_list[sitio].append(individual)
+
+    html = render_to_string('sitios_report_pdf.html', {
+        'individual_per_sitio_list': individual_per_sitio_list,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="sitios.pdf"'
+    return response
+
+
+def sitios_report_filtered_pdf(request):
+    selected_brgy = request.GET.get('sitio-brgy')
+
+    brgy = Barangay.objects.get(id=selected_brgy)
+
+    individual_filtered_per_sitio_list = {}
+    if selected_brgy == 'None':
+        individuals = Individual.objects.filter(sitio=None)
+        for individual in individuals:
+            sitio = individual.sitio
+            if not sitio in individual_filtered_per_sitio_list:
+                individual_filtered_per_sitio_list[sitio] = [individual]
+            else:
+                individual_filtered_per_sitio_list[sitio].append(individual)
+    elif selected_brgy:
+        individuals = Individual.objects.filter(sitio__brgy__id=selected_brgy)
+        for individual in individuals:
+            sitio = individual.sitio
+            if not sitio in individual_filtered_per_sitio_list:
+                individual_filtered_per_sitio_list[sitio] = [individual]
+            else:
+                individual_filtered_per_sitio_list[sitio].append(individual)
+
+    html = render_to_string('sitios_report_filtered_pdf.html', {
+        'individual_filtered_per_sitio_list': individual_filtered_per_sitio_list,
+        'selected_brgy': selected_brgy,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="sitios-{brgy}.pdf"'
+    return response
+
 
 
 @login_required(login_url='login')
@@ -1625,9 +1943,13 @@ def registration_validation(request):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def registrants(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+
     registrant_objects = Registrants.objects.all()
     return render(request, 'registrants.html', {
         'registrant_objects': registrant_objects,
+        'logged_user': logged_user,
     })
 
 
@@ -2250,7 +2572,8 @@ def non_admin_leader_profile(request, username):
     signing_key = b'Cold'
     signer = Signer(key=signing_key)
 
-    encrypted_username = signer.sign(leader.name) # 1st Encrypt the username
+    # Commented 2/20/2024 encrypted_username = signer.sign(leader.name) # 1st Encrypt the username
+    encrypted_username = signer.sign(leader.user) # 1st Encrypt the username
     data = encrypted_username.encode('utf-8') # 2 Convert encrypted_username to bytes
     encrypted_data = cipher_suite.encrypt(data) # Final
 
@@ -2465,7 +2788,8 @@ def non_admin_member_profile(request, username):
     signing_key = b'Cold'
     signer = Signer(key=signing_key)
 
-    encrypted_username = signer.sign(member.name) # 1st Encrypt the username
+    # Commented 2/20/2024 encrypted_username = signer.sign(member.name) # 1st Encrypt the username
+    encrypted_username = signer.sign(member.user) # 1st Encrypt the username
     data = encrypted_username.encode('utf-8') # 2 Convert encrypted_username to bytes
     encrypted_data = cipher_suite.encrypt(data) # Final
 

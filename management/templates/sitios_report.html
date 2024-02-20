@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<section class="sitio-report-utmost-container-section">
+    <div class="sitio-report-title-header-div">
+        Members per Sitio
+    </div>
+    <div class="sitio-report-filter-form-container-div">
+        <form class="sitio-report-filter-brgy-sitio-form" action="{% url 'sitio-report' %}">
+            <div class="sitio-report-form-element-div">
+                <select class="sitio-report-select-field" name="sitio-brgy" id="sitio-report-brgy-dropdown">
+                    {% for brgy in brgys %}
+                        <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
+                    {% endfor %}
+                    <option value="None">None</option>
+                </select>
+            </div>
+            <div class="sitio-report-form-element-div">
+                <div class="sitio-report-filter-btn-container-div">
+                    <button class="sitio-report-filter-btn" type="submit"><i class="fa fa-filter"></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% if not selected_brgy %}
+        <div class="sitio-report-download-pdf-function-container-div">
+            <a class="sitio-report-download-pdf" href="{% url 'sitio-report-pdf' %}">Download PDF</a>
+        </div>
+        <div class="sitio-report-member-per-sitio-table-container">
+            {% for sitio, individuals in individual_per_sitio_list.items %}
+                <table class="sitio-report-member-per-sitio-table">
+                    <tr class="sitio-report-member-per-sitio-table-row">
+                        <th class="sitio-report-member-per-sitio-table-head" colspan="2">{{ sitio }}</th>
+                    </tr>
+                    {% for individual in individuals %}
+                        <tr class="sitio-report-member-per-sitio-table-row">
+                            <td class="sitio-report-member-per-sitio-table-data">
+                                {{ individual.name }}
+                            </td>
+                            <td class="sitio-report-member-per-sitio-table-data">
+                                {{ individual.group }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="sitio-report-download-pdf-function-container-div">
+            <a class="sitio-report-download-pdf" href="{% url 'sitio-report-filtered-pdf' %}?sitio-brgy={{ selected_brgy }}">Download PDF</a>
+        </div>
+        <div class="sitio-report-member-per-sitio-table-container">
+            {% for sitio, individuals in individual_filtered_per_sitio_list.items %}
+                <table class="sitio-report-member-per-sitio-table">
+                    <tr class="sitio-report-member-per-sitio-table-row">
+                        <th class="sitio-report-member-per-sitio-table-head" colspan="2">
+                            {{ sitio }}
+                        </th>
+                    </tr>
+                    {% for individual in individuals %}
+                        <tr class="sitio-report-member-per-sitio-table-row">
+                            <td class="sitio-report-member-per-sitio-table-data">
+                                {{ individual.name }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% empty %}
+                No Sitios in this brgy
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

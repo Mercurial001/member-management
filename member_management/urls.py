@@ -35,16 +35,18 @@ urlpatterns = [
     path('clusters/', views.clusters, name='clusters'),
     path('add-leader/', views.add_leader, name='add-leader'),
     path('reports/', views.reports, name='reports'),
+
     path('report/member-count-brgy/', views.member_count_per_brgy, name='member-count-brgy'),
     path('report/leaders/member/None/', views.no_members_leader, name='no-member-leader'),
     path('report/members/leader/None/', views.leaderless_members, name='leaderless-members'),
     path('report/no-member-brgys/', views.no_member_barangays, name='no-member-brgys'),
-
     path('report/members/all/', views.all_members_individuals_report, name='all-members-report'),
     path('report/brgy/members/', views.members_per_brgy_report, name='per-brgy-members'),
     path('report/cluster/', views.leader_members_report, name='cluster-report'),
     path('report/members/', views.all_members_report, name='members-report'),
     path('report/leaders/', views.all_leaders_report, name='leaders-report'),
+    path('attendance/list/', views.attendance_list, name='attendance-list'),
+    path('report/sitios/', views.sitios_report, name='sitio-report'),
 
     path('report/no-member-brgys/download-pdf', views.no_member_barangays_pdf, name='no-member-brgys-pdf'),
     path('report/member-count-brgy/download-pdf', views.member_count_per_brgy_pdf, name='member-count-brgy-pdf'),
@@ -55,11 +57,16 @@ urlpatterns = [
     path('report/members/all/download-pdf/', views.all_members_individuals_report_pdf, name='all-members-report-pdf'),
     path('report/leaders/download-pdf', views.all_leaders_report_pdf, name='leaders-report-pdf'),
     path('report/members/download-pdf', views.all_members_report_pdf, name='members-report-pdf'),
+    path('attendance/list/download-pdf/', views.attendance_list_pdf, name='attendance-list-pdf'),
+    path('report/sitios/download-pdf', views.sitios_report_pdf, name='sitio-report-pdf'),
 
     path('report/cluster-filtered/download-pdf', views.leader_members_report_filtered_pdf,
          name='cluster-filtered-report-pdf'),
     path('report/brgy-filtered/members/download-pdf/', views.members_filtered_per_brgy_report_pdf,
        name="per-filtered-brgy-members-pdf"),
+    path('attendance/list-daily/download-pdf/', views.attendance_list_filtered_daily_pdf,
+       name='attendance-list-daily-pdf'),
+    path('report/sitios/download-filtered-pdf', views.sitios_report_filtered_pdf, name='sitio-report-filtered-pdf'),
 
 
     path('function/<str:member_name>/<str:leader_name>/', views.tag_leader_member, name='tag-leader'),

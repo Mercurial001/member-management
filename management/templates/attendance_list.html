@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section id="attendance-list-section">
+        <div class="attendance-utmost-container-div">
+            <div class="attendance-title-heading-div">
+                <h1>Attendance Records</h1>
+            </div>
+            <div class="attendance-form-container-div">
+                <form method="GET" action="{% url 'attendance-list' %}">
+                    <div class="attendance-form-content-div">
+                        <label class="attendance-date-filter-label" for="date">Select Date:</label>
+                    </div>
+                    <div class="attendance-form-content-div">
+                        <input class="attendance-date-input" type="date" id="date" name="date" value="{{ default_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="attendance-form-content-div">
+                        <button class="attendance-date-filter-btn" type="submit">
+                            <i id="attendance-date-filter-icon" class="fa fa-filter"></i>
+                            Filter Date
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="attendance-list-table-div">
+                <table class="attendance-table">
+                    <tr class="attendance-table-row">
+                        <th class="attendance-table-head">
+                            <p>Name</p>
+                        </th>
+                        <th class="attendance-table-head">
+                            <p>Barangay</p>
+                        </th>
+                        <th class="attendance-table-head">
+                            <p>Sitio</p>
+                        </th>
+                        <th class="attendance-table-head">
+                            <p>Status</p>
+                        </th>
+                        <th class="attendance-table-head">
+                            <p>Attendance Date</p>
+                        </th>
+                    </tr>
+                    {% if not selected_date %}
+                        <div class="attendance-list-download-pdf-all-div">
+                            <a class="attendance-list-download-pdf-function" href="{% url 'attendance-list-pdf' %}">
+                                Download PDF
+                            </a>
+                        </div>
+                        {% for attendance in attendances_default %}
+                            <tr class="attendance-table-row">
+                                <td class="attendance-table-data">
+                                    {{ attendance.name }}
+                                </td>
+                                <td class="attendance-table-data">
+                                    {{ attendance.brgy }}
+                                </td>
+                                <td class="attendance-table-data">
+                                    {{ attendance.sitio }}
+                                </td>
+                                <td class="attendance-table-data">
+                                    {{ attendance.group }}
+                                </td>
+                                <td class="attendance-table-data">
+                                    {{ attendance.date_time }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <div class="attendance-filtered-message-div">
+                            Attendance Record for {{ selected_date }}
+                        </div>
+                        {% if attendances %}
+                            <div class="attendance-list-download-pdf-filtered-div">
+                                <a class="attendance-list-download-pdf-filtered-function"
+                                   href="{% url 'attendance-list-daily-pdf' %}?date={{ selected_date }}">
+                                    Download PDF for {{ selected_date }}
+                                </a>
+                            </div>
+                            {% for attendance in attendances %}
+                                <tr class="attendance-table-row">
+                                    <td class="attendance-table-data">
+                                        {{ attendance.name }}
+                                    </td>
+                                    <td class="attendance-table-data">
+                                        {{ attendance.brgy }}
+                                    </td>
+                                    <td class="attendance-table-data">
+                                        {{ attendance.sitio }}
+                                    </td>
+                                    <td class="attendance-table-data">
+                                        {{ attendance.group }}
+                                    </td>
+                                    <td class="attendance-table-data">
+                                        {{ attendance.date_time }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td id="attendance-no-record-date" colspan="5">No records for {{ selected_date }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

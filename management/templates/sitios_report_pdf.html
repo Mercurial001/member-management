@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% for sitio, individuals in individual_per_sitio_list.items %}
+        <table>
+            <tr>
+                <th>{{ sitio }}</th>
+            </tr>
+            {% for individual in individuals %}
+                <tr>
+                    <td>
+                        {{ individual.name }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+</body>
+</html>

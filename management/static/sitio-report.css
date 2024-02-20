@@ -1,0 +1,84 @@
+.sitio-report-utmost-container-section{
+    font-family: 'Montserrat';
+}
+
+.sitio-report-title-header-div{
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align: center;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    font-size: 20px;
+    font-weight: 800;
+    color: rgb(80, 80, 80);
+}
+
+.sitio-report-filter-form-container-div{
+    text-align: center;
+    margin: 20px;
+}
+
+.sitio-report-filter-brgy-sitio-form{
+}
+
+.sitio-report-select-field{
+    border: 1px solid rgb(100, 100, 100);
+    width: 250px;
+    height: 35px;
+    border-radius: 10px;
+}
+
+.sitio-report-select-field:focus{
+    outline: none;
+}
+
+.sitio-report-form-element-div{
+    display: inline-block;
+}
+
+.sitio-report-filter-btn{
+    height: 35px;
+    border-radius: 10px;
+    width: 50px;
+    border: 1px solid rgb(100, 100, 100);
+    cursor:pointer;
+}
+
+.sitio-report-download-pdf{
+    background-color: rgba(80, 150, 150, 0.8);
+    color: beige;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 10px;
+    border: 1px solid rgb(150, 200, 200);
+}
+
+.sitio-report-download-pdf-function-container-div{
+    text-align: center;
+    margin: 20px;
+}
+
+.sitio-report-member-per-sitio-table-container{
+    margin: auto;
+    width:50%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.sitio-report-member-per-sitio-table{
+    margin: 40px;
+}
+
+.sitio-report-member-per-sitio-table-head{
+    width: 700px;
+    background-color: rgb(20, 50, 50);
+    color: beige;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.sitio-report-member-per-sitio-table-data{
+    background-color: rgb(220, 220, 220);
+    padding: 10px;
+}

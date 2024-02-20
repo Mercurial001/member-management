@@ -20,9 +20,19 @@
             </tr>
             {% for leader, count in leader_list.items %}
                 <tr class="leader-report-table-row">
-                    <td class="leader-report-table-data">{{ leader.leader.name }}</td>
-                    <td class="leader-report-table-data">{{ leader.leader.brgy }}</td>
-                    <td class="leader-report-table-data">{{ leader.leader.sitio }}</td>
+                    <td class="leader-report-table-data">
+                        <a href="{% url 'cluster' leader.leader.name leader.leader.user %}">
+                            {{ leader.leader.name }}
+                        </a>
+                    </td>
+                    <td class="leader-report-table-data">
+                        <a href="{% url 'member-brgy' leader.leader.brgy %}">
+                            {{ leader.leader.brgy }}
+                        </a>
+                    </td>
+                    <td class="leader-report-table-data">
+                        <a >{{ leader.leader.sitio }}</a>
+                    </td>
                     <td class="leader-report-table-data">{{ count }}</td>
                 </tr>
             {% endfor %}

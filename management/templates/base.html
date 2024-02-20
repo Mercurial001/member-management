@@ -29,14 +29,42 @@
     <link rel="stylesheet" href="{% static 'members-report.css' %}">
     <link rel="stylesheet" href="{% static 'leaders-report.css' %}">
     <link rel="stylesheet" href="{% static 'sitio-profile.css' %}">
+    <link rel="stylesheet" href="{% static 'attendance-list.css' %}">
+    <link rel="stylesheet" href="{% static 'sitio-report.css' %}">
+
+    <link href='https://fonts.googleapis.com/css?family=Lato:100italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
     <!-- Add this to include Swiper.js -->
-<!--    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->
+    <!--    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->
     <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
     <script src="{% static 'chart.js' %}"></script>
     <script src="{% static 'swiper-bundle.min.js' %}"></script>
 </head>
 <body>
     <header id="main-header">
+        <div class="home-page-authenticated-user">
+            {{ request.user }}
+        </div>
+        <div class="leader-profile-unassociated-members-profile-image-container-div">
+            {% if logged_user.image %}
+                <div >
+                    <img class="leader-profile-unassociated-members-profile-image"
+                         src="{{ logged_user.image.url }}"
+                    >
+                </div>
+            {% else %}
+                <div >
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div style="padding: 0.5px;
+                    background-color: rgba(150, 150, 150, 0.5);
+                    margin: auto;
+                    width: 60%;
+                    margin-top: 10px;
+                    margin-bottom: 10px;">
+        </div>
         <ul class="home-header-nav-links">
             {% if request.user.is_authenticated %}
                 <li class="home-header-nav-link">
