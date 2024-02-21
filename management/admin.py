@@ -14,6 +14,11 @@ from .models import EmailMessage
 from .models import PasswordResetToken
 from .models import TotalVoterPopulation
 from .models import QRCodeAttendance
+from .models import ActivityLog
+
+
+class ActivityLogAdmin(admin.ModelAdmin):
+    list_display = ('title', 'date_time')
 
 
 class QRCodeAttendanceAdmin(admin.ModelAdmin):
@@ -76,6 +81,7 @@ class CLusterAdmin(admin.ModelAdmin):
     list_display = ('leader',)
 
 
+admin.site.register(ActivityLog, ActivityLogAdmin)
 admin.site.register(QRCodeAttendance, QRCodeAttendanceAdmin)
 admin.site.register(TotalVoterPopulation, TotalVoterPopulationAdmin)
 admin.site.register(PasswordResetToken, PasswordResetTokenAdmin)

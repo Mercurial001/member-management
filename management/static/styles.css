@@ -313,3 +313,42 @@ body{
     letter-spacing: 2px;
 }
 
+/* Activity Log */
+
+.home-activity-log-container-div{
+    margin: auto;
+    width: 70%;
+    margin-top: 20px;
+}
+
+.home-activity-log-title-header{
+    font-family: Lato, 'Montserrat';
+    margin: 15px;
+    font-weight: 800;
+    font-size: 30px;
+}
+
+.home-activity-log-table{
+    font-family: 'Montserrat';
+}
+
+.home-activity-log-table-head{
+    padding: 10px;
+    background-color: rgb(40, 90, 90);
+    color: beige;
+    font-family: Lato, 'Montserrat';
+}
+
+.home-activity-log-table-data{
+    padding: 7px;
+    background-color: rgb(220, 220, 220);
+}
+
+#activity-log-activity{
+    text-align: left;
+    padding-left:10px;
+}
+
+#activity-log-date{
+    width: 200px;
+}

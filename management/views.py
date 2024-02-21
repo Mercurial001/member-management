@@ -4,7 +4,7 @@ from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm,
     ChangePasswordForm, ForgotPasswordForm, ChangeSitioDetailsForm, TotalVoterPopulationEditForm
 from django.contrib import messages
 from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants, \
-    Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation, QRCodeAttendance
+    Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation, QRCodeAttendance, ActivityLog
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
@@ -38,6 +38,7 @@ import pdfkit
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
 def homepage(request):
+    activities = ActivityLog.objects.order_by('-date_time')[:12]
     member_brgy = Member.objects.exclude(name=None).values('brgy__brgy_name').distinct()
     leader_brgy = Leader.objects.exclude(name=None).values('brgy__brgy_name').distinct()
 
@@ -96,6 +97,7 @@ def homepage(request):
         'search_result_sum_leader': search_result_sum_leader,
         'total_results': total_results,
         'logged_user': logged_user,
+        'activities': activities,
     })
 
 
@@ -377,6 +379,20 @@ def leader_cluster(request, name, username):
             else:
                 leader_profile.sitio = None
             leader_profile.save()
+            # natural_time = naturaltime(notification.date_time)
+            current_time = timezone.now()
+
+            # Format the current date and time as a string
+            formatted_time = current_time.strftime("%B %d, %Y")
+
+            activity_log = ActivityLog.objects.create(
+                title=f'Leader Profile Edited {leader.name}',
+                content=f'Leader {leader.name} has their profile edited on {formatted_time}',
+                date=timezone.now(),
+                date_time=timezone.now(),
+            )
+            activity_log.save()
+
             messages.success(request, 'Editted!')
             return redirect('cluster', name=leader_profile.name, username=username)
 
@@ -502,6 +518,14 @@ def add_sitio(request):
         if form.is_valid():
             sitio = form.save(commit=False)
             sitio.save()
+
+            activity_log = ActivityLog.objects.create(
+                title=f'Sitio Added by {request_user}',
+                content=f'{request_user} has added sitio {sitio.name} in {sitio.brgy}',
+                date=timezone.now(),
+                date_time=timezone.now(),
+            )
+            activity_log.save()
     return render(request, 'add_sitio.html', {
         'sitio_form': sitio_form,
         'sitios': sitios,
@@ -717,9 +741,25 @@ def member_profile(request, name, id):
 
             # External Data
             selected_sitio = request.POST.get('member-edit-sitio')
-            member_sitio = Sitio.objects.get(id=selected_sitio)
-            edited_member.sitio = member_sitio
+            if selected_sitio != 'None':
+                member_sitio = Sitio.objects.get(id=selected_sitio)
+                edited_member.sitio = member_sitio
+            else:
+                edited_member.sitio = None
             edited_member.save()
+
+            current_time = timezone.now()
+            # Format the current date and time as a string
+            formatted_time = current_time.strftime("%B %d, %Y")
+
+            activity_log = ActivityLog.objects.create(
+                title=f"{request_user} has Edited Member {member.name}'s details",
+                content=f"{request_user} has edited {member.name}'s details on {formatted_time}",
+                date=timezone.now(),
+                date_time=timezone.now(),
+            )
+            activity_log.save()
+
             return redirect('member-profile', name=edited_member.name, id=member.id)
 
     return render(request, 'member_profile.html', {
@@ -808,6 +848,16 @@ def members_per_brgy_report(request):
 def members_per_brgy_report_pdf(request):
     member_per_brgy_list = {}
     members = Individual.objects.all()
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of Members Per Barangay Report",
+        content=f"{request.user} has download a pdf copy of Members Per Barangay Report on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     for member in members:
         member_brgy = member.brgy
@@ -853,6 +903,17 @@ def members_per_brgy_report_pdf(request):
 def members_filtered_per_brgy_report_pdf(request):
     member_filtered_per_brgy_list = {}
     brgys = Barangay.objects.all()
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of Members(Filtered) Per Barangay Report",
+        content=f"{request.user} has downloaded a pdf copy of Members(Filtered) Per Barangay Report on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     selected_brgy = request.GET.get('selected-brgy')
     if selected_brgy:  # Check if a date is selected
@@ -935,6 +996,17 @@ def leader_members_report(request):
 def leader_members_report_pdf(request):
     cluster = Cluster.objects.all()
 
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of Leaders' Cluster",
+        content=f"{request.user} has downloaded a pdf copy of Leaders' Cluster on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
+
     html = render_to_string('leader_members_report_pdf.html', {
         'cluster': cluster,
     })
@@ -963,6 +1035,17 @@ def leader_members_report_pdf(request):
 
 def leader_members_report_filtered_pdf(request):
     brgys = Barangay.objects.all()
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of a Filtered Leaders' Cluster",
+        content=f"{request.user} has downloaded a pdf copy of a Filtered Leaders' Cluster on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     selected_brgy = request.GET.get('selected-brgy')
     if selected_brgy:  # Check if a date is selected
@@ -1015,6 +1098,17 @@ def all_members_individuals_report(request):
 def all_members_individuals_report_pdf(request):
     individuals = Individual.objects.all().order_by('brgy')
 
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of a Total Members PDF",
+        content=f"{request.user} has downloaded a pdf copy of a Filtered Leaders' Cluster on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
+
     html = render_to_string('all_member_report_pdf.html', {
         'individuals': individuals,
     })
@@ -1064,6 +1158,17 @@ def all_leaders_report(request):
 def all_leaders_report_pdf(request):
     leaders = Cluster.objects.all()
 
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of All Leaders Report",
+        content=f"{request.user} has downloaded a pdf copy of All Leaders Report on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
+
     leader_list = {}
     for leader in leaders:
         if leader not in leader_list:
@@ -1111,6 +1216,17 @@ def all_members_report(request):
 
 def all_members_report_pdf(request):
     members = Member.objects.all()
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of All Members Report",
+        content=f"{request.user} has downloaded a pdf copy of All Members Report on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     html = render_to_string('members_report_pdf.html', {
         'members': members,
@@ -1171,6 +1287,17 @@ def no_member_barangays_pdf(request):
 
     brgys = [brgy['brgy__brgy_name'] for brgy in member_brgys]
     # Barangay w/o members
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of Barangay w/o Members",
+        content=f"{request.user} has downloaded a pdf copy of Barangay w/o Members on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     no_member_brgy_list = {}
     brgys_for_members = Barangay.objects.all()
@@ -1245,6 +1372,17 @@ def member_count_per_brgy_pdf(request):
         'brgy__brgy_voter_population'
     ).annotate(member_count=Count('name'))
 
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of Members Count per Barangay",
+        content=f"{request.user} has downloaded a pdf copy of Members Count per Barangay on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
+
     member_sum = [count['member_count'] for count in brgys_member_count]
     member_brgy = [brgy['brgy__brgy_name'] for brgy in brgys_member_count]
     member_percentage = [round(((count['member_count'] / count['brgy__brgy_voter_population']) * 100)) for count in brgys_member_count]
@@ -1301,6 +1439,17 @@ def no_members_leader(request):
 @allowed_users(allowed_roles=['Admin'])
 def no_members_leader_pdf(request):
     no_members = Cluster.objects.filter(members=None)
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of Leaders w/o Members",
+        content=f"{request.user} has downloaded a pdf copy of Leaders w/o Members on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     html = render_to_string('no_member_leaders_pdf.html', {
         'no_members': no_members,
@@ -1359,6 +1508,17 @@ def leaderless_members(request):
 def leaderless_members_pdf(request):
     members = Member.objects.all().order_by('brgy__brgy_name')
     leaderless_member = Cluster.objects.values('members__name')
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of Members w/o Leaders",
+        content=f"{request.user} has downloaded a pdf copy of Members w/o Leaders on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     cluster_members_filter = [members['members__name'] for members in leaderless_member]
 
@@ -1438,6 +1598,17 @@ def tag_leader_member(request, member_name, leader_name):
     leader_cluster, created = Cluster.objects.get_or_create(leader=leader)
     leader_cluster.members.add(member)
     leader_cluster.save()
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has associated {member.name} to Leader {leader.name}",
+        content=f"{request.user} has associated {member.name} to Leader {leader.name} on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     referring_url = request.META.get('HTTP_REFERER')
 
@@ -1546,6 +1717,17 @@ def attendance_list(request):
 def attendance_list_pdf(request):
     attendances_default = QRCodeAttendance.objects.all()
 
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of attendances",
+        content=f"{request.user} has downloaded a pdf copy of attendances on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
+
     html = render_to_string('attendance_list_pdf.html', {
         'attendances_default': attendances_default,
     })
@@ -1588,6 +1770,17 @@ def attendance_list_filtered_daily_pdf(request):
         attendances = QRCodeAttendance.objects.filter(date=selected_date)
     else:
         attendances = []
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf filtered copy of attendances-{selected_date}",
+        content=f"{request.user} has downloaded a pdf copy of attendances on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     html = render_to_string('attendance_list_filtered_daily_pdf.html', {
         # 'selected_date_str': selected_date_str,
@@ -1664,6 +1857,18 @@ def sitios_report(request):
 
 def sitios_report_pdf(request):
     individuals = Individual.objects.all()
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a pdf copy of Sitio Report",
+        content=f"{request.user} has downloaded a pdf copy of Sitio Report on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
+
     individual_per_sitio_list = {}
     for individual in individuals:
         sitio = individual.sitio
@@ -1702,6 +1907,17 @@ def sitios_report_filtered_pdf(request):
     selected_brgy = request.GET.get('sitio-brgy')
 
     brgy = Barangay.objects.get(id=selected_brgy)
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has downloaded a filtered pdf copy of Sitio of Barangay {brgy} Report",
+        content=f"{request.user} has downloaded a filtered pdf copy of Sitio of Barangay {brgy} Report on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     individual_filtered_per_sitio_list = {}
     if selected_brgy == 'None':
@@ -1744,9 +1960,8 @@ def sitios_report_filtered_pdf(request):
     pdf = pdfkit.from_string(html, False, options=options, configuration=config)
 
     response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="sitios-{brgy}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="sitios.pdf"'
     return response
-
 
 
 @login_required(login_url='login')
@@ -1754,6 +1969,17 @@ def sitios_report_filtered_pdf(request):
 def promote_to_leader(request, username):
     user = User.objects.get(username=username)
     member = Member.objects.get(user=user)
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has promoted {member.name} to Leader",
+        content=f"{request.user} has promoted {member.name} to Leader on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     new_filename = f"leader-{member.user.username}.jpg"
 
@@ -1795,6 +2021,18 @@ def authentication(request):
         password = request.POST.get('password')
         user = authenticate(username=username, password=password)
         if user is not None:
+
+            current_time = timezone.now()
+            # Format the current date and time as a string
+            formatted_time = current_time.strftime("%B %d, %Y")
+            activity_log = ActivityLog.objects.create(
+                title=f"{username} has logged in to the platform",
+                content=f"{username} has logged in to the platform on {formatted_time}",
+                date=timezone.now(),
+                date_time=timezone.now(),
+            )
+            activity_log.save()
+
             login(request, user)
             if user.groups.filter(name='Admin').exists() and user.groups.filter(name='Leaders').exists():
                 return redirect('homepage')
@@ -1815,6 +2053,17 @@ def authentication(request):
 
 
 def logout_user(request):
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"{request.user} has logged out from the platform",
+        content=f"{request.user} has logged out from the platform on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
+
     logout(request)
     return redirect('login')
 
@@ -2432,6 +2681,17 @@ def associate_member_to_leader(request, leader_username, member_username):
     leader_cluster.members.add(member)
     leader_cluster.save()
 
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"Leader {leader.name} has associated {member.name} in their cluster",
+        content=f"Leader {leader.name} has associated {member.name} in their cluster on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
+
     referring_url = request.META.get('HTTP_REFERER')
 
     if referring_url:
@@ -2454,6 +2714,17 @@ def remove_member_from_leader(request, leader_username, member_username):
     leader_cluster = Cluster.objects.get(leader=leader)
     leader_cluster.members.remove(member)
     leader_cluster.save()
+
+    current_time = timezone.now()
+    # Format the current date and time as a string
+    formatted_time = current_time.strftime("%B %d, %Y")
+    activity_log = ActivityLog.objects.create(
+        title=f"Leader {leader.name} has removed {member.name} from their cluster",
+        content=f"Leader {leader.name} has removed{member.name} from their cluster on {formatted_time}",
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    activity_log.save()
 
     referring_url = request.META.get('HTTP_REFERER')
 
@@ -2602,8 +2873,19 @@ def non_admin_leader_profile(request, username):
             else:
                 leader_profile.sitio = None
             leader_profile.save()
-            messages.success(request, 'Editted!')
-            return redirect('cluster', name=leader_profile.name)
+
+            current_time = timezone.now()
+            # Format the current date and time as a string
+            formatted_time = current_time.strftime("%B %d, %Y")
+            activity_log = ActivityLog.objects.create(
+                title=f"Leader {leader.name} has edited their details",
+                content=f"Leader {leader.name} has edited their details on {formatted_time}",
+                date=timezone.now(),
+                date_time=timezone.now(),
+            )
+            activity_log.save()
+
+            return redirect('profile-leader', username=leader_profile.user)
     # leader_user = User.objects.get(username=username)
     # leader = Leader.objects.get(user=leader_user)
     # leaders_cluster = Cluster.objects.get(leader=leader)
@@ -2807,10 +3089,26 @@ def non_admin_member_profile(request, username):
 
             # External Data
             selected_sitio = request.POST.get('member-edit-sitio')
-            member_sitio = Sitio.objects.get(id=selected_sitio)
-            edited_member.sitio = member_sitio
+            if selected_sitio != 'None':
+                member_sitio = Sitio.objects.get(id=selected_sitio)
+                edited_member.sitio = member_sitio
+            else:
+                edited_member.sitio = None
+
+            current_time = timezone.now()
+
+            # Format the current date and time as a string
+            formatted_time = current_time.strftime("%B %d, %Y")
+            activity_log = ActivityLog.objects.create(
+                title=f"Member {member.name} has edited their details",
+                content=f"Member {member.name} has edited their details on {formatted_time}",
+                date=timezone.now(),
+                date_time=timezone.now(),
+            )
+            activity_log.save()
+
             edited_member.save()
-            return redirect('member-profile', name=edited_member.name, id=member.id)
+            return redirect('profile-member', username=edited_member.user)
 
     return render(request, 'non_admin_member_profile.html', {
         'member': member,
@@ -2937,7 +3235,21 @@ def change_password(request, email, token_str):
                 messages.success(request, "You've successfully reset your password")
                 token = PasswordResetToken.objects.get(user=user, token=token_str)
                 token.delete()
+
+                current_time = timezone.now()
+
+                # Format the current date and time as a string
+                formatted_time = current_time.strftime("%B %d, %Y")
+                activity_log = ActivityLog.objects.create(
+                    title=f"User {user.username} changed their password",
+                    content=f"User {user.username} changed their password on {formatted_time}",
+                    date=timezone.now(),
+                    date_time=timezone.now(),
+                )
+                activity_log.save()
+
                 return redirect('login')
+
             else:
                 messages.error(request, "Password does not match")
 

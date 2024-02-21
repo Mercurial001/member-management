@@ -306,6 +306,32 @@
                             </div>
                         </div>
                     {% endif %}
+                {% else %}
+                <div class="home-activity-log-container-div">
+                    <div class="home-activity-log-title-header">
+                        Activity Log
+                    </div>
+                    <table class="home-activity-log-table">
+                        <tr class="home-activity-log-table-row">
+                            <th class="home-activity-log-table-head">
+                                Activity
+                            </th>
+                            <th class="home-activity-log-table-head">
+                                Time
+                            </th>
+                        </tr>
+                        {% for activity in activities %}
+                            <tr class="home-activity-log-table-row">
+                                <td class="home-activity-log-table-data" id="activity-log-activity">
+                                    {{ activity.title }}
+                                </td>
+                                <td class="home-activity-log-table-data" id="activity-log-date">
+                                    {{ activity.date_time}}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
                 {% endif %}
             </div>
         {% endblock %}

@@ -22,7 +22,7 @@ from member_management import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.homepage, name='homepage'),
+    path('home/', views.homepage, name='homepage'),
 
     path('brgy/<str:brgy_name>/', views.barangay_members, name='member-brgy'),
     path('sitio/<int:id>/', views.sitio_profile, name='sitio-profile'),
@@ -78,7 +78,7 @@ urlpatterns = [
     path('get_filtered_sitios_using_brgy_id/', views.get_filtered_sitios_using_brgy_id,
          name='get-filtered-sitios-using-brgy-id'),
     path('get_filtered_leaders/', views.get_filtered_leaders, name='get_filtered_leaders'),
-    path('login/', views.authentication, name='login'),
+    path('', views.authentication, name='login'),
     path('logout/', views.logout_user, name='logout'),
     path('create-individuals/', views.create_individuals, name='create-individuals'),
     path('registration/', views.registration_validation, name='registration'),

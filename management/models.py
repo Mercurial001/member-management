@@ -159,3 +159,10 @@ class QRCodeAttendance(models.Model):
     group = models.CharField(max_length=255)
     date = models.DateField()
     date_time = models.DateTimeField()
+
+
+class ActivityLog(models.Model):
+    date = models.DateField()
+    date_time = models.DateTimeField()
+    title = models.CharField(max_length=255)
+    content = models.TextField()
