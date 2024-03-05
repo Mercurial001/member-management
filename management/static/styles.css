@@ -39,7 +39,25 @@ body{
     font-family: 'Montserrat';
     text-align: center;
     background-color: rgb(40, 100, 100);
-    padding: 15px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.home-page-authenticated-user-image-container{
+    float: left;
+}
+
+.home-page-authenticated-user-name{
+    float: right;
+    margin-top: 15px;
+    margin-right: 120px;
+}
+
+.home-page-authenticated-user-profile-image{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    float: left;
 }
 
 .home-header-nav-links{

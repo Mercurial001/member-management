@@ -15,6 +15,16 @@ from .models import PasswordResetToken
 from .models import TotalVoterPopulation
 from .models import QRCodeAttendance
 from .models import ActivityLog
+from .models import LeaderConnectMemberRequest
+from .models import LeadersRequestConnect
+
+
+class LeadersRequestConnectAdmin(admin.ModelAdmin):
+    list_display = ('leader', )
+
+
+class LeaderConnectMemberRequestAdmin(admin.ModelAdmin):
+    list_display = ('member', )
 
 
 class ActivityLogAdmin(admin.ModelAdmin):
@@ -81,6 +91,8 @@ class CLusterAdmin(admin.ModelAdmin):
     list_display = ('leader',)
 
 
+admin.site.register(LeadersRequestConnect, LeadersRequestConnectAdmin)
+admin.site.register(LeaderConnectMemberRequest, LeaderConnectMemberRequestAdmin)
 admin.site.register(ActivityLog, ActivityLogAdmin)
 admin.site.register(QRCodeAttendance, QRCodeAttendanceAdmin)
 admin.site.register(TotalVoterPopulation, TotalVoterPopulationAdmin)

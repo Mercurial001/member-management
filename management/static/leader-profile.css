@@ -470,7 +470,8 @@
     border: 1px solid rgb(100, 100, 100);
     padding-left: 30px;
     height: 30px;
-    width:70%;
+    width:80%;
+    margin-left: -55px;
 }
 
 #leader-profile-search-unassociated-members-input:focus{
@@ -478,9 +479,12 @@
 }
 
 .leader-profile-unassociated-members-lens-icon{
-    position: absolute;
+    float: left;
     margin-top: 7px;
-    margin-left: 10px;
+    margin-left: 30px;
+    margin-bottom:-20px;
+    z-index: 40;
+    position: relative;
 }
 
 .leader-profile-no-unassociated-members-notifier{

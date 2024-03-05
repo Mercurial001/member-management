@@ -282,12 +282,24 @@
                                                     {{ member.sitio }}
                                                 </div>
                                             </div>
+                                            <!-- Added 3/5/2024 1:56 AM-->
+                                            {% if not member.user in leaders_request_list %}
                                             <div class="leader-profile-add-member-btn-container-div">
                                                 <a class="leader-profile-associate-member-btn"
-                                                   href="{% url 'associate-member' leader.user member.user %}">
+                                                   href="{% url 'request-connect' member.user leader.user %}">
                                                     Add as Member
                                                 </a>
                                             </div>
+                                            {% else %}
+                                            <div class="leader-profile-add-member-btn-container-div">
+                                                Request Sent
+                                                <div>
+                                                    <a href="{% url 'revert-request-connect' member.user leader.user %}">
+                                                        Revert Request
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            {% endif %}
                                         </div>
                                     {% endfor %}
                                 {% else %}
@@ -296,6 +308,7 @@
                                     </div>
                                 {% endif %}
                             {% else %}
+
                                 {% for member in unassociated_members %}
                                     <div class="leader-profile-unassociated-member-div">
                                         <div class="leader-profile-unassociated-members-profile-image-container-div">
@@ -322,12 +335,24 @@
                                                 {{ member.sitio }}
                                             </div>
                                         </div>
+                                        <!-- Added 3/5/2024 1:40 AM-->
+                                        {% if not member.user in leaders_request_list %}
                                         <div class="leader-profile-add-member-btn-container-div">
                                             <a class="leader-profile-associate-member-btn"
-                                               href="{% url 'associate-member' leader.user member.user %}">
+                                               href="{% url 'request-connect' member.user leader.user %}">
                                                 Add as Member
                                             </a>
                                         </div>
+                                        {% else %}
+                                        <div class="leader-profile-add-member-btn-container-div">
+                                            Request Sent
+                                            <div>
+                                                <a href="{% url 'revert-request-connect' member.user leader.user %}">
+                                                    Revert Request
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endif %}
                                     </div>
                                 {% empty %}
                                     <div class="leader-profile-no-unassociated-members-notifier">

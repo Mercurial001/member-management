@@ -128,6 +128,8 @@ class Registrants(models.Model):
 
 
 class Notification(models.Model):
+    # user field added on 3/4/2024 to fix bug
+    user = models.ForeignKey(User, related_name='user_notification', on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=255)
     message = models.CharField(max_length=400)
     is_seen = models.BooleanField(default=False, null=True, blank=True)
@@ -166,3 +168,20 @@ class ActivityLog(models.Model):
     date_time = models.DateTimeField()
     title = models.CharField(max_length=255)
     content = models.TextField()
+
+
+class LeaderConnectMemberRequest(models.Model):
+    member = models.ForeignKey(Member, related_name='member_connect_request', on_delete=models.CASCADE)
+    requests = models.ManyToManyField(Leader, related_name='leader_connecting_request', blank=True, null=True)
+
+    def __str__(self):
+        return self.member.name
+
+
+# Added 3/5/2024 1:46 AM
+class LeadersRequestConnect(models.Model):
+    leader = models.ForeignKey(Leader, related_name='leader_connect_request', on_delete=models.CASCADE)
+    requests = models.ManyToManyField(Member, related_name='leader_connecting_member', blank=True, null=True)
+
+    def __str__(self):
+        return self.leader.name

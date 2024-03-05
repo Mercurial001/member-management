@@ -4,7 +4,8 @@ from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm,
     ChangePasswordForm, ForgotPasswordForm, ChangeSitioDetailsForm, TotalVoterPopulationEditForm
 from django.contrib import messages
 from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants, \
-    Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation, QRCodeAttendance, ActivityLog
+    Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation, QRCodeAttendance, ActivityLog, \
+    LeaderConnectMemberRequest, LeadersRequestConnect
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
@@ -41,8 +42,6 @@ def homepage(request):
     activities = ActivityLog.objects.order_by('-date_time')[:12]
     member_brgy = Member.objects.exclude(name=None).values('brgy__brgy_name').distinct()
     leader_brgy = Leader.objects.exclude(name=None).values('brgy__brgy_name').distinct()
-
-    # Let's create a search engine in the homepage to fill the void as it should
 
     user = request.user
     logged_user = Individual.objects.get(user__username=user)
@@ -98,6 +97,7 @@ def homepage(request):
         'total_results': total_results,
         'logged_user': logged_user,
         'activities': activities,
+        'user': user,
     })
 
 
@@ -379,6 +379,16 @@ def leader_cluster(request, name, username):
             else:
                 leader_profile.sitio = None
             leader_profile.save()
+
+            individual_link = Individual.objects.get(user=leader_profile.user)
+            individual_link.name = leader_profile.name
+            individual_link.gender = leader_profile.gender
+            individual_link.age = leader_profile.age
+            individual_link.brgy = leader_profile.brgy
+            individual_link.sitio = leader_profile.sitio
+            individual_link.image = leader_profile.image
+            individual_link.save()
+
             # natural_time = naturaltime(notification.date_time)
             current_time = timezone.now()
 
@@ -747,6 +757,15 @@ def member_profile(request, name, id):
             else:
                 edited_member.sitio = None
             edited_member.save()
+
+            individual_link = Individual.objects.get(user=edited_member.user)
+            individual_link.name = edited_member.name
+            individual_link.gender = edited_member.gender
+            individual_link.age = edited_member.age
+            individual_link.brgy = edited_member.brgy
+            individual_link.sitio = edited_member.sitio
+            individual_link.image = edited_member.image
+            individual_link.save()
 
             current_time = timezone.now()
             # Format the current date and time as a string
@@ -1981,6 +2000,16 @@ def promote_to_leader(request, username):
     )
     activity_log.save()
 
+    promote_notification, created = Notification.objects.get_or_create(
+        title=f'Member {member.name} Promoted to Leader by {request.user}',
+        message=f'This is to notify you that the member, {member.name} '
+                f'has been promoted to leader by {request.user} on {formatted_time}',
+        identifier=f'Member Promoted to Leader Identifier: {member.name}-{request.user}',
+        date=timezone.now(),
+        date_time=timezone.now(),
+    )
+    promote_notification.save()
+
     new_filename = f"leader-{member.user.username}.jpg"
 
     # Save the image with the new filename
@@ -1993,7 +2022,7 @@ def promote_to_leader(request, username):
                                                    gender=member.gender,
                                                    age=member.age,
                                                    brgy=member.brgy,
-                                                   image=new_image_path)
+                                                   image=new_filename)
 
     leader_group = Group.objects.get(name='Leaders')
     member_group = Group.objects.get(name='Members')
@@ -2414,6 +2443,7 @@ def confirm_registration_leader(request, username):
 def confirm_registrant_as_admin_and_leader(request, username):
     registrant = Registrants.objects.get(username=username)
     email_message = EmailMessage.objects.get(type='Admin Verification')
+
     new_filename = f"leader-{registrant.username}.jpg"
 
     # Save the image with the new filename
@@ -2474,15 +2504,18 @@ def confirm_registrant_as_admin_and_leader(request, username):
     # Format the current date and time as a string
     formatted_time = current_time.strftime("%B %d, %Y")
 
-    leader_verified_notification, created = Notification.objects.get_or_create(
-        title=f'Registrant {registrant.name} verified as Leader and Admin by {acting_user}',
-        message=f'This is to notify you that the registrant, {registrant.name} '
-                f'has been verified as an admin and leader on {formatted_time}',
-        identifier=f' Registrant Verified as Leader Identifier: {registrant.name}-{registrant.id}',
-        date=timezone.now(),
-        date_time=timezone.now(),
-    )
-    leader_verified_notification.save()
+    admin_users = User.objects.filter(groups__name='Admin')
+    for user in admin_users:
+        leader_verified_notification, created = Notification.objects.get_or_create(
+            user=user,
+            title=f'Registrant {registrant.name} verified as Leader and Admin by {acting_user}',
+            message=f'This is to notify you that the registrant, {registrant.name} '
+                    f'has been verified as an admin and leader on {formatted_time}',
+            identifier=f' Registrant Verified as Leader Identifier: {registrant.name}-{registrant.id}',
+            date=timezone.now(),
+            date_time=timezone.now(),
+        )
+        leader_verified_notification.save()
 
     name = registrant.name
     from_email = 'Autodidacticism'
@@ -2525,15 +2558,18 @@ def deny_registration(request, username):
     # Format the current date and time as a string
     formatted_time = current_time.strftime("%B %d, %Y")
 
-    denied_registration_notification, created = Notification.objects.get_or_create(
-        title=f'Registrant {registrant.name} registration denied by {acting_user} ',
-        message=f"This is to notify you that the registrant, {registrant.name}"
-                f'has been denied registration on {formatted_time}',
-        identifier=f' Registrant Verified as Leader Identifier: {registrant.name}-{registrant.id}',
-        date=timezone.now(),
-        date_time=timezone.now(),
-    )
-    denied_registration_notification.save()
+    admin_users = User.objects.filter(groups__name='Admin')
+    for user in admin_users:
+        denied_registration_notification, created = Notification.objects.get_or_create(
+            user=user,
+            title=f'Registrant {registrant.name} registration denied by {acting_user} ',
+            message=f"This is to notify you that the registrant, {registrant.name}"
+                    f'has been denied registration on {formatted_time}',
+            identifier=f' Registrant Verified as Leader Identifier: {registrant.name}-{registrant.id}',
+            date=timezone.now(),
+            date_time=timezone.now(),
+        )
+        denied_registration_notification.save()
 
     name = registrant.name
     from_email = 'Autodidacticism'
@@ -2737,10 +2773,12 @@ def remove_member_from_leader(request, leader_username, member_username):
 
 
 def notifications_async(request):
-    notifications = Notification.objects.filter(removed=False)
+    notifications = Notification.objects.filter(user__username=request.user, removed=False)
     notification_list = []
 
-    unseen_notifications = Notification.objects.filter(is_seen=False).annotate(unseen_notifications=Count('is_seen'))
+    unseen_notifications = Notification.objects.filter(
+        user__username=request.user,
+        is_seen=False).annotate(unseen_notifications=Count('is_seen'))
     unseen_sum = unseen_notifications.aggregate(unseen=Sum('unseen_notifications'))['unseen']
 
     for notification in notifications:
@@ -2830,6 +2868,23 @@ def non_admin_leader_profile(request, username):
         if member_name not in members_b:
             unassociated_members.append(member)
 
+    # Added 3/5/2024 1:40 AM
+    leader_requests = LeaderConnectMemberRequest.objects.all()
+    leaders_request_list = []
+    for leaders in leader_requests:
+        for leader in leaders.requests.all():
+            if leader not in leaders_request_list:
+                leaders_request_list.append(leaders.member.user)
+
+    # Added 3/5/2024 1:40 AM
+    leader_member_request = LeadersRequestConnect.objects.all()
+    leader_member_connect_request_list = []
+    for leaders in leader_member_request:
+        for members in leaders.requests.all():
+            member_username = members.user
+            if member_username not in leader_member_connect_request_list:
+                leader_member_connect_request_list.append(members.user)
+
     # Create QR Code for each user
     qr = qrcode.QRCode(
         version=1,
@@ -2873,6 +2928,15 @@ def non_admin_leader_profile(request, username):
             else:
                 leader_profile.sitio = None
             leader_profile.save()
+
+            individual_link = Individual.objects.get(user=leader_profile.user)
+            individual_link.name = leader_profile.name
+            individual_link.gender = leader_profile.gender
+            individual_link.age = leader_profile.age
+            individual_link.brgy = leader_profile.brgy
+            individual_link.sitio = leader_profile.sitio
+            individual_link.image = leader_profile.image
+            individual_link.save()
 
             current_time = timezone.now()
             # Format the current date and time as a string
@@ -3034,6 +3098,8 @@ def non_admin_leader_profile(request, username):
         'search_engine_field_query': search_engine_field_query,
         'total_results': total_results,
         'authenticated_leader': authenticated_leader,
+        'leaders_request_list': leaders_request_list,
+        'leader_member_connect_request_list': leader_member_connect_request_list,
     })
 
 
@@ -3081,6 +3147,10 @@ def non_admin_member_profile(request, username):
     img = qr.make_image(fill_color="black", back_color="white")
 
     img.save(f'management/static/images/qr-codes/QR-Code-{member.name}-{member.brgy}-{member.id}.png')
+
+    # Added 3/5/2024 1:40 AM
+    leaders_request = LeaderConnectMemberRequest.objects.get(member=member)
+
     edit_member_detail_form = MemberRegistrationEditForm(instance=member)
     if request.method == 'POST':
         form = MemberRegistrationEditForm(request.POST, request.FILES, instance=member)
@@ -3108,6 +3178,16 @@ def non_admin_member_profile(request, username):
             activity_log.save()
 
             edited_member.save()
+
+            individual_link = Individual.objects.get(user=edited_member.user)
+            individual_link.name = edited_member.name
+            individual_link.gender = edited_member.gender
+            individual_link.age = edited_member.age
+            individual_link.brgy = edited_member.brgy
+            individual_link.sitio = edited_member.sitio
+            individual_link.image = edited_member.image
+            individual_link.save()
+
             return redirect('profile-member', username=edited_member.user)
 
     return render(request, 'non_admin_member_profile.html', {
@@ -3120,7 +3200,132 @@ def non_admin_member_profile(request, username):
         "sitios": sitios,
         'member_leader': member_leader,
         'authenticated_member': authenticated_member,
+        'leaders_request': leaders_request,
     })
+
+
+# Added 3/5/2024 1:40 AM
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin', 'Leaders'])
+def add_member_leader_request(request, member, leader):
+    member_user = User.objects.get(username=member)
+    leader_user = User.objects.get(username=leader)
+
+    member = Member.objects.get(user=member_user)
+    leader = Leader.objects.get(user=leader_user)
+
+    member_connect_request, created = LeaderConnectMemberRequest.objects.get_or_create(
+        member=member,
+    )
+    member_connect_request.requests.add(leader)
+    member_connect_request.save()
+
+    leader_connect_to_member, created = LeadersRequestConnect.objects.get_or_create(leader=leader)
+    leader_connect_to_member.requests.add(member)
+    leader_connect_to_member.save()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
+
+
+# Added 3/5/2024 1:52 AM
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin', 'Leaders'])
+def revert_member_leader_request(request, member, leader):
+    member_user = User.objects.get(username=member)
+    leader_user = User.objects.get(username=leader)
+
+    member = Member.objects.get(user=member_user)
+    leader = Leader.objects.get(user=leader_user)
+
+    member_connect_request, created = LeaderConnectMemberRequest.objects.get_or_create(
+        member=member,
+    )
+    member_connect_request.requests.remove(leader)
+    member_connect_request.save()
+
+    leader_connect_to_member, created = LeadersRequestConnect.objects.get_or_create(leader=leader)
+    leader_connect_to_member.requests.remove(member)
+    leader_connect_to_member.save()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
+
+
+# Added 3/5/2024 1:40 AM
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin', 'Members'])
+def accept_leader_connect_request(request, leader, member):
+    member_user = User.objects.get(username=member)
+    leader_user = User.objects.get(username=leader)
+
+    member = Member.objects.get(user=member_user)
+    leader = Leader.objects.get(user=leader_user)
+
+    member_connect_request, created = LeaderConnectMemberRequest.objects.get_or_create(
+        member=member,
+    )
+    member_connect_request.requests.remove(leader)
+    member_connect_request.save()
+
+    leader_connect_to_member, created = LeadersRequestConnect.objects.get_or_create(leader=leader)
+    leader_connect_to_member.requests.remove(member)
+    leader_connect_to_member.save()
+
+    cluster_leader, created = Cluster.objects.get_or_create(leader=leader)
+    cluster_leader.members.add(member)
+    cluster_leader.save()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
+
+
+# Added 3/5/2024 1:53 AM
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin', 'Members'])
+def deny_leader_connect_request(request, leader, member):
+    member_user = User.objects.get(username=member)
+    leader_user = User.objects.get(username=leader)
+
+    member = Member.objects.get(user=member_user)
+    leader = Leader.objects.get(user=leader_user)
+
+    member_connect_request, created = LeaderConnectMemberRequest.objects.get_or_create(
+        member=member,
+    )
+    member_connect_request.requests.remove(leader)
+    member_connect_request.save()
+
+    leader_connect_to_member, created = LeadersRequestConnect.objects.get_or_create(leader=leader)
+    leader_connect_to_member.requests.remove(member)
+    leader_connect_to_member.save()
+
+    referring_url = request.META.get('HTTP_REFERER')
+
+    if referring_url:
+        # Redirect back to the referring page
+        return HttpResponseRedirect(referring_url)
+    else:
+        # If there's no referring URL, redirect to a default page
+        return redirect('homepage')
 
 
 class MyTokenGenerator(PasswordResetTokenGenerator):
@@ -3264,7 +3469,8 @@ def change_password(request, email, token_str):
 @allowed_users(allowed_roles=['Admin'])
 def seen_notifications(request):
     try:
-        notifications = Notification.objects.all()
+        user = request.user
+        notifications = Notification.objects.filter(user__username=user)
         for notification in notifications:
             notification.is_seen = True
             notification.save()

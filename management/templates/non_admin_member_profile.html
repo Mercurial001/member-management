@@ -164,6 +164,18 @@
                                 This member is currently not associated with any Leader
                           {% endif %}
                       </div>
+                      <!-- Added 3/5/2024 1:40 AM -->
+                      {% if leaders_request %}
+                        {% for leader in leaders_request.requests.all %}
+                            <div>
+                                {{ leader.name }}
+                                <a href="{% url 'accept-connect' leader.user member.user %}">
+                                    Accept
+                                </a>
+                                <a href="{% url 'deny-connect' leader.user member.user %}">Deny</a>
+                            </div>
+                        {% endfor %}
+                      {% endif %}
                   </div>
 <!--                  <div class="member-profile-brgy-leader-container-div">-->
 <!--                      <div class="member-profile-leaders-brgy-message-div">-->

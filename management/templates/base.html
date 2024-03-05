@@ -43,20 +43,23 @@
 <body>
     <header id="main-header">
         <div class="home-page-authenticated-user">
-            {{ request.user }}
-        </div>
-        <div class="leader-profile-unassociated-members-profile-image-container-div">
-            {% if logged_user.image %}
-                <div >
-                    <img class="leader-profile-unassociated-members-profile-image"
-                         src="{{ logged_user.image.url }}"
-                    >
+            <div class="home-page-authenticated-user-element-container">
+                <div class="home-page-authenticated-user-image-container">
+                    {% if logged_user.image %}
+                        <img class="home-page-authenticated-user-profile-image"
+                             src="{{ logged_user.image.url }}">
+                    {% else %}
+                        <div>
+                            <i class="fa fa-user" aria-hidden="true"></i>
+                        </div>
+                    {% endif %}
                 </div>
-            {% else %}
-                <div >
-                    <i class="fa fa-user" aria-hidden="true"></i>
+            </div>
+            <div class="home-page-authenticated-user-element-container">
+                <div class="home-page-authenticated-user-name">
+                    {{ request.user }}
                 </div>
-            {% endif %}
+            </div>
         </div>
         <div style="padding: 0.5px;
                     background-color: rgba(150, 150, 150, 0.5);
@@ -242,6 +245,7 @@
     </header>
     <section class="base-block-content-section-container">
         {% block content %}
+            {{ user }}
             <div class="home-base-utmost-container-div">
                 <div class="home-base-search-engine-container-div">
                     <form class="home-base-search-engine-form" method="GET" action="{% url 'homepage' %}">
