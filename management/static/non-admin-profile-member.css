@@ -332,3 +332,39 @@
     color: rgb(70, 70, 70);
     font-weight: 800;
 }
+.member-profile-leader-connect-request-table{
+    border-collapse: collapse;
+}
+
+
+.member-profile-leader-connect-request-table-head{
+    background-color: rgb(100, 140, 140);
+    color: beige;
+    font-family: 'Montserrat';
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.member-profile-leader-connect-request-table-data{
+    background-color: rgb(200, 200, 200);
+    color: rgb(50, 50, 50);
+    font-family: 'Montserrat';
+    padding: 10px;
+}
+
+.member-profile-connect-btn{
+    font-weight: 800;
+    text-decoration: none;
+    color: rgb(50, 50, 50);
+}
+.member-profile-connect-btn:hover{
+    text-decoration: underline;
+}
+
+.member-profile-member-request-connect-leader-profile-img{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}

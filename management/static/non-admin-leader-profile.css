@@ -516,3 +516,37 @@
     text-decoration: none;
     color: rgb(100, 100, 100);
 }
+
+.leader-profile-request-sent-notifier{
+    font-family: 'Montserrat';
+    background-color: rgb(60, 140, 60);
+    margin: auto;
+    width: 50%;
+    color: beige;
+    font-size: 12px;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+.leader-profile-revert-connect-div{
+    background-color: rgb(140, 50, 50);
+    color: beige;
+    margin: auto;
+    width: 50%;
+    font-size: 12px;
+    margin-top: 5px;
+    border-radius: 5px;
+    font-family: 'Montserrat';
+    transition: all ease 0.5s;
+    cursor: pointer;
+}
+
+.leader-profile-revert-connect-div:hover{
+    background-color: rgb(140, 100, 100);
+}
+
+.leader-profile-revert-request-function{
+    font-family: 'Montserrat';
+    color: beige;
+    text-decoration: none;
+}

@@ -822,17 +822,16 @@ def members_per_brgy_report(request):
 
         for member in members_filter:
             member_brgy = member.brgy
-
             if member_brgy not in member_filtered_per_brgy_list:
                 member_filtered_per_brgy_list[member_brgy] = [(
                     member,
-                    round((1 / member.brgy.brgy_voter_population) * 100),
+                    round((len([m for m in members if m.brgy == member_brgy]) / member.brgy.brgy_voter_population) * 100),
                     member.brgy.brgy_voter_population,
                 )]
             else:
                 member_filtered_per_brgy_list[member_brgy].append((
                     member,
-                    round((1 / member.brgy.brgy_voter_population) * 100),
+                    round((len([m for m in members if m.brgy == member_brgy]) / member.brgy.brgy_voter_population) * 100),
                     member.brgy.brgy_voter_population,
                 ))
     else:
@@ -843,13 +842,13 @@ def members_per_brgy_report(request):
         if member_brgy not in member_per_brgy_list:
             member_per_brgy_list[member_brgy] = [(
                 member,
-                round((1 / member.brgy.brgy_voter_population) * 100),
+                round((len([m for m in members if m.brgy == member_brgy]) / member.brgy.brgy_voter_population) * 100),
                 member.brgy.brgy_voter_population,
             )]
         else:
             member_per_brgy_list[member_brgy].append((
                 member,
-                round((1 / member.brgy.brgy_voter_population) * 100),
+                round((len([m for m in members if m.brgy == member_brgy]) / member.brgy.brgy_voter_population) * 100),
                 member.brgy.brgy_voter_population,
             ))
 
@@ -2868,22 +2867,24 @@ def non_admin_leader_profile(request, username):
         if member_name not in members_b:
             unassociated_members.append(member)
 
-    # Added 3/5/2024 1:40 AM
-    leader_requests = LeaderConnectMemberRequest.objects.all()
-    leaders_request_list = []
-    for leaders in leader_requests:
-        for leader in leaders.requests.all():
-            if leader not in leaders_request_list:
-                leaders_request_list.append(leaders.member.user)
+    # # Added 3/5/2024 1:40 AM
+    # leader_requests = LeaderConnectMemberRequest.objects.all()
+    # leaders_request_list = []
+    # for leaders in leader_requests:
+    #     for leadera in leaders.requests.all():
+    #         if leadera not in leaders_request_list:
+    #             leaders_request_list.append(leaders.member.user.username)
 
     # Added 3/5/2024 1:40 AM
-    leader_member_request = LeadersRequestConnect.objects.all()
-    leader_member_connect_request_list = []
-    for leaders in leader_member_request:
-        for members in leaders.requests.all():
+    if LeadersRequestConnect.objects.filter(leader=leader).exists():
+        leader_member_request = LeadersRequestConnect.objects.get(leader=leader)
+        leader_member_connect_request_list = []
+        for members in leader_member_request.requests.all():
             member_username = members.user
             if member_username not in leader_member_connect_request_list:
-                leader_member_connect_request_list.append(members.user)
+                leader_member_connect_request_list.append(members.user.username)
+    else:
+        leader_member_connect_request_list = []
 
     # Create QR Code for each user
     qr = qrcode.QRCode(
@@ -3098,7 +3099,7 @@ def non_admin_leader_profile(request, username):
         'search_engine_field_query': search_engine_field_query,
         'total_results': total_results,
         'authenticated_leader': authenticated_leader,
-        'leaders_request_list': leaders_request_list,
+        # 'leaders_request_list': leaders_request_list,
         'leader_member_connect_request_list': leader_member_connect_request_list,
     })
 
@@ -3149,7 +3150,10 @@ def non_admin_member_profile(request, username):
     img.save(f'management/static/images/qr-codes/QR-Code-{member.name}-{member.brgy}-{member.id}.png')
 
     # Added 3/5/2024 1:40 AM
-    leaders_request = LeaderConnectMemberRequest.objects.get(member=member)
+    if LeaderConnectMemberRequest.objects.filter(member=member).exists():
+        leaders_request = LeaderConnectMemberRequest.objects.get(member=member)
+    else:
+        leaders_request = ''
 
     edit_member_detail_form = MemberRegistrationEditForm(instance=member)
     if request.method == 'POST':

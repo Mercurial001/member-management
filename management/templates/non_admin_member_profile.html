@@ -165,16 +165,45 @@
                           {% endif %}
                       </div>
                       <!-- Added 3/5/2024 1:40 AM -->
-                      {% if leaders_request %}
-                        {% for leader in leaders_request.requests.all %}
-                            <div>
-                                {{ leader.name }}
-                                <a href="{% url 'accept-connect' leader.user member.user %}">
-                                    Accept
-                                </a>
-                                <a href="{% url 'deny-connect' leader.user member.user %}">Deny</a>
-                            </div>
-                        {% endfor %}
+                      {% if leaders_request and request.user == member.user %}
+                        <table class="member-profile-leader-connect-request-table">
+                            <tr class="member-profile-leader-connect-request-table-row">
+                                <th class="member-profile-leader-connect-request-table-head"
+                                    colspan="4">Leader Requested to Connect</th>
+                            </tr>
+                            {% for leader in leaders_request.requests.all %}
+                                <tr class="member-profile-leader-connect-request-table-row">
+                                    <td class="member-profile-leader-connect-request-table-data">
+                                        {% if leader.image %}
+                                          <div>
+                                              <img class="member-profile-member-request-connect-leader-profile-img"
+                                                   src="{{ leader.image.url }}"
+                                              >
+                                          </div>
+                                        {% else %}
+                                          <div class="member-profile-associated-leader-no-img-container-span">
+                                              <i id="member-profile-member-associated-leader-default-profile-img"
+                                                 class="fa fa-user" aria-hidden="true">
+                                              </i>
+                                          </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="member-profile-leader-connect-request-table-data">
+                                        {{ leader.name }}
+                                    </td>
+                                    <td class="member-profile-leader-connect-request-table-data">
+                                        <a class="member-profile-connect-btn"
+                                           href="{% url 'accept-connect' leader.user member.user %}">
+                                            Accept
+                                        </a>
+                                    </td>
+                                    <td class="member-profile-leader-connect-request-table-data">
+                                        <a class="member-profile-connect-btn"
+                                           href="{% url 'deny-connect' leader.user member.user %}">Deny</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
                       {% endif %}
                   </div>
 <!--                  <div class="member-profile-brgy-leader-container-div">-->
