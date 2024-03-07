@@ -550,3 +550,54 @@
     color: beige;
     text-decoration: none;
 }
+
+.leader-profile-revert-request-btn{
+    background: none;
+    font-family: 'Montserrat';
+    border: none;
+    color: beige;
+    cursor: pointer;
+}
+
+.leader-profile-connect-request-btn{
+    background-color: rgb(100, 150, 150);
+    color: beige;
+    font-family: 'Montserrat';
+    border: rgb(150, 200, 200) solid 1px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.leader-profile-remove-member-btn{
+    background-color: rgb(150,50, 50);
+    border: 1px solid rgb(200, 100, 100);
+    cursor: pointer;
+}
+
+.loading-spinner {
+    display: none;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #7983ff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+.htmx-request.loading-spinner {
+    display: inline-block;
+}
+
+.htmx-request.leader-profile-connect-request-btn {
+    visibility: hidden;
+}
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-spinner-product-list-container-div{
+    position: absolute;
+}

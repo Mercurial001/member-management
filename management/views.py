@@ -3228,14 +3228,31 @@ def add_member_leader_request(request, member, leader):
     leader_connect_to_member.requests.add(member)
     leader_connect_to_member.save()
 
-    referring_url = request.META.get('HTTP_REFERER')
-
-    if referring_url:
-        # Redirect back to the referring page
-        return HttpResponseRedirect(referring_url)
+    if LeadersRequestConnect.objects.filter(leader=leader).exists():
+        leader_member_request = LeadersRequestConnect.objects.get(leader=leader)
+        leader_member_connect_request_list = []
+        for members in leader_member_request.requests.all():
+            member_username = members.user
+            if member_username not in leader_member_connect_request_list:
+                leader_member_connect_request_list.append(members.user.username)
     else:
-        # If there's no referring URL, redirect to a default page
-        return redirect('homepage')
+        leader_member_connect_request_list = []
+
+    # referring_url = request.META.get('HTTP_REFERER')
+    #
+    # if referring_url:
+    #     # Redirect back to the referring page
+    #     return HttpResponseRedirect(referring_url)
+    # else:
+    #     # If there's no referring URL, redirect to a default page
+    #     return redirect('homepage')
+    return render(request, 'leader_request_connect.html', {
+        'member': member,
+        'leader': leader,
+        'member_connect_request': member_connect_request,
+        'leader_connect_to_member': leader_connect_to_member,
+        'leader_member_connect_request_list': leader_member_connect_request_list,
+    })
 
 
 # Added 3/5/2024 1:52 AM
@@ -3258,14 +3275,32 @@ def revert_member_leader_request(request, member, leader):
     leader_connect_to_member.requests.remove(member)
     leader_connect_to_member.save()
 
-    referring_url = request.META.get('HTTP_REFERER')
-
-    if referring_url:
-        # Redirect back to the referring page
-        return HttpResponseRedirect(referring_url)
+    if LeadersRequestConnect.objects.filter(leader=leader).exists():
+        leader_member_request = LeadersRequestConnect.objects.get(leader=leader)
+        leader_member_connect_request_list = []
+        for members in leader_member_request.requests.all():
+            member_username = members.user
+            if member_username not in leader_member_connect_request_list:
+                leader_member_connect_request_list.append(members.user.username)
     else:
-        # If there's no referring URL, redirect to a default page
-        return redirect('homepage')
+        leader_member_connect_request_list = []
+
+    return render(request, 'leader_request_cancel.html', {
+        'member': member,
+        'leader': leader,
+        'member_connect_request': member_connect_request,
+        'leader_connect_to_member': leader_connect_to_member,
+        'leader_member_connect_request_list': leader_member_connect_request_list,
+    })
+    # referring_url = request.META.get('HTTP_REFERER')
+    #
+    # if referring_url:
+    #     # Redirect back to the referring page
+    #     return HttpResponseRedirect(referring_url)
+    # else:
+    #     # If there's no referring URL, redirect to a default page
+    #     return redirect('homepage')
+
 
 
 # Added 3/5/2024 1:40 AM

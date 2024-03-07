@@ -1,0 +1,45 @@
+                                        {% if not member.user.username in leader_member_connect_request_list %}
+                                        <div class="leader-profile-add-member-btn-container-div">
+                                            <form action="{% url 'request-connect' member.user leader.user %}">
+                                                {% csrf_token %}
+                                                <button hx-post="{% url 'request-connect' member.user leader.user %}"
+                                                        hx-target="#harkon-{{ member.user}}-{{ leader.user }}"
+                                                        hx-swap="innerHTML"
+                                                        hx-indicator="#loading-spinning{{ member.user}}-{{ leader.user }}"
+                                                        class="leader-profile-connect-request-btn"
+                                                        id="leader-connect-btn{{ member.user}}-{{ leader.user }}">
+                                                    Add as Member
+                                                </button>
+                                                <span id="loading-spinning{{ member.user}}-{{ leader.user }}"
+                                                      class="loading-spinner">
+
+                                                </span>
+
+                                            </form>
+                                            <!--                                            <a class="leader-profile-associate-member-btn"-->
+                                            <!--                                               href="{% url 'request-connect' member.user leader.user %}">-->
+                                            <!--                                                Add as Member-->
+                                            <!--                                            </a>-->
+                                        </div>
+                                        {% else %}
+                                        <div class="leader-profile-leader-connect-request-div">
+                                            <div class="leader-profile-request-sent-notifier">
+                                                Request Sent
+                                            </div>
+                                            <div class="leader-profile-revert-connect-div">
+                                                <form action="{% url 'revert-request-connect' member.user leader.user %}">
+                                                    {% csrf_token %}
+                                                    <button hx-post="{% url 'revert-request-connect' member.user leader.user %}"
+                                                            hx-target="#harkon-{{ member.user}}-{{ leader.user }}"
+                                                            hx-swap="innerHTML"
+                                                            class="leader-profile-revert-request-btn">
+                                                        Cancel
+                                                    </button>
+                                                </form>
+<!--                                                <a class="leader-profile-revert-request-function"-->
+<!--                                                   href="{% url 'revert-request-connect' member.user leader.user %}">-->
+<!--                                                    Revert-->
+<!--                                                </a>-->
+                                            </div>
+                                        </div>
+                                        {% endif %}

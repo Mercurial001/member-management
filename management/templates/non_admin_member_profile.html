@@ -13,6 +13,7 @@
     <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
     <script src="{% static 'chart.js' %}"></script>
     <script src="{% static 'swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'htmx.js' %}"></script>
 </head>
 <body>
   <section class="member-profile-utmost-container-section">
@@ -192,14 +193,32 @@
                                         {{ leader.name }}
                                     </td>
                                     <td class="member-profile-leader-connect-request-table-data">
-                                        <a class="member-profile-connect-btn"
-                                           href="{% url 'accept-connect' leader.user member.user %}">
-                                            Accept
-                                        </a>
+                                        <form action="{% url 'accept-connect' leader.user member.user %}">
+                                            {% csrf_token %}
+                                            <button hx-post="{% url 'accept-connect' leader.user member.user %}"
+                                                    hx-target=".member-profile-utmost-container-section"
+                                                    hx-swap="innerHTML"
+                                                    class="member-profile-response-btn">
+                                                Accept
+                                            </button>
+                                        </form>
+<!--                                        <a class="member-profile-connect-btn"-->
+<!--                                           href="{% url 'accept-connect' leader.user member.user %}">-->
+<!--                                            Accept-->
+<!--                                        </a>-->
                                     </td>
                                     <td class="member-profile-leader-connect-request-table-data">
-                                        <a class="member-profile-connect-btn"
-                                           href="{% url 'deny-connect' leader.user member.user %}">Deny</a>
+                                        <form action="{% url 'deny-connect' leader.user member.user %}">
+                                            {% csrf_token %}
+                                            <button hx-post="{% url 'deny-connect' leader.user member.user %}"
+                                                    hx-target=".member-profile-utmost-container-section"
+                                                    hx-swap="innerHTML"
+                                                    class="member-profile-response-btn">
+                                                Deny
+                                            </button>
+                                        </form>
+<!--                                        <a class="member-profile-connect-btn"-->
+<!--                                           href="{% url 'deny-connect' leader.user member.user %}">Deny</a>-->
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -311,6 +330,14 @@
   <!--    </div>-->
   </section>
   <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            ToggleEditForm()
+            // HTMX event listener to reapply the toggle functionality after successful response
+            document.addEventListener('htmx:afterSwap', function(event) {
+                ToggleEditForm()
+            });
+        });
+
       document.getElementById('member-edit-brgys').addEventListener('change', function() {
           // Get the selected value
           var selectedValue = this.value;
@@ -333,18 +360,20 @@
           });
       });
 
-      const toggleEditLeaderForm = document.querySelector('.member-profile-edit-detail-toggle-btn');
-      const untoggleEditLeaderForm = document.querySelector('.member-profile-hide-edit-form-btn');
+      function ToggleEditForm() {
+          const toggleEditLeaderForm = document.querySelector('.member-profile-edit-detail-toggle-btn');
+          const untoggleEditLeaderForm = document.querySelector('.member-profile-hide-edit-form-btn');
 
-      const editLeaderProfileForm = document.querySelector('.member-profile-edit-member-data-form-container-div');
+          const editLeaderProfileForm = document.querySelector('.member-profile-edit-member-data-form-container-div');
 
-      toggleEditLeaderForm.addEventListener('click', ()=> {
-          editLeaderProfileForm.classList.add('member-profile-edit-member-data-form-container-div-show');
-      });
+          toggleEditLeaderForm.addEventListener('click', ()=> {
+              editLeaderProfileForm.classList.add('member-profile-edit-member-data-form-container-div-show');
+          });
 
-      untoggleEditLeaderForm.addEventListener('click', ()=> {
-          editLeaderProfileForm.classList.remove('member-profile-edit-member-data-form-container-div-show');
-      });
+          untoggleEditLeaderForm.addEventListener('click', ()=> {
+              editLeaderProfileForm.classList.remove('member-profile-edit-member-data-form-container-div-show');
+          });
+      };
   </script>
 </body>
 </html>

@@ -332,10 +332,13 @@
     color: rgb(70, 70, 70);
     font-weight: 800;
 }
+
+
+
+
 .member-profile-leader-connect-request-table{
     border-collapse: collapse;
 }
-
 
 .member-profile-leader-connect-request-table-head{
     background-color: rgb(100, 140, 140);
@@ -367,4 +370,12 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
+}
+
+.member-profile-response-btn{
+    background: none;
+    border:none;
+    font-family: "Montserrat";
+    font-weight: 800;
+    cursor: pointer;
 }
