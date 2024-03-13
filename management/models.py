@@ -8,7 +8,7 @@ class PasswordResetToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
-    expires_at = models.DateTimeField(default=timezone.now() + timezone.timedelta(minutes=10))
+    expires_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         verbose_name = _('password reset token')
@@ -58,6 +58,7 @@ class Leader(models.Model):
     sitio = models.ForeignKey(Sitio, related_name='leader_sitio', on_delete=models.CASCADE, null=True, blank=True)
     date_registered = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/")
+    encryption = models.CharField(max_length=2000) # Added 3/12/2024
 
     def __str__(self):
         return self.name
@@ -72,6 +73,7 @@ class Member(models.Model):
     sitio = models.ForeignKey(Sitio, related_name='member_sitio', on_delete=models.CASCADE, null=True, blank=True)
     date_registered = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/")
+    encryption = models.CharField(max_length=2000) # Added 3/12/2024
 
     def __str__(self):
         return self.name
@@ -99,6 +101,11 @@ class AddedMembers(models.Model):
 
 class Individual(models.Model):
     user = models.ForeignKey(User, related_name='user_individual', on_delete=models.CASCADE)
+    # member field added on 3/13/2024 to link member since members are now tied to user objects through forms.
+    # member = models.ForeignKey(Member, related_name='member_instance',
+    #                            on_delete=models.CASCADE,
+    #                            blank=True,
+    #                            null=True)
     name = models.CharField(max_length=255)
     gender = models.ForeignKey(Gender, related_name='individual_gender', on_delete=models.PROTECT)
     age = models.IntegerField()
@@ -172,7 +179,7 @@ class ActivityLog(models.Model):
 
 class LeaderConnectMemberRequest(models.Model):
     member = models.ForeignKey(Member, related_name='member_connect_request', on_delete=models.CASCADE)
-    requests = models.ManyToManyField(Leader, related_name='leader_connecting_request', blank=True, null=True)
+    requests = models.ManyToManyField(Leader, related_name='leader_connecting_request')
 
     def __str__(self):
         return self.member.name
@@ -181,7 +188,12 @@ class LeaderConnectMemberRequest(models.Model):
 # Added 3/5/2024 1:46 AM
 class LeadersRequestConnect(models.Model):
     leader = models.ForeignKey(Leader, related_name='leader_connect_request', on_delete=models.CASCADE)
-    requests = models.ManyToManyField(Member, related_name='leader_connecting_member', blank=True, null=True)
+    requests = models.ManyToManyField(Member, related_name='leader_connecting_member')
 
     def __str__(self):
         return self.leader.name
+
+
+class AmbiguousVoters(models.Model):
+    name = models.CharField(max_length=255)
+    voters = models.ManyToManyField(Individual, related_name='ambiguous_voters', null=True, blank=True)

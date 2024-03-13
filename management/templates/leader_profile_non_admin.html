@@ -30,7 +30,7 @@
             </span>
             <span>
                 {% if authenticated_leader %}
-                    <a class="home-link-to-page" href="{% url 'profile-leader' request.user %}">
+                    <a class="home-link-to-page" href="{% url 'profile-leader' authenticated_leader.encryption %}">
                         <span class="home-link-icon-container">
                             <span class="home-link-name">
                                 {{ request.user }}
@@ -38,7 +38,7 @@
                         </span>
                     </a>
                 {% else %}
-                    <a class="home-link-to-page" href="{% url 'profile-member' request.user %}">
+                    <a class="home-link-to-page" href="{% url 'profile-member' authenticated_member_stalk.encryption %}">
                         <span class="home-link-icon-container">
                             <span class="home-link-name">
                                 {{ request.user }}
@@ -210,7 +210,7 @@
                                 </div>
                                 <div class="leader-profile-member-name-container-div">
                                     <a class="leader-profile-link-to-member-profile"
-                                       href="{% url 'profile-member' member.user %}">
+                                       href="{% url 'profile-member' member.encryption %}">
                                         {{ member.name }}
                                     </a>
                                 </div>
@@ -247,251 +247,265 @@
             </div>
         </div>
         <div class="leader-profile-other-details-container-block-div">
-            {% if request.user == leader.user %}
-                {% if unassociated_members %}
-                    <div class="leader-profile-unassociated-members-block-div">
-                        <div class="leader-profile-unassociated-members-title-header">
-                            Unassociated Members in Brgy. {{ leader.brgy }}
-                        </div>
-                        <div class="leader-profile-unassociated-members-container">
-                            <div class="leader-profile-unassociated-member-search-form-container">
-                                <form class="leader-profile-search-unassociated-member-form"
-                                      method="GET" action="{% url 'profile-leader' leader.user %}">
-                                    <span class="leader-profile-unassociated-members-lens-icon">
-                                        <i class="fa fa-search"></i>
-                                    </span>
-                                    <input id="leader-profile-search-unassociated-members-input"
-                                           type="text" name="search" placeholder="Search Members">
-                                </form>
-                            </div>
-                            {% if search_engine_field_query %}
-                                {% if not total_results == 0 %}
-                                    {% for member in search_engine_result_member %}
-                                        <div class="leader-profile-unassociated-member-div">
-                                            <div class="leader-profile-unassociated-members-profile-image-container-div">
-                                                {% if member.image %}
-                                                    <div >
-                                                        <img class="leader-profile-unassociated-members-profile-image"
-                                                             src="{{ member.image.url }}"
-                                                        >
-                                                    </div>
-                                                {% else %}
-                                                    <div >
-                                                        <i class="fa fa-user" aria-hidden="true"></i>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                            <div class="leader-profile-unassociated-member-details-container">
-                                                <div class="leader-profile-unassociated-member-name-div">
-                                                    <a class="leader-profile-unassociated-member-name"
-                                                       href="{% url 'profile-member' member.user %}">
-                                                        {{ member.name }}
-                                                    </a>
-                                                </div>
-                                                <div>
-                                                    {{ member.sitio }}
-                                                </div>
-                                            </div>
-                                            <!-- Added 3/5/2024 1:56 AM-->
-                                            {% if not member.user.username in leader_member_connect_request_list %}
-                                                <div class="leader-profile-add-member-btn-container-div">
-                                                    <form action="{% url 'request-connect' member.user leader.user %}">
-                                                        {% csrf_token %}
-                                                        <button hx-post="{% url 'request-connect' member.user leader.user %}"
-                                                                hx-target=".leader-profile-utmost-container-section"
-                                                                hx-swap="innerHTML"
-                                                                class="leader-profile-connect-request-btn">
-                                                            Add as Member
-                                                        </button>
-                                                    </form>
-<!--                                                    <a class="leader-profile-associate-member-btn"-->
-<!--                                                       href="{% url 'request-connect' member.user leader.user %}">-->
-<!--                                                        Add as Member-->
+            <!-- Commented on 3/12/2024 for I was right!!!!!!!!!! AHAHHAHA I read minds!-->
+<!--            {% if request.user == leader.user %}-->
+<!--                {% if unassociated_members %}-->
+<!--                    <div class="leader-profile-unassociated-members-block-div">-->
+<!--                        <div class="leader-profile-unassociated-members-title-header">-->
+<!--                            Unassociated Members in Brgy. {{ leader.brgy }}-->
+<!--                        </div>-->
+<!--                        <div class="leader-profile-unassociated-members-container">-->
+<!--                            <div class="leader-profile-unassociated-member-search-form-container">-->
+<!--                                <form class="leader-profile-search-unassociated-member-form"-->
+<!--                                      method="GET" action="{% url 'profile-leader' leader.user %}">-->
+<!--                                    <span class="leader-profile-unassociated-members-lens-icon">-->
+<!--                                        <i class="fa fa-search"></i>-->
+<!--                                    </span>-->
+<!--                                    <input id="leader-profile-search-unassociated-members-input"-->
+<!--                                           type="text" name="search" placeholder="Search Members">-->
+<!--                                </form>-->
+<!--                            </div>-->
+<!--                            {% if search_engine_field_query %}-->
+<!--                                {% if not total_results == 0 %}-->
+<!--                                    {% for member in search_engine_result_member %}-->
+<!--                                        <div class="leader-profile-unassociated-member-div">-->
+<!--                                            <div class="leader-profile-unassociated-members-profile-image-container-div">-->
+<!--                                                {% if member.image %}-->
+<!--                                                    <div >-->
+<!--                                                        <img class="leader-profile-unassociated-members-profile-image"-->
+<!--                                                             src="{{ member.image.url }}"-->
+<!--                                                        >-->
+<!--                                                    </div>-->
+<!--                                                {% else %}-->
+<!--                                                    <div >-->
+<!--                                                        <i class="fa fa-user" aria-hidden="true"></i>-->
+<!--                                                    </div>-->
+<!--                                                {% endif %}-->
+<!--                                            </div>-->
+<!--                                            <div class="leader-profile-unassociated-member-details-container">-->
+<!--                                                <div class="leader-profile-unassociated-member-name-div">-->
+<!--                                                    <a class="leader-profile-unassociated-member-name"-->
+<!--                                                       href="{% url 'profile-member' member.user %}">-->
+<!--                                                        {{ member.name }}-->
 <!--                                                    </a>-->
-                                                </div>
-                                            {% else %}
-                                                <div class="leader-profile-leader-connect-request-div">
-                                                    <div class="leader-profile-request-sent-notifier">
-                                                        Request Sent
-                                                    </div>
-                                                    <div class="leader-profile-revert-request-div">
-                                                        <form action="{% url 'revert-request-connect' member.user leader.user %}">
-                                                            {% csrf_token %}
-                                                            <button hx-post="{% url 'revert-request-connect' member.user leader.user %}"
-                                                                    hx-target=".leader-profile-utmost-container-section"
-                                                                    hx-swap="innerHTML"
-                                                                    class="leader-profile-revert-request-btn">
-                                                                Cancel
-                                                            </button>
-                                                        </form>
-<!--                                                        <a class="leader-profile-revert-request-member-btn"-->
-<!--                                                           href="{% url 'revert-request-connect' member.user leader.user %}">-->
-<!--                                                            Revert Request-->
-<!--                                                        </a>-->
-                                                    </div>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    {% endfor %}
-                                {% else %}
-                                    <div>
-                                        No results for "{{ search_engine_field_query }}"
-                                    </div>
-                                {% endif %}
-                            {% else %}
-                                {% for member in unassociated_members %}
-                                    <section class="leader-profile-unassociated-member-div">
-                                        <div class="leader-profile-unassociated-members-profile-image-container-div">
-                                            {% if member.image %}
-                                                <div >
-                                                    <img class="leader-profile-unassociated-members-profile-image"
-                                                         src="{{ member.image.url }}"
-                                                    >
-                                                </div>
-                                            {% else %}
-                                                <div >
-                                                    <i class="fa fa-user" aria-hidden="true"></i>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="leader-profile-unassociated-member-details-container">
-                                            <div class="leader-profile-unassociated-member-name-div">
-                                                <a class="leader-profile-unassociated-member-name"
-                                                   href="{% url 'profile-member' member.user %}">
-                                                    {{ member.name }}
-                                                </a>
-                                            </div>
-                                            <div>
-                                                {{ member.sitio }}
-                                            </div>
-                                        </div>
-                                        <!-- Added 3/5/2024 1:40 AM-->
-                                        <section class="harkon" id="harkon-{{ member.user}}-{{ leader.user }}">
-                                            {% if not member.user.username in leader_member_connect_request_list %}
-                                            <div class="leader-profile-add-member-btn-container-div">
-                                                <form action="{% url 'request-connect' member.user leader.user %}">
-                                                    {% csrf_token %}
-                                                    <button hx-post="{% url 'request-connect' member.user leader.user %}"
-                                                            hx-target="#harkon-{{ member.user}}-{{ leader.user }}"
-                                                            hx-swap="innerHTML"
-                                                            hx-indicator="#loading-spinning{{ member.user}}-{{ leader.user }}"
-                                                            class="leader-profile-connect-request-btn"
-                                                            id="leader-connect-btn{{ member.user}}-{{ leader.user }}">
-                                                        Add as Member
-                                                    </button>
-                                                    <span id="loading-spinning{{ member.user}}-{{ leader.user }}"
-                                                          class="loading-spinner">
-
-                                                    </span>
-                                                </form>
-                                                <!--                                            <a class="leader-profile-associate-member-btn"-->
-                                                <!--                                               href="{% url 'request-connect' member.user leader.user %}">-->
-                                                <!--                                                Add as Member-->
-                                                <!--                                            </a>-->
-                                            </div>
-                                            {% else %}
-                                            <div class="leader-profile-leader-connect-request-div">
-                                                <div class="leader-profile-request-sent-notifier">
-                                                    Request Sent
-                                                </div>
-                                                <div class="leader-profile-revert-connect-div">
-                                                    <form action="{% url 'revert-request-connect' member.user leader.user %}">
-                                                        {% csrf_token %}
-                                                        <button hx-post="{% url 'revert-request-connect' member.user leader.user %}"
-                                                                hx-target="#harkon-{{ member.user}}-{{ leader.user }}"
-                                                                hx-swap="innerHTML"
-                                                                class="leader-profile-revert-request-btn">
-                                                            Cancel
-                                                        </button>
-                                                    </form>
-    <!--                                                <a class="leader-profile-revert-request-function"-->
-    <!--                                                   href="{% url 'revert-request-connect' member.user leader.user %}">-->
-    <!--                                                    Revert-->
-    <!--                                                </a>-->
-                                                </div>
-                                            </div>
-                                            {% endif %}
-                                        </section>
-                                    </section>
-                                {% empty %}
-                                    <div class="leader-profile-no-unassociated-members-notifier">
-                                        Members in this Barangay are associated.
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endif %}
-            {% endif %}
-            <!-- Commented for V. 2 -->
-<!--            <div class="leader-profile-add-member-form-container-div">-->
-<!--                <div class="leader-profile-add-member-header-title">-->
-<!--                    Add New Member-->
-<!--                </div>-->
-<!--                <div class="leader-profile-add-member-form-div">-->
-<!--                    <form method="post" enctype="multipart/form-data">-->
-<!--                        {% csrf_token %}-->
-<!--                        <div class="leader-profile-add-member-field-and-label-container">-->
-<!--                            <div class="leader-profile-add-field-label">-->
-<!--                                Member Name:-->
-<!--                            </div>-->
-<!--                            <div class="leader-profile-add-member-field">-->
-<!--                                {{ member_registration_form.name }}-->
-<!--                            </div>-->
-
-<!--                        </div>-->
-<!--                        <div class="leader-profile-add-member-min-fields-container">-->
-<!--                            <div class="leader-profile-add-member-field-and-label-container-min">-->
-<!--                                <div class="leader-profile-add-field-label">-->
-<!--                                    Gender:-->
-<!--                                </div>-->
-<!--                                <div class="leader-profile-add-member-field">-->
-<!--                                    {{ member_registration_form.gender }}-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="leader-profile-add-member-field-and-label-container-min">-->
-<!--                                <div class="leader-profile-add-field-label">-->
-<!--                                    Age:-->
-<!--                                </div>-->
-<!--                                <div class="leader-profile-add-member-field">-->
-<!--                                    {{ member_registration_form.age }}-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="leader-profile-add-member-field-and-label-container">-->
-<!--                            <div class="leader-profile-add-field-label">-->
-<!--                                Sitio:-->
-<!--                            </div>-->
-<!--                            <div class="leader-profile-add-member-field">-->
-<!--                                <select class="add-new-member-in-leader-field"-->
-<!--                                        name="added-member-sitio">-->
-<!--                                    {% for sitio in sitios %}-->
-<!--                                        <option value="{{ sitio.id }}">{{ sitio.name }}</option>-->
-<!--                                    {% empty %}-->
-<!--                                        <option value="None">None</option>-->
+<!--                                                </div>-->
+<!--                                                <div>-->
+<!--                                                    {{ member.sitio }}-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                            &lt;!&ndash; Added 3/5/2024 1:56 AM&ndash;&gt;-->
+<!--                                            <section class="harkon" id="harkon-{{ member.user}}-{{ leader.user }}">-->
+<!--                                                {% if not member.user.username in leader_member_connect_request_list %}-->
+<!--                                                    <div class="leader-profile-add-member-btn-container-div">-->
+<!--                                                    <span id="loading-spinning{{ member.user}}-{{ leader.user }}"-->
+<!--                                                          class="loading-spinner">-->
+<!--                                                    </span>-->
+<!--                                                    <form action="{% url 'request-connect' member.user leader.user %}">-->
+<!--                                                        {% csrf_token %}-->
+<!--                                                        <button hx-post="{% url 'request-connect' member.user leader.user %}"-->
+<!--                                                                hx-target="#harkon-{{ member.user}}-{{ leader.user }}"-->
+<!--                                                                hx-swap="innerHTML"-->
+<!--                                                                hx-indicator="#loading-spinning{{ member.user}}-{{ leader.user }}"-->
+<!--                                                                class="leader-profile-connect-request-btn"-->
+<!--                                                                id="leader-connect-btn{{ member.user}}-{{ leader.user }}"-->
+<!--                                                                onclick="hideButton(this)">-->
+<!--                                                            Add as Member-->
+<!--                                                        </button>-->
+<!--                                                    </form>-->
+<!--    &lt;!&ndash;                                                    <a class="leader-profile-associate-member-btn"&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                       href="{% url 'request-connect' member.user leader.user %}">&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                        Add as Member&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                    </a>&ndash;&gt;-->
+<!--                                                    </div>-->
+<!--                                                {% else %}-->
+<!--                                                    <div class="leader-profile-leader-connect-request-div">-->
+<!--                                                        <div class="leader-profile-revert-connect-div">-->
+<!--                                                            <span id="loading-spinning-cancel{{ member.user}}-{{ leader.user }}"-->
+<!--                                                                  class="loading-spinner">-->
+<!--                                                            </span>-->
+<!--                                                            <form action="{% url 'revert-request-connect' member.user leader.user %}">-->
+<!--                                                                {% csrf_token %}-->
+<!--                                                                <button hx-post="{% url 'revert-request-connect' member.user leader.user %}"-->
+<!--                                                                        hx-target="#harkon-{{ member.user}}-{{ leader.user }}"-->
+<!--                                                                        hx-indicator="#loading-spinning-cancel{{ member.user}}-{{ leader.user }}"-->
+<!--                                                                        hx-swap="innerHTML"-->
+<!--                                                                        class="leader-profile-revert-request-btn"-->
+<!--                                                                        onclick="hideButton(this)">-->
+<!--                                                                    Cancel-->
+<!--                                                                </button>-->
+<!--                                                            </form>-->
+<!--    &lt;!&ndash;                                                        <a class="leader-profile-revert-request-member-btn"&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                           href="{% url 'revert-request-connect' member.user leader.user %}">&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                            Revert Request&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                        </a>&ndash;&gt;-->
+<!--                                                        </div>-->
+<!--                                                    </div>-->
+<!--                                                {% endif %}-->
+<!--                                            </section>-->
+<!--                                        </div>-->
 <!--                                    {% endfor %}-->
-<!--                                </select>-->
-<!--                            </div>-->
+<!--                                {% else %}-->
+<!--                                    <div>-->
+<!--                                        No results for "{{ search_engine_field_query }}"-->
+<!--                                    </div>-->
+<!--                                {% endif %}-->
+<!--                            {% else %}-->
+<!--                                {% for member in unassociated_members %}-->
+<!--                                    <section class="leader-profile-unassociated-member-div">-->
+<!--                                        <div class="leader-profile-unassociated-members-profile-image-container-div">-->
+<!--                                            {% if member.image %}-->
+<!--                                                <div >-->
+<!--                                                    <img class="leader-profile-unassociated-members-profile-image"-->
+<!--                                                         src="{{ member.image.url }}"-->
+<!--                                                    >-->
+<!--                                                </div>-->
+<!--                                            {% else %}-->
+<!--                                                <div >-->
+<!--                                                    <i class="fa fa-user" aria-hidden="true"></i>-->
+<!--                                                </div>-->
+<!--                                            {% endif %}-->
+<!--                                        </div>-->
+<!--                                        <div class="leader-profile-unassociated-member-details-container">-->
+<!--                                            <div class="leader-profile-unassociated-member-name-div">-->
+<!--                                                <a class="leader-profile-unassociated-member-name"-->
+<!--                                                   href="{% url 'profile-member' member.user %}">-->
+<!--                                                    {{ member.name }}-->
+<!--                                                </a>-->
+<!--                                            </div>-->
+<!--                                            <div>-->
+<!--                                                {{ member.sitio }}-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                        &lt;!&ndash; Added 3/5/2024 1:40 AM&ndash;&gt;-->
+<!--                                        <section class="harkon" id="harkon-{{ member.user}}-{{ leader.user }}">-->
+<!--                                            {% if not member.user.username in leader_member_connect_request_list %}-->
+<!--                                            <div class="leader-profile-add-member-btn-container-div">-->
+<!--                                                <span id="loading-spinning{{ member.user}}-{{ leader.user }}"-->
+<!--                                                      class="loading-spinner">-->
+<!--                                                </span>-->
+<!--                                                <form action="{% url 'request-connect' member.user leader.user %}">-->
+<!--                                                    {% csrf_token %}-->
+<!--                                                    <button hx-post="{% url 'request-connect' member.user leader.user %}"-->
+<!--                                                            hx-target="#harkon-{{ member.user}}-{{ leader.user }}"-->
+<!--                                                            hx-swap="innerHTML"-->
+<!--                                                            hx-indicator="#loading-spinning{{ member.user}}-{{ leader.user }}"-->
+<!--                                                            class="leader-profile-connect-request-btn"-->
+<!--                                                            id="leader-connect-btn{{ member.user}}-{{ leader.user }}"-->
+<!--                                                            onclick="hideButton(this)">-->
+<!--                                                        Add as Member-->
+<!--                                                    </button>-->
+<!--                                                </form>-->
+<!--                                                &lt;!&ndash;                                            <a class="leader-profile-associate-member-btn"&ndash;&gt;-->
+<!--                                                &lt;!&ndash;                                               href="{% url 'request-connect' member.user leader.user %}">&ndash;&gt;-->
+<!--                                                &lt;!&ndash;                                                Add as Member&ndash;&gt;-->
+<!--                                                &lt;!&ndash;                                            </a>&ndash;&gt;-->
+<!--                                            </div>-->
+<!--                                            {% else %}-->
+<!--                                            <div class="leader-profile-leader-connect-request-div">-->
+<!--                                                <div class="leader-profile-revert-connect-div">-->
+<!--                                                    <span id="loading-spinning-cancel{{ member.user}}-{{ leader.user }}"-->
+<!--                                                          class="loading-spinner">-->
+<!--                                                    </span>-->
+<!--                                                    <form action="{% url 'revert-request-connect' member.user leader.user %}">-->
+<!--                                                        {% csrf_token %}-->
+<!--                                                        <button hx-post="{% url 'revert-request-connect' member.user leader.user %}"-->
+<!--                                                                hx-target="#harkon-{{ member.user}}-{{ leader.user }}"-->
+<!--                                                                hx-indicator="#loading-spinning-cancel{{ member.user}}-{{ leader.user }}"-->
+<!--                                                                hx-swap="innerHTML"-->
+<!--                                                                class="leader-profile-revert-request-btn"-->
+<!--                                                                onclick="hideButton(this)">-->
+<!--                                                            Cancel-->
+<!--                                                        </button>-->
+<!--                                                    </form>-->
+<!--    &lt;!&ndash;                                                <a class="leader-profile-revert-request-function"&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                   href="{% url 'revert-request-connect' member.user leader.user %}">&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                    Revert&ndash;&gt;-->
+<!--    &lt;!&ndash;                                                </a>&ndash;&gt;-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                            {% endif %}-->
+<!--                                        </section>-->
+<!--                                    </section>-->
+<!--                                {% empty %}-->
+<!--                                    <div class="leader-profile-no-unassociated-members-notifier">-->
+<!--                                        Members in this Barangay are associated.-->
+<!--                                    </div>-->
+<!--                                {% endfor %}-->
+<!--                            {% endif %}-->
 <!--                        </div>-->
-<!--                        <div class="leader-profile-add-member-field-and-label-container">-->
-<!--                            <div class="leader-profile-add-field-label">-->
-<!--                                Image:-->
-<!--                            </div>-->
-<!--                            <div class="leader-profile-add-member-field">-->
-<!--                                {{ member_registration_form.image }}-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="leader-profile-add-new-member-btn-container-div">-->
-<!--                            <button-->
-<!--                                    class="leader-profile-add-new-member-btn"-->
-<!--                                    type="submit"-->
-<!--                                    name='add-new-member-btn'>-->
-<!--                                Submit-->
-<!--                            </button>-->
-<!--                        </div>-->
-<!--                    </form>-->
-<!--                </div>-->
-<!--            </div>-->
+<!--                    </div>-->
+<!--                {% endif %}-->
+<!--            {% endif %}-->
+            <!-- Commented for V. 2 -->
+            <!-- Restored on 3/12/2024 for I was right!!!!!!!!!! AHAHHAHA I read minds!-->
+            <div class="leader-profile-add-member-form-container-div">
+                <div class="leader-profile-add-member-header-title">
+                    Add New Member
+                </div>
+                <div class="leader-profile-add-member-form-div">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="leader-profile-add-member-field-and-label-container">
+                            <div class="leader-profile-add-field-label">
+                                Member Name:
+                            </div>
+                            <div class="leader-profile-add-member-field">
+                                {{ member_registration_form.name }}
+                            </div>
+
+                        </div>
+                        <div class="leader-profile-add-member-min-fields-container">
+                            <div class="leader-profile-add-member-field-and-label-container-min">
+                                <div class="leader-profile-add-field-label">
+                                    Gender:
+                                </div>
+                                <div class="leader-profile-add-member-field">
+                                    {{ member_registration_form.gender }}
+                                </div>
+                            </div>
+                            <div class="leader-profile-add-member-field-and-label-container-min">
+                                <div class="leader-profile-add-field-label">
+                                    Age:
+                                </div>
+                                <div class="leader-profile-add-member-field">
+                                    {{ member_registration_form.age }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="leader-profile-add-member-field-and-label-container">
+                            <div class="leader-profile-add-field-label">
+                                Sitio:
+                            </div>
+                            <div class="leader-profile-add-member-field">
+                                <select class="add-new-member-in-leader-field"
+                                        name="added-member-sitio">
+                                    {% for sitio in sitios %}
+                                        <option value="{{ sitio.id }}">{{ sitio.name }}</option>
+                                    {% empty %}
+                                        <option value="None">None</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="leader-profile-add-member-field-and-label-container">
+                            <div class="leader-profile-add-field-label">
+                                Image:
+                            </div>
+                            <div class="leader-profile-add-member-field">
+                                {{ member_registration_form.image }}
+                            </div>
+                        </div>
+                        <div class="leader-profile-add-new-member-btn-container-div">
+                            <button
+                                    class="leader-profile-add-new-member-btn"
+                                    type="submit"
+                                    name='add-new-member-btn'>
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
             {% if request.user == leader.user %}
                 <div class="leader-profile-qr-code-container-div">
                     <div class="leader-profile-qr-code-header-title">
@@ -507,11 +521,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             ToggleEditForm()
+            hideButton(button)
           // HTMX event listener to reapply the toggle functionality after successful response
           document.addEventListener('htmx:afterSwap', function(event) {
             ToggleEditForm()
+            hideButton(button)
           });
         });
+
+        function hideButton(button) {
+            button.style.display = 'none';
+        }
         document.getElementById('leader-edit-brgys').addEventListener('change', function() {
             // Get the selected value
             var selectedValue = this.value;

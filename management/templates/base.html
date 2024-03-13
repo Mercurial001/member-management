@@ -31,7 +31,7 @@
     <link rel="stylesheet" href="{% static 'sitio-profile.css' %}">
     <link rel="stylesheet" href="{% static 'attendance-list.css' %}">
     <link rel="stylesheet" href="{% static 'sitio-report.css' %}">
-
+    <link rel="stylesheet" href="{% static 'ambiguous_voters.css' %}">
     <link href='https://fonts.googleapis.com/css?family=Lato:100italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
     <!-- Add this to include Swiper.js -->
@@ -39,8 +39,9 @@
     <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
     <script src="{% static 'chart.js' %}"></script>
     <script src="{% static 'swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'htmx.js' %}"></script>
 </head>
-<body>
+<body class="base-template-utmost-body">
     <header id="main-header">
         <div class="home-page-authenticated-user">
             <div class="home-page-authenticated-user-element-container">

@@ -560,6 +560,7 @@
 }
 
 .leader-profile-connect-request-btn{
+    visibility: visible;
     background-color: rgb(100, 150, 150);
     color: beige;
     font-family: 'Montserrat';
@@ -588,16 +589,11 @@
     display: inline-block;
 }
 
-.htmx-request.leader-profile-connect-request-btn {
-    visibility: hidden;
+.htmx-request.loading-spinner-cancel {
+    display: inline-block;
 }
-
 
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-.loading-spinner-product-list-container-div{
-    position: absolute;
 }

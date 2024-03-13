@@ -17,6 +17,11 @@ from .models import QRCodeAttendance
 from .models import ActivityLog
 from .models import LeaderConnectMemberRequest
 from .models import LeadersRequestConnect
+from .models import AmbiguousVoters
+
+
+class AmbiguousVotersAdmin(admin.ModelAdmin):
+    list_display = ('name', )
 
 
 class LeadersRequestConnectAdmin(admin.ModelAdmin):
@@ -91,6 +96,7 @@ class CLusterAdmin(admin.ModelAdmin):
     list_display = ('leader',)
 
 
+admin.site.register(AmbiguousVoters, AmbiguousVotersAdmin)
 admin.site.register(LeadersRequestConnect, LeadersRequestConnectAdmin)
 admin.site.register(LeaderConnectMemberRequest, LeaderConnectMemberRequestAdmin)
 admin.site.register(ActivityLog, ActivityLogAdmin)

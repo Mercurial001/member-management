@@ -50,6 +50,7 @@ urlpatterns = [
     path('report/leaders/', views.all_leaders_report, name='leaders-report'),
     path('attendance/list/', views.attendance_list, name='attendance-list'),
     path('report/sitios/', views.sitios_report, name='sitio-report'),
+    path('report/ambiguous-voters/', views.ambiguous_members_report, name='ambiguous-voters'),
 
     path('report/no-member-brgys/download-pdf', views.no_member_barangays_pdf, name='no-member-brgys-pdf'),
     path('report/member-count-brgy/download-pdf', views.member_count_per_brgy_pdf, name='member-count-brgy-pdf'),
@@ -105,11 +106,13 @@ urlpatterns = [
          name='revert-request-connect'),
     path('accept/request/<str:leader>/<str:member>/', views.accept_leader_connect_request, name='accept-connect'),
     path('deny/request/<str:leader>/<str:member>/', views.deny_leader_connect_request, name='deny-connect'),
-
+    path('encrypt-members/',  views.encrypt_members, name='encrypt-members'),
+    path('suspect/<str:username>/', views.suspect_voter, name='suspect-voter'),
+    path('un-suspect/<str:username>/', views.unsuspect_voter, name='unsuspect-voter'),
 
     path('notifications/', views.notifications_async, name='notifications'),
-    path('profile/leader/<str:username>/', views.non_admin_leader_profile, name='profile-leader'),
-    path('profile/member/<str:username>/', views.non_admin_member_profile, name='profile-member'),
+    path("profile/leader/<str:encryption>/", views.non_admin_leader_profile, name='profile-leader'),
+    path("profile/member/<str:encryption>/", views.non_admin_member_profile, name='profile-member'),
     path('forgot-password/', views.forgot_password, name='forgot-password'),
     path('enter-token/<str:email>/', views.enter_token, name='enter-token'),
     path('change-password/<str:email>/<str:token_str>/', views.change_password, name='change-password'),

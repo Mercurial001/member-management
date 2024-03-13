@@ -135,6 +135,21 @@
                     </span>
                     <span>{{ leader.gender }}</span>
                 </div>
+                {% if not leader.user.username in ambiguous_voters_list %}
+                    <div class="leader-profile-detail-div">
+                        <span class="leader-profile-detail-icon-span">
+                            <i class="fa fa-neuter" aria-hidden="true"></i>
+                        </span>
+                        <a href="{% url 'suspect-voter' leader.user %}">Mark</a>
+                    </div>
+                {% else %}
+                    <div class="leader-profile-detail-div">
+                        <span class="leader-profile-detail-icon-span">
+                            <i class="fa fa-neuter" aria-hidden="true"></i>
+                        </span>
+                        <span>Ambiguous Voter</span>
+                    </div>
+                {% endif %}
             </div>
         </div>
         <div style="box-shadow: 1px 2px 5px 1px rgba(0, 0, 0, 0.5); padding: 1px; margin-top: 100px;"></div>

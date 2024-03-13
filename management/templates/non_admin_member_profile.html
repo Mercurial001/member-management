@@ -28,8 +28,9 @@
                 </a>
             </span>
             <span>
+
                 {% if authenticated_member %}
-                    <a class="member-link-to-page" href="{% url 'profile-member' request.user %}">
+                    <a class="member-link-to-page" href="{% url 'profile-member' member.encryption %}">
                         <span class="member-profile-link-icon-container">
                             <span class="member-profile-link-name">
                                 {{ request.user }}
@@ -37,7 +38,7 @@
                         </span>
                     </a>
                 {% else %}
-                    <a class="member-link-to-page" href="{% url 'profile-leader' request.user %}">
+                    <a class="member-link-to-page" href="{% url 'profile-leader' leader_request.encryption %}">
                         <span class="member-profile-link-icon-container">
                             <span class="member-profile-link-name">
                                 {{ request.user }}
@@ -221,6 +222,11 @@
 <!--                                           href="{% url 'deny-connect' leader.user member.user %}">Deny</a>-->
                                     </td>
                                 </tr>
+                            {% empty %}
+                                <tr class="member-profile-leader-connect-request-table-row">
+                                    <th style="padding: 10px; font-family: 'Montserrat";
+                                        colspan="4">No requests</th>
+                                </tr>
                             {% endfor %}
                         </table>
                       {% endif %}
@@ -287,7 +293,7 @@
                                   {% endif %}
                               </div>
                               <div class="member-profile-associated-leader">
-                                  <a href="{% url 'profile-leader' possible_leaders.leader.user %}">
+                                  <a href="{% url 'profile-leader' possible_leaders.leader.encryption %}">
                                       {{ possible_leaders.leader }}
                                   </a>
                               </div>

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <section class="ambiguous-members-utmost-container-section">
+        <div class="ambiguous-title-header-div">
+            Ambiguous Members
+        </div>
+        <div class="ambiguous-filter-registrant-form-div">
+            <form class="ambiguous-filter-form" action="">
+                <select name="ambiguous-voter-brgy" id="ambiguous-voter-brgy-dropdown">
+                    <option value="">None</option>
+                    {% for barangay in barangays %}
+                        <option value="{{ barangay.brgy_name }}">{{ barangay.brgy_name }}</option>
+                    {% endfor %}
+                </select>
+                <button class="ambiguous-voter-filter-btn" type="submit"><i class="fa fa-filter"></i></button>
+            </form>
+        </div>
+<!--        {{ ambiguous_voters_filtered_brgy_list }}-->
+        {% if not ambiguous_voters_brgy %}
+            <table class="ambiguous-voters-table">
+                <tr class="ambiguous-voters-table-row">
+                    <th class="ambiguous-voters-table-head">Name</th>
+                    <th class="ambiguous-voters-table-head">Status</th>
+                    <th class="ambiguous-voters-table-head">Barangay</th>
+                    <th></th>
+                </tr>
+                {% for voter in ambiguous_members.voters.all %}
+                    <tr class="ambiguous-voters-table-row">
+                        <td class="ambiguous-voters-table-data">{{ voter.name }}</td>
+                        <td class="ambiguous-voters-table-data">{{ voter.group }}</td>
+                        <td class="ambiguous-voters-table-data">{{ voter.brgy }}</td>
+                        <td>
+                            <form action="{% url 'unsuspect-voter' voter.user %}">
+                                {% csrf_token %}
+                                <button class="ambiguous-voter-unmark-btn"
+                                        hx-post="{% url 'unsuspect-voter' voter.user %}"
+                                        hx-target=".base-template-utmost-body"
+                                        hx-swap="innerHTML">
+                                    Unmark
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="ambiguous-voters-table-row">
+                        <th class="ambiguous-voters-table-head" colspan="4">No Ambiguous Voters</th>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <div class="ambiguous-voter-selected-brgy-filter-header">
+                Ambiguous Voters in Barangay {{ ambiguous_voters_brgy }}
+            </div>
+            <table class="ambiguous-voters-table">
+                <tr class="ambiguous-voters-table-row">
+                    <th class="ambiguous-voters-table-head">Namee</th>
+                    <th class="ambiguous-voters-table-head">Status</th>
+                    <th></th>
+                </tr>
+                {% for voter in ambiguous_voters_filtered_brgy_list %}
+                    <tr class="ambiguous-voters-table-row">
+                        <td class="ambiguous-voters-table-data">{{ voter.name }}</td>
+                        <td class="ambiguous-voters-table-data">{{ voter.group }}</td>
+                        <td>
+                            <form action="{% url 'unsuspect-voter' voter.user %}">
+                                {% csrf_token %}
+                                <button class="ambiguous-voter-unmark-btn"
+                                        hx-post="{% url 'unsuspect-voter' voter.user %}"
+                                        hx-target=".base-template-utmost-body"
+                                        hx-swap="innerHTML">
+                                    Unmark
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr class="ambiguous-voters-table-row">
+                        <th class="ambiguous-voters-table-head" colspan="3">
+                            No Ambiguous Voters for {{ ambiguous_voters_brgy }}
+                        </th>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </section>
+{% endblock %}

@@ -1,0 +1,70 @@
+.ambiguous-title-header-div{
+    text-align: center;
+    margin: 20px;
+    font-family: 'Montserrat';
+    font-weight: 800;
+    font-size: 25px;
+    text-transform: uppercase;
+    color: rgb(100, 100, 100);
+}
+
+.ambiguous-filter-registrant-form-div{
+    text-align: center;
+}
+
+#ambiguous-voter-brgy-dropdown{
+    width: 250px;
+    height: 30px;
+    border-radius: 5px;
+}
+
+.ambiguous-voter-filter-btn{
+    width: 40px;
+    height: 30px;
+    border-radius: 5px;
+    border: 1px solid rgb(100, 100, 100);
+    cursor: pointer;
+}
+
+.ambiguous-voter-selected-brgy-filter-header{
+    text-align: center;
+    margin: 15px;
+    font-family: 'Montserrat';
+    font-weight: 800;
+    text-transform: uppercase;
+    color: rgb(50, 50, 50);
+}
+
+.ambiguous-voters-table{
+    margin: auto;
+    width: 60%;
+    margin-top: 30px;
+}
+
+.ambiguous-voters-table-head{
+    background-color: rgb(100, 150, 150);
+    color: beige;
+    font-family: Lato, 'Montserrat';
+    font-weight: 800;
+    height: 30px;
+    width: 400px;
+}
+
+.ambiguous-voters-table-data{
+    background-color: rgb(200, 200, 200);
+    padding: 10px;
+    font-family: 'Montserrat';
+}
+
+.ambiguous-voter-unmark-btn{
+    background-color: rgba(224, 200, 45, 0.8);
+    color: rgb(100, 100, 100);
+    border: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Montserrat';
+}
