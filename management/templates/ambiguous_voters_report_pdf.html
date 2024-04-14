@@ -1,30 +1,88 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .ambiguous-title-header-div{
+            text-align: center;
+            margin: 20px;
+            font-family: 'Montserrat';
+            font-weight: 800;
+            font-size: 25px;
+            text-transform: uppercase;
+            color: rgb(100, 100, 100);
+        }
 
-{% load static %}
+        .ambiguous-filter-registrant-form-div{
+            text-align: center;
+        }
 
-{% block content %}
+        #ambiguous-voter-brgy-dropdown{
+            width: 250px;
+            height: 30px;
+            border-radius: 5px;
+        }
+
+        .ambiguous-voter-filter-btn{
+            width: 40px;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid rgb(100, 100, 100);
+            cursor: pointer;
+        }
+
+        .ambiguous-voter-selected-brgy-filter-header{
+            text-align: center;
+            margin: 15px;
+            font-family: 'Montserrat';
+            font-weight: 800;
+            text-transform: uppercase;
+            color: rgb(50, 50, 50);
+        }
+
+        .ambiguous-voters-table{
+            margin: auto;
+            width: 60%;
+            margin-top: 30px;
+        }
+
+        .ambiguous-voters-table-head{
+            background-color: rgb(100, 150, 150);
+            color: beige;
+            font-family: Lato, 'Montserrat';
+            font-weight: 800;
+            height: 30px;
+            width: 400px;
+        }
+
+        .ambiguous-voters-table-data{
+            background-color: rgb(200, 200, 200);
+            padding: 10px;
+            font-family: 'Montserrat';
+        }
+
+        .ambiguous-voter-unmark-btn{
+            background-color: rgba(224, 200, 45, 0.8);
+            color: rgb(100, 100, 100);
+            border: none;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 20px;
+            padding-right: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Montserrat';
+        }
+    </style>
+</head>
+<body>
     <section class="ambiguous-members-utmost-container-section">
         <div class="ambiguous-title-header-div">
             Ambiguous Members
         </div>
-        <div class="ambiguous-filter-registrant-form-div">
-            <form class="ambiguous-filter-form" action="">
-                <select name="ambiguous-voter-brgy" id="ambiguous-voter-brgy-dropdown">
-                    <option value="">None</option>
-                    {% for barangay in barangays %}
-                        <option value="{{ barangay.brgy_name }}">{{ barangay.brgy_name }}</option>
-                    {% endfor %}
-                </select>
-                <button class="ambiguous-voter-filter-btn" type="submit"><i class="fa fa-filter"></i></button>
-            </form>
-        </div>
 <!--        {{ ambiguous_voters_filtered_brgy_list }}-->
         {% if not ambiguous_voters_brgy %}
-            <div class="ambiguous-voter-form-div">
-                <form action="{% url 'ambiguous-voters-pdf' %}">
-                    <button class="ambiguous-voter-form-download-btn" type="submit">Download PDF</button>
-                </form>
-            </div>
             <table class="ambiguous-voters-table">
                 <tr class="ambiguous-voters-table-row">
                     <th class="ambiguous-voters-table-head">Name</th>
@@ -56,42 +114,18 @@
                 {% endfor %}
             </table>
         {% else %}
-<!--            <div class="ambiguous-voter-form-div">-->
-<!--                <form action="{% url 'ambiguous-voters-filtered-pdf' %}?ambiguous-voter-brgy={{ ambiguous_voters_brgy }}">-->
-<!--                    <button class="ambiguous-voter-form-download-btn"-->
-<!--                            type="submit">Download PDF for {{ ambiguous_voters_brgy }}</button>-->
-<!--                </form>-->
-<!--            </div>-->
-            <div class="ambiguous-voter-form-div">
-                <a class="ambiguous-voter-form-download-btn"
-                   href="{% url 'ambiguous-voters-filtered-pdf' %}?ambiguous-voter-brgy={{ ambiguous_voters_brgy }}">
-                    Download PDF for {{ ambiguous_voters_brgy }}
-                </a>
-            </div>
             <div class="ambiguous-voter-selected-brgy-filter-header">
                 Ambiguous Voters in Barangay {{ ambiguous_voters_brgy }}
             </div>
             <table class="ambiguous-voters-table">
                 <tr class="ambiguous-voters-table-row">
-                    <th class="ambiguous-voters-table-head">Name</th>
+                    <th class="ambiguous-voters-table-head">Namee</th>
                     <th class="ambiguous-voters-table-head">Status</th>
-                    <th></th>
                 </tr>
                 {% for voter in ambiguous_voters_filtered_brgy_list %}
                     <tr class="ambiguous-voters-table-row">
                         <td class="ambiguous-voters-table-data">{{ voter.name }}</td>
                         <td class="ambiguous-voters-table-data">{{ voter.group }}</td>
-                        <td>
-                            <form action="{% url 'unsuspect-voter' voter.user %}">
-                                {% csrf_token %}
-                                <button class="ambiguous-voter-unmark-btn"
-                                        hx-post="{% url 'unsuspect-voter' voter.user %}"
-                                        hx-target=".base-template-utmost-body"
-                                        hx-swap="innerHTML">
-                                    Unmark
-                                </button>
-                            </form>
-                        </td>
                     </tr>
                 {% empty %}
                     <tr class="ambiguous-voters-table-row">
@@ -103,4 +137,5 @@
             </table>
         {% endif %}
     </section>
-{% endblock %}
+</body>
+</html>

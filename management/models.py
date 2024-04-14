@@ -8,7 +8,7 @@ class PasswordResetToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=255, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
-    expires_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True) # changed on 3/12/2024
 
     class Meta:
         verbose_name = _('password reset token')
@@ -194,6 +194,7 @@ class LeadersRequestConnect(models.Model):
         return self.leader.name
 
 
+# Added 3/13/2024
 class AmbiguousVoters(models.Model):
     name = models.CharField(max_length=255)
     voters = models.ManyToManyField(Individual, related_name='ambiguous_voters', null=True, blank=True)

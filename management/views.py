@@ -34,6 +34,9 @@ from .decorators import authenticated_user, allowed_users
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import six
 import pdfkit
+from .serializers import QRCodeAttendanceSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
 @login_required(login_url='login')
@@ -99,6 +102,26 @@ def homepage(request):
         'activities': activities,
         'user': user,
     })
+
+
+@api_view(['GET'])
+def endpoints(request):
+    routes = [
+        {
+            'Endpoint': '/attendance/qr-scan/mobile/',
+            'method': 'POST',
+            'body': None,
+            'description': 'Endpoint for making attendances through QR Code scan via mobile app'
+        },
+        {
+            'Endpoint': '/attendance/list/',
+            'method': 'GET',
+            'body': None,
+            'description': 'Endpoint for retrieving attendances'
+        }
+    ]
+
+    return Response(routes)
 
 
 @login_required(login_url='login')
@@ -719,6 +742,13 @@ def member_profile(request, name, id):
     request_user = request.user
     logged_user = Individual.objects.get(user__username=request_user)
 
+    ambiguous_voters = AmbiguousVoters.objects.get(id=1)
+    ambiguous_voters_list = []
+    for voter in ambiguous_voters.voters.all():
+        voter_name = voter.name
+        if voter_name not in ambiguous_voters_list:
+            ambiguous_voters_list.append(voter.user.username)
+
     member = Member.objects.get(id=id, name=name)
     members = Cluster.objects.values('members__name')
     leaders = Leader.objects.filter(brgy=member.brgy)
@@ -798,6 +828,7 @@ def member_profile(request, name, id):
         'edit_member_detail_form': edit_member_detail_form,
         "sitios": sitios,
         'logged_user': logged_user,
+        'ambiguous_voters_list': ambiguous_voters_list,
     })
 
 
@@ -1838,6 +1869,8 @@ def attendance_list_filtered_daily_pdf(request):
     return response
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def sitios_report(request):
     request_user = request.user
     logged_user = Individual.objects.get(user__username=request_user)
@@ -1881,6 +1914,8 @@ def sitios_report(request):
     })
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def sitios_report_pdf(request):
     individuals = Individual.objects.all()
 
@@ -1929,6 +1964,8 @@ def sitios_report_pdf(request):
     return response
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def sitios_report_filtered_pdf(request):
     selected_brgy = request.GET.get('sitio-brgy')
 
@@ -1990,6 +2027,8 @@ def sitios_report_filtered_pdf(request):
     return response
 
 
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
 def ambiguous_members_report(request):
     request_user = request.user
     logged_user = Individual.objects.get(user__username=request_user)
@@ -2012,6 +2051,95 @@ def ambiguous_members_report(request):
         'ambiguous_voters_brgy': ambiguous_voters_brgy,
         'ambiguous_voters_filtered_brgy_list': ambiguous_voters_filtered_brgy_list,
     })
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def ambiguous_members_report_pdf(request):
+    request_user = request.user
+    logged_user = Individual.objects.get(user__username=request_user)
+    barangays = Barangay.objects.all()
+    ambiguous_members = AmbiguousVoters.objects.get(id=1)
+    ambiguous_voters_brgy = request.GET.get('ambiguous-voter-brgy')
+
+    ambiguous_voters_filtered_brgy_list = []
+    if ambiguous_voters_brgy:
+        ambiguous_voters_filtered = AmbiguousVoters.objects.get(id=1)
+        for voter in ambiguous_voters_filtered.voters.all():
+            voter_brgy = voter.brgy.brgy_name
+            if voter_brgy == ambiguous_voters_brgy:
+                ambiguous_voters_filtered_brgy_list.append(voter)
+
+    html = render_to_string('ambiguous_voters_report_pdf.html', {
+        'logged_user': logged_user,
+        'ambiguous_members': ambiguous_members,
+        'barangays': barangays,
+        'ambiguous_voters_brgy': ambiguous_voters_brgy,
+        'ambiguous_voters_filtered_brgy_list': ambiguous_voters_filtered_brgy_list,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ambiguous_voter.pdf"'
+    return response
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+def ambiguous_members_filter_report_pdf(request):
+    barangays = Barangay.objects.all()
+    ambiguous_voters_brgy = request.GET.get('ambiguous-voter-brgy')
+
+    ambiguous_voters_filtered_brgy_list = []
+    if ambiguous_voters_brgy:
+        ambiguous_voters_filtered = AmbiguousVoters.objects.get(id=1)
+        for voter in ambiguous_voters_filtered.voters.all():
+            voter_brgy = voter.brgy.brgy_name
+            if voter_brgy == ambiguous_voters_brgy:
+                ambiguous_voters_filtered_brgy_list.append(voter)
+
+    html = render_to_string('ambiguous_voters_filtered_report.html', {
+        'barangays': barangays,
+        'ambiguous_voters_brgy': ambiguous_voters_brgy,
+        'ambiguous_voters_filtered_brgy_list': ambiguous_voters_filtered_brgy_list,
+    })
+
+    options = {
+        'margin-top': '0',
+        'margin-right': '0',
+        'margin-bottom': '0',
+        'margin-left': '0',
+        'page-size': 'Letter',
+        'encoding': 'UTF-8',
+        'quiet': '',
+        'print-media-type': '',
+        'disable-smart-shrinking': '',
+        'no-outline': '',
+    }
+
+    config = pdfkit.configuration(wkhtmltopdf='C:/Program Files/wkhtmltopdf/bin/wkhtmltopdf.exe')
+
+    pdf = pdfkit.from_string(html, False, options=options, configuration=config)
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ambiguous_voter-{ambiguous_voters_brgy}.pdf"'
+    return response
 
 
 @login_required(login_url='login')
@@ -3241,7 +3369,7 @@ def non_admin_member_profile(request, encryption):
             individual_link.image = edited_member.image
             individual_link.save()
 
-            return redirect('profile-member', username=edited_member.user)
+            return redirect('profile-member', encryption=member.encryption)
 
     return render(request, 'non_admin_member_profile.html', {
         'member': member,
@@ -3644,3 +3772,83 @@ def encrypt_members(request):
     else:
         # If there's no referring URL, redirect to a default page
         return redirect('homepage')
+
+
+#APIS Functions
+@api_view(['POST'])
+def scanned_qr_data_mobile(request):
+    data = request.data
+
+    scanned_data = data['scanned_data']
+
+    key = b'bSKEk2cT2V8vllCpMtQWsO2FxUVQdl3S_IHwBbEE4eQ='
+    cipher_suite = Fernet(key)
+    signing_key = b'Cold'
+    signer = Signer(key=signing_key)
+
+    plain_text = cipher_suite.decrypt(scanned_data)  # 1
+    my_string = plain_text.decode('utf-8')  # 2
+    decrypted_username = signer.unsign(my_string)  # 3
+
+    if Individual.objects.filter(user__username=decrypted_username).exists():
+        individual_object = Individual.objects.get(user__username=decrypted_username)
+
+        attendance = QRCodeAttendance.objects.create(
+            user=decrypted_username,
+            name=individual_object.name,
+            brgy=individual_object.brgy.brgy_name,
+            sitio=individual_object.sitio.name,
+            group=individual_object.group,
+            date=timezone.now(),
+            date_time=timezone.now(),
+        )
+        serializer = QRCodeAttendanceSerializer(attendance, mamy=False)
+        return Response(serializer.data)
+    elif not Individual.objects.filter(user__username=decrypted_username).exists():
+        return Response('Scanned data does not exist!')
+
+
+# @login_required(login_url='login')
+# @allowed_users(allowed_roles=['Admin'])
+# @csrf_exempt
+# def qr_code_scanner(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body.decode('utf-8'))
+#         scanned_data = data.get('scanned_data')
+#         # Process or store the scanned data as needed
+#
+#         # encrypted_username = signer.sign(user.username)  # 1st Encrypt the username
+#         # data = encrypted_username.encode('utf-8')  # 2 Convert encrypted_username to bytes
+#         # encrypted_data = cipher_suite.encrypt(data)  # Final
+#
+#         key = b'bSKEk2cT2V8vllCpMtQWsO2FxUVQdl3S_IHwBbEE4eQ='
+#         cipher_suite = Fernet(key)
+#         signing_key = b'Cold'
+#         signer = Signer(key=signing_key)
+#
+#         # encrypted_username = signer.sign(user.username)  # 1st Encrypt the username
+#         # data = encrypted_username.encode('utf-8')  # 2 Convert encrypted_username to bytes
+#         # encrypted_data = cipher_suite.encrypt(data)  # Final
+#
+#         plain_text = cipher_suite.decrypt(scanned_data)  # 1
+#         my_string = plain_text.decode('utf-8')  # 2
+#         decrypted_username = signer.unsign(my_string)  # 3
+#         print(decrypted_username)
+#         if Individual.objects.filter(user__username=decrypted_username).exists():
+#             individual_object = Individual.objects.get(user__username=decrypted_username)
+#
+#             attendance = QRCodeAttendance.objects.create(
+#                 user=decrypted_username,
+#                 name=individual_object.name,
+#                 brgy=individual_object.brgy.brgy_name,
+#                 sitio=individual_object.sitio.name,
+#                 group=individual_object.group,
+#                 date=timezone.now(),
+#                 date_time=timezone.now(),
+#             )
+#
+#             attendance.save()
+#             return JsonResponse({'status': 'success', 'message': f'Welcome, {decrypted_username}'})
+#         # return JsonResponse({decrypted_username: True})
+#
+#     return render(request, 'qr_code_attendance.html')

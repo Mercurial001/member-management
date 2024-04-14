@@ -40,7 +40,15 @@ INSTALLED_APPS = [
     'management',
     'django_cleanup.apps.CleanupConfig',
     'django.contrib.humanize',
+    'rest_framework',
+    'corsheaders'
 ]
+
+# # Commented for the moment
+# CORS_ALLOWED_ORIGINS = ['Lists of URLS allowed to access the API']
+# CORS_ALLOWED_ORIGINS_REGEXES
+# CORS_ALLOW_ALL_ORIGINS = True/False
+CORS_ALLOW_ALL_ORIGINS = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -50,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'member_management.urls'

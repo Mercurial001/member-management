@@ -68,3 +68,20 @@
     cursor: pointer;
     font-family: 'Montserrat';
 }
+
+.ambiguous-voter-form-div{
+    text-align: center;
+    margin: 15px;
+}
+
+.ambiguous-voter-form-download-btn{
+    background-color: rgba(100, 150, 150, 0.9);
+    color: beige;
+    border: 1px solid rgb(150, 200, 200);
+    padding:10px;
+    font-family:'Montserrat';
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}

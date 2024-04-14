@@ -12,11 +12,15 @@ def authenticated_user(view_func):
         elif request.user.groups.filter(name='Leaders').exists():
             user_object = User.objects.get(username=request.user)
             leader_user = Leader.objects.get(user=user_object)
-            return redirect('profile-leader', username=request.user)
+            # Commented 3/16/2024 10:26 PM hospital
+            # return redirect('profile-leader', username=request.user)
+            return redirect('profile-leader', encryption=leader_user.encryption)
         elif request.user.groups.filter(name='Members').exists():
             user_object = User.objects.get(username=request.user)
             member_user = Member.objects.get(user=user_object)
-            return redirect('profile-member', username=request.user)
+            # Commented 3/16/2024 10:26 PM hospital
+            # return redirect('profile-member', username=request.user)
+            return redirect('profile-member', encryption=member_user.encryption)
         else:
             return view_func(request, *args, **kwargs)
     return wrapper_func

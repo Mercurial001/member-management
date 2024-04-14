@@ -63,6 +63,7 @@ urlpatterns = [
     path('report/members/download-pdf', views.all_members_report_pdf, name='members-report-pdf'),
     path('attendance/list/download-pdf/', views.attendance_list_pdf, name='attendance-list-pdf'),
     path('report/sitios/download-pdf', views.sitios_report_pdf, name='sitio-report-pdf'),
+    path('report/ambiguous-voters-pdf/', views.ambiguous_members_report_pdf, name='ambiguous-voters-pdf'),
 
     path('report/cluster-filtered/download-pdf', views.leader_members_report_filtered_pdf,
          name='cluster-filtered-report-pdf'),
@@ -71,7 +72,8 @@ urlpatterns = [
     path('attendance/list-daily/download-pdf/', views.attendance_list_filtered_daily_pdf,
        name='attendance-list-daily-pdf'),
     path('report/sitios/download-filtered-pdf', views.sitios_report_filtered_pdf, name='sitio-report-filtered-pdf'),
-
+    path('report/ambiguous-voters-filtered-pdf/', views.ambiguous_members_filter_report_pdf,
+         name='ambiguous-voters-filtered-pdf'),
 
     path('function/<str:member_name>/<str:leader_name>/', views.tag_leader_member, name='tag-leader'),
     path('change-brgy-name/', views.change_brgy_name, name='change-brgy-name'),
@@ -116,6 +118,9 @@ urlpatterns = [
     path('forgot-password/', views.forgot_password, name='forgot-password'),
     path('enter-token/<str:email>/', views.enter_token, name='enter-token'),
     path('change-password/<str:email>/<str:token_str>/', views.change_password, name='change-password'),
+
+    # APIS
+    path('endpoints/', views.endpoints, name='endpoint')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # if settings.DEBUG:

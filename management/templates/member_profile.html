@@ -92,6 +92,21 @@
                     {{ member.gender }}
                 </span>
             </div>
+            {% if not member.user.username in ambiguous_voters_list %}
+                <div class="member-profile-detail">
+                    <span class="member-profile-detail-icon-span">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i>
+                    </span>
+                    <a href="{% url 'suspect-voter' member.user %}">Mark</a>
+                </div>
+            {% else %}
+                <div class="leader-profile-detail-div">
+                    <span class="leader-profile-detail-icon-span">
+                        <i class="fa fa-warning" aria-hidden="true"></i>
+                    </span>
+                    <span>Ambiguous Voter</span>
+                </div>
+            {% endif %}
             <div class="member-profile-detail">
                 <span class="member-profile-detail-icon-span">
                     <i class="fas fa-user-check" aria-hidden="true"></i>
