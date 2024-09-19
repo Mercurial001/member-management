@@ -5,7 +5,7 @@ from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm,
 from django.contrib import messages
 from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants, \
     Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation, QRCodeAttendance, ActivityLog, \
-    LeaderConnectMemberRequest, LeadersRequestConnect, AmbiguousVoters
+    LeaderConnectMemberRequest, LeadersRequestConnect, AmbiguousVoters, Gender
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
@@ -55,48 +55,33 @@ def homepage(request):
     # Now that we have retrieve the search engine field in the base.html, it's time to delve into the login of it
 
     if search_engine_field_query:
-        search_engine_result_member = Member.objects.filter(
+        search_engine_result_individual = Individual.objects.filter(
             Q(name__icontains=search_engine_field_query)
             | Q(brgy__brgy_name__icontains=search_engine_field_query) 
-            | Q(sitio__name__icontains=search_engine_field_query))
-        search_engine_result_leader = Leader.objects.filter(
-            Q(name__icontains=search_engine_field_query) 
-            | Q(brgy__brgy_name__icontains=search_engine_field_query) 
-            | Q(sitio__name__icontains=search_engine_field_query))
+            | Q(sitio__name__icontains=search_engine_field_query)
+            | Q(last_name__icontains=search_engine_field_query)
+        )
 
-        search_result_count_member = search_engine_result_member.annotate(count=Count('name'))
+        search_result_count_member = search_engine_result_individual.annotate(count=Count('name'))
         search_result_sum_member = search_result_count_member.aggregate(sum=Sum('count'))['sum']
 
-        search_result_count_leader = search_engine_result_leader.annotate(count=Count('name'))
-        search_result_sum_leader = search_result_count_leader.aggregate(sum=Sum('count'))['sum']
-
-        if search_result_sum_member is None and search_result_sum_leader is None:
+        if search_result_sum_member is None:
             total_results = 0
-        elif search_result_sum_member is None and search_result_sum_leader is not None:
-            search_result_sum_member = 0
-            total_results = search_result_sum_member + search_result_sum_leader
-        elif search_result_sum_leader is None and search_result_sum_member is not None:
-            search_result_sum_leader = 0
-            total_results = search_result_sum_member + search_result_sum_leader
         else:
-            total_results = search_result_sum_member + search_result_sum_leader
+            total_results = search_result_sum_member
     else:
-        search_engine_result_member = []
-        search_engine_result_leader = []
         total_results = []
         search_result_count_member = []
         search_result_sum_member = []
-        search_result_sum_leader = []
+        search_engine_result_individual = []
 
     return render(request, 'base.html', {
         'member_brgy': member_brgy,
         'leader_brgy': leader_brgy,
-        'search_engine_result_member': search_engine_result_member,
-        'search_engine_result_leader': search_engine_result_leader,
+        'search_engine_result_individual': search_engine_result_individual,
         'search_engine_field_query': search_engine_field_query,
         'search_result_count_member': search_result_count_member,
         'search_result_sum_member': search_result_sum_member,
-        'search_result_sum_leader': search_result_sum_leader,
         'total_results': total_results,
         'logged_user': logged_user,
         'activities': activities,
@@ -3852,3 +3837,87 @@ def scanned_qr_data_mobile(request):
 #         # return JsonResponse({decrypted_username: True})
 #
 #     return render(request, 'qr_code_attendance.html')
+
+
+def individual(request):
+    individuals = Individual.objects.all()
+    return render(request, 'individuals.html', {
+        'individuals': individuals
+    })
+
+
+def individual_input(request):
+    genders = Gender.objects.all()
+    barangays = Barangay.objects.all()
+    individual_general = Individual.objects.all()
+    individual_mothers = Individual.objects.filter(is_parent=True, is_father=False)
+    individual_fathers = Individual.objects.filter(is_parent=True, is_father=True)
+
+    # requested values
+    individual_first_name = request.POST.get('individual-first-name')
+    individual_middle_name = request.POST.get('individual-middle-name')
+    individual_last_name = request.POST.get('individual-last-name')
+    individual_suffix = request.POST.get('individual-suffix')
+    individual_gender = request.POST.get('individual-gender')
+    individual_age = request.POST.get('individual-age')
+    individual_brgy = request.POST.get('individual-brgy')
+    individual_sitio = request.POST.get('individual-sitio-result-htmx')
+    individual_house_image = request.FILES.get('individual-house-photo')
+    individual_image = request.FILES.get('individual-photo')
+    individual_leader_bool = request.POST.get('individual-leader-status')
+    individual_religion = request.POST.get('individual-religion')
+    individual_contact_number = request.POST.get('individual-number')
+    individual_latitude = request.POST.get('individual-latitude')
+    individual_longitude = request.POST.get('individual-longitude')
+    individual_oot_status = request.POST.get('individual-oot')
+    individual_swing_voter_status = request.POST.get('individual-swing-voter')
+    individual_occupation = request.POST.get('individual-occupation')
+    individual_deceased_status = request.POST.get('individual-deceased-status')
+    individual_ok_ok = request.POST.get('individual-cockroach')
+    individual_mother = request.POST.get('individual-mother')
+    individual_father = request.POST.get('individual-father')
+    individual_siblings = request.POST.get('individual-siblings')
+    individual_spouse = request.POST.get('individual-spouse')
+    individual_children = request.POST.get('individual-children')
+    individual_parent_status = request.POST.get('individual-parent-status')
+
+    if request.method == 'POST':
+
+        selected_gender = Gender.objects.get(id=individual_gender)
+        selected_brgy = Barangay.objects.get(id=individual_brgy)
+
+        if individual_sitio != "":
+            selected_sitio = Sitio.objects.get(id=individual_sitio)
+        else:
+            selected_sitio = None
+
+        Individual.objects.create(
+            name=individual_first_name,
+            middle_name=individual_middle_name,
+            last_name=individual_last_name,
+            suffix=individual_suffix,
+            gender=selected_gender,
+            age=individual_age,
+            brgy=selected_brgy,
+            sitio=selected_sitio,
+            group='Members',
+
+        )
+
+    return render(request, 'individual_input.html', {
+        'genders': genders,
+        'barangays': barangays,
+        'individual_general': individual_general,
+        'individual_mothers': individual_mothers,
+        'individual_fathers': individual_fathers,
+    })
+
+
+def htmx_sitio_options(request):
+    selected_brgy = request.POST.get('individual-brgy')
+    sitios = Sitio.objects.filter(brgy__id=selected_brgy)
+
+    return render(request, 'sitio_results_htmx.html', {
+        'sitios': sitios,
+    })
+

@@ -32,6 +32,7 @@
     <link rel="stylesheet" href="{% static 'attendance-list.css' %}">
     <link rel="stylesheet" href="{% static 'sitio-report.css' %}">
     <link rel="stylesheet" href="{% static 'ambiguous_voters.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Lato:100italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
     <!-- Add this to include Swiper.js -->
@@ -268,7 +269,7 @@
                             </div>
                             <div class="home-base-results-div">
                                 <div class="home-base-search-results-member-container-div">
-                                    {% for member in search_engine_result_member %}
+                                    {% for member in search_engine_result_individual %}
                                         <div class="home-base-member-name-result">
                                             <a class="home-base-member-result-link"
                                                href="{% url 'member-profile' member.name member.id %}">

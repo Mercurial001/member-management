@@ -128,9 +128,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-     os.path.join(BASE_DIR, "static"),
-]
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+# STATICFILES_DIRS = [
+#      os.path.join(BASE_DIR, "static"),
+# ]
 
 MEDIA_URL = '/media/'
 
@@ -149,3 +151,36 @@ EMAIL_PORT = 587
 SERVER_EMAIL = 'LMS'
 EMAIL_HOST_USER = 'dandan321321321@gmail.com'
 EMAIL_HOST_PASSWORD = 'hxcbtgizfjhbgzxh'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'exclude_specific_log_message': {
+            '()': 'main.ExcludeSpecificLogMessageFilter',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'filters': ['exclude_specific_log_message'],  # Apply the filter to the console handler
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'logfile.log',
+            'filters': ['exclude_specific_log_message'],  # Apply the filter to the file handler
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+    },
+}
