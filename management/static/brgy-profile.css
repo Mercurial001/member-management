@@ -286,3 +286,135 @@ input[type="number"] {
     transform-origin: 100% 100%;
     margin-right: 50px;
 }
+
+.brgy-profile-barangay-figures-div{
+    display: inline-block;
+    margin-left: 40px;
+    margin-right: 40px;
+    border: 1px solid rgb(10, 40, 40);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    width: 400px;
+    font-family: 'Montserrat';
+    vertical-align: top;
+}
+
+.brgy-profile-barangay-figure-div-header{
+    background-color: rgb(10, 40, 40);
+    font-family: 'Montserrat';
+    color: beige;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    padding: 10px;
+}
+
+.brgy-profile-barangay-official-form{
+    text-align: left;
+}
+
+.brgy-profile-barangay-figure-input{
+    margin: 2px;
+}
+
+.brgy-profile-barangay-figure-add-btn{
+    margin: 2px;
+}
+
+.brgy-profile-barangay-figure-loop-div{
+    margin: 10px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding: 10px;
+}
+
+.brgy-profile-election-result-loop-form-div{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin: auto;
+    width: 90%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+
+.brgy-profile-election-result-loop-form-header{
+    background-color: rgb(10, 40, 40);
+    font-family: 'Montserrat';
+    color: beige;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.brgy-profile-add-contender-form{
+    margin: 10px;
+}
+
+.brgy-profile-add-election-form{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    font-family: 'Montserrat';
+    margin: auto;
+    width: 90%;
+    margin-bottom: 20px;
+}
+
+.brgy-profile-election-result-input{
+    margin: 10px;
+}
+
+.brgy-profile-add-election-form-header{
+    color: beige;
+    background-color: rgb(10, 40, 40);
+    padding: 10px;
+}
+
+.brgy-profile-election-result-loop-div{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin:auto;
+    width: 90%;
+    font-family: 'Montserrat';
+    margin-bottom: 20px;
+}
+
+.brgy-profile-election-result-contenders-loop-header-div{
+    margin: 10px;
+}
+
+.brgy-profile-election-result-loop-header{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    padding: 10px;
+}
+
+.brgy-profile-contenders-party-div{
+    display: inline-block;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin: 20px;
+    vertical-align: top;
+}
+
+.brgy-profile-contender-party-header{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    padding: 10px;
+}
+
+.brgy-profile-contenders-container-div{
+    margin: 20px;
+}
+
+.brgy-profile-contender-div{
+    margin:10px;
+}
+
+.brgy-profile-contender-table{
+    text-align: left;
+}
+
+.brgy-profile-brgy-remark-div{
+    font-family: 'Montserrat';
+    text-align: left;
+    margin: auto;
+    width: 50%;
+}
+
+.brgy-profile-remark-div{
+    list-style-type: circle;
+}

@@ -126,6 +126,7 @@ class AddedMembers(models.Model):
 
 class Individual(models.Model):
     # Added null=True attribute to user field on 9/16/2024 MM/DD/YYYY
+    # All fields nullified due sibling, and children fields
     user = models.ForeignKey(
         User,
         related_name='user_individual',
@@ -138,43 +139,99 @@ class Individual(models.Model):
     #                            on_delete=models.CASCADE,
     #                            blank=True,
     #                            null=True)
-    name = models.CharField(max_length=255)
-    middle_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    name = models.CharField(max_length=255, null=True, blank=True)
+    middle_name = models.CharField(max_length=50, null=True, blank=True)
+    last_name = models.CharField(max_length=50, null=True, blank=True)
     suffix = models.CharField(max_length=10, null=True, blank=True)
-    gender = models.ForeignKey(Gender, related_name='individual_gender', on_delete=models.PROTECT)
-    age = models.IntegerField()
-    brgy = models.ForeignKey(Barangay, related_name='individual_brgy', on_delete=models.PROTECT)
-    sitio = models.ForeignKey(Sitio, related_name='individual_sitio', on_delete=models.PROTECT, null=True, blank=True)
+    gender = models.ForeignKey(
+        Gender,
+        related_name='individual_gender',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
+    age = models.IntegerField(null=True, blank=True)
+    brgy = models.ForeignKey(
+        Barangay,
+        related_name='individual_brgy',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
+    sitio = models.ForeignKey(
+        Sitio,
+        related_name='individual_sitio',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
     date_registered = models.DateTimeField(auto_now_add=True)
-    group = models.CharField(max_length=255)
+    group = models.CharField(max_length=255, null=True, blank=True)
     image = models.ImageField(null=True, blank=True, upload_to="images/")
     house_image = models.ImageField(null=True, blank=True, upload_to="houses/")
     # New Fields Added 09/15/2024
-    is_leader = models.BooleanField(default=False)
-    religion = models.ForeignKey(Religion, on_delete=models.PROTECT, null=True)
+    religion = models.ForeignKey(Religion, on_delete=models.PROTECT, null=True, blank=True)
+    occupation = models.ForeignKey(Occupation, on_delete=models.SET_NULL, null=True, blank=True)
     mobile = models.CharField(max_length=20, null=True, blank=True)
     lat = models.FloatField(null=True, blank=True)
     long = models.FloatField(null=True, blank=True)
+    birthday = models.DateField(null=True, blank=True)
+    is_leader = models.BooleanField(default=False)
     is_oot = models.BooleanField(default=False)
     is_swing_voter = models.BooleanField(default=False)
-    occupation = models.ForeignKey(Occupation, on_delete=models.SET_NULL, null=True, blank=True)
     is_cockroach = models.BooleanField(default=False)
     is_deceased = models.BooleanField(default=False)
     is_parent = models.BooleanField(default=False)
     is_father = models.BooleanField(default=False)
-    # For family Tree
-    spouse = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
-    siblings = models.ManyToManyField('self')
-    children = models.ManyToManyField('self')
-    parents = models.ManyToManyField('self')
 
     def __str__(self):
-        return self.name
+        if self.name != None:
+            return self.name
+        else:
+            return str(self.id)
+
+    def middle_initial(self):
+        return self.middle_name[0]
+
+
+class IndividualSpouse(models.Model):
+    individual = models.ForeignKey(
+        Individual,
+        on_delete=models.PROTECT,
+        related_name="individuals_spouse"
+    )
+    spouse = models.ForeignKey(Individual, on_delete=models.SET_NULL, blank=True, null=True)
+
+
+class IndividualSiblings(models.Model):
+    individual = models.ForeignKey(
+        Individual,
+        on_delete=models.PROTECT,
+        related_name="individuals_sibling"
+    )
+    siblings = models.ManyToManyField(Individual, blank=True)
+
+
+class IndividualOffspring(models.Model):
+    individual = models.ForeignKey(
+        Individual,
+        on_delete=models.PROTECT,
+        related_name="individuals_offspring"
+    )
+    children = models.ManyToManyField(Individual, blank=True)
+
+
+class IndividualParents(models.Model):
+    individual = models.ForeignKey(
+        Individual,
+        on_delete=models.PROTECT,
+        related_name="individuals_parent"
+    )
+    parents = models.ManyToManyField(Individual, blank=True)
 
 
 class IndividualLeaderCluster(models.Model):
-    leader = models.ForeignKey(
+    individual = models.ForeignKey(
         Individual,
         on_delete=models.PROTECT,
         related_name='individual_leader'
@@ -185,55 +242,79 @@ class IndividualLeaderCluster(models.Model):
     )
 
 
+class BrgyOfficial(models.Model):
+    brgy = models.ForeignKey(Barangay, related_name='brgy_official', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    rank = models.CharField(max_length=255)
+
+    def middle_initial(self):
+        return self.middle_name[0]
+
+
+class BrgySchoolHead(models.Model):
+    brgy = models.ForeignKey(Barangay, related_name='brgy_school_head', on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    rank = models.CharField(max_length=255)
+
+    # def middle_initial(self):
+    #     return self.middle_name[0]
+
+
 class BarangayFigures(models.Model):
     brgy = models.ForeignKey(Barangay, on_delete=models.PROTECT)
-    captain = models.ForeignKey(Individual, on_delete=models.PROTECT, related_name='captain_barangay')
-    officials = models.ManyToManyField(Individual, related_name='officials_barangay')
-    school_heads = models.ManyToManyField(Individual)
+    # captain = models.CharField()
+    officials = models.ManyToManyField(
+        BrgyOfficial,
+        related_name='officials_barangay',
+        blank=True
+    )
+    school_heads = models.ManyToManyField(BrgySchoolHead, blank=True)
 
 
 class ElectionType(models.Model):
     name = models.CharField(max_length=100, null=True, blank=True)
 
+    def __str__(self):
+        return self.name
 
+
+class BarangayElectionContender(models.Model):
+    name = models.CharField(max_length=255)
+    rank = models.CharField(max_length=255)
+    vote_count = models.IntegerField(default=0)
+    party = models.CharField(max_length=255)
+
+
+# For Barangay Level
 class BarangayElectionResults(models.Model):
     brgy = models.ForeignKey(
         Barangay,
         on_delete=models.PROTECT
     )
-    election_type = models.ForeignKey(ElectionType, on_delete=models.PROTECT)
-    election_year = models.DateField()
+    election_year = models.DateField(null=True, blank=True)
+    election_type = models.ForeignKey(ElectionType, on_delete=models.PROTECT, null=True, blank=True)
+    contenders = models.ManyToManyField(BarangayElectionContender, blank=True)
 
 
-class BarangayElectionContenders(models.Model):
-    election = models.ForeignKey(BarangayElectionResults, on_delete=models.SET_NULL, null=True, blank=True)
+class ElectionContender(models.Model):
     name = models.CharField(max_length=255)
     rank = models.CharField(max_length=255)
     vote_count = models.IntegerField(default=0)
     party = models.CharField(max_length=255)
 
 
+# For Palompon Town
 class ElectionResults(models.Model):
     election_type = models.ForeignKey(
         ElectionType,
         on_delete=models.PROTECT,
-        related_name='election_type',
+        related_name='election_type_result',
     )
     election_year = models.DateField()
-
-
-class ElectionContenders(models.Model):
-    election = models.ForeignKey(
-        ElectionResults,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='election_result'
+    contenders = models.ManyToManyField(
+        ElectionContender,
+        blank=True
     )
-    name = models.CharField(max_length=255)
-    rank = models.CharField(max_length=255)
-    vote_count = models.IntegerField(default=0)
-    party = models.CharField(max_length=255)
 
 
 # Added 2/9/2024 for Version 2

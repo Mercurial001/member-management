@@ -113,7 +113,18 @@
                         </div>
                     </div>
                     <div class="sitio-profile-save-changes-btn">
-                        <button type="submit">Save Changes</button>
+                        <button type="submit" name="edit-sitio-details-btn">Save Changes</button>
+                    </div>
+                </form>
+                <form method="POST">
+                    {% csrf_token %}
+                    <textarea name="sitio-remark">
+
+                    </textarea>
+                    <div>
+                        <button type="submit" name="add-sitio-remark-btn">
+                            Add Remark
+                        </button>
                     </div>
                 </form>
             </div>
@@ -152,6 +163,26 @@
                 </div>
             </div>
             <div class="sitio-profile-showcase-underline"></div>
+
+            <div class="sitio-profile-sitio-details-block-container-div">
+                <div class="sitio-profile-details-title-header-div">
+                    Sitio {{ sitio.name }} Remarks
+                </div>
+                <div class="sitio-profile-remarks">
+                    <ul>
+                        {% for remark in sitio_remarks %}
+                            <li>
+                                {{ remark.remark }}
+                            </li>
+                        {% empty %}
+                            <li>
+                                None
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
             <div class="sitio-profile-sitio-details-block-container-div">
                 <div class="sitio-profile-details-title-header-div">
                     Data List

@@ -5,7 +5,10 @@ from .forms import LeaderRegistrationForm, MemberRegistrationForm, BarangayForm,
 from django.contrib import messages
 from .models import Member, Barangay, Leader, Cluster, AddedLeaders, AddedMembers, Sitio, Individual, Registrants, \
     Notification, EmailMessage, PasswordResetToken, TotalVoterPopulation, QRCodeAttendance, ActivityLog, \
-    LeaderConnectMemberRequest, LeadersRequestConnect, AmbiguousVoters, Gender
+    LeaderConnectMemberRequest, LeadersRequestConnect, AmbiguousVoters, Gender, Religion, Occupation, IndividualParents, \
+    IndividualSpouse, IndividualOffspring, IndividualSiblings, IndividualLeaderCluster, BarangayFigures, ElectionType, \
+    BarangayElectionResults, BarangayElectionContender, ElectionResults, ElectionContender, BrgyOfficial, BrgySchoolHead, \
+    Church, BarangayRemark, SitioRemark
 from django.db.models import Sum, Count, Q
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.hashers import make_password
@@ -37,6 +40,8 @@ import pdfkit
 from .serializers import QRCodeAttendanceSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+import statistics
+from itertools import zip_longest
 
 
 @login_required(login_url='login')
@@ -52,15 +57,38 @@ def homepage(request):
     # First let's retrieve the search field in the base.html
     search_engine_field_query = request.GET.get('search')
 
-    # Now that we have retrieve the search engine field in the base.html, it's time to delve into the login of it
+    # Now that we have retrieve the search engine field in the base.html,
+    # it's time to delve into the login of it # Start with all individuals
 
     if search_engine_field_query:
-        search_engine_result_individual = Individual.objects.filter(
-            Q(name__icontains=search_engine_field_query)
-            | Q(brgy__brgy_name__icontains=search_engine_field_query) 
-            | Q(sitio__name__icontains=search_engine_field_query)
-            | Q(last_name__icontains=search_engine_field_query)
-        )
+        filters = Q(name__icontains=search_engine_field_query) | \
+                  Q(brgy__brgy_name__icontains=search_engine_field_query) | \
+                  Q(sitio__name__icontains=search_engine_field_query) | \
+                  Q(last_name__icontains=search_engine_field_query) | \
+                  Q(religion__name__icontains=search_engine_field_query.title())
+
+        # Check for year
+        try:
+            year = datetime.strptime(search_engine_field_query, "%Y").year
+            filters |= Q(birthday__year=year)
+        except ValueError:
+            pass  # If it fails, just skip this filter
+
+        # Check for month
+        try:
+            month = datetime.strptime(search_engine_field_query.title(), "%B").month
+            filters |= Q(birthday__month=month)
+        except ValueError:
+            pass  # If it fails, just skip this filter
+
+        try:
+            month_year = datetime.strptime(search_engine_field_query, "%B").month
+            filters |= Q(birthday__month=month)
+        except ValueError:
+            pass  # If it fails, just skip this filter
+
+        # Apply all the filters
+        search_engine_result_individual = Individual.objects.filter(filters)
 
         search_result_count_member = search_engine_result_individual.annotate(count=Count('name'))
         search_result_sum_member = search_result_count_member.aggregate(sum=Sum('count'))['sum']
@@ -121,6 +149,8 @@ def barangay_members(request, brgy_name):
     sitios = Sitio.objects.filter(brgy__brgy_name=brgy_name)
     brgy_edit_form = ChangeBarangayNameForm(instance=brgy)
 
+    barangay_remarks = BarangayRemark.objects.filter(brgy=brgy)
+
     brgy_individual_count = Individual.objects.filter(brgy=brgy).annotate(count=Count('name'))
     brgy_individual_sum = brgy_individual_count.aggregate(sum=Sum('count'))['sum']
 
@@ -129,12 +159,186 @@ def barangay_members(request, brgy_name):
 
     brgy_cluster = Cluster.objects.filter(leader__brgy=brgy)
 
+    brgy_figures, created_brgy_figures = BarangayFigures.objects.get_or_create(
+        brgy=brgy
+    )
+
+    barangay_official_ranks = []
+    for official in BrgyOfficial.objects.all():
+        if official.rank not in barangay_official_ranks:
+            barangay_official_ranks.append(official.rank)
+
+    barangay_official_rank_len = len(barangay_official_ranks)
+
+    barangay_official_party = []
+    for contender in BarangayElectionContender.objects.all():
+        if contender.party not in barangay_official_party:
+            barangay_official_party.append(contender.party)
+
+    barangay_official_party_len = len(barangay_official_party)
+
+    barangay_school_head_ranks = []
+    for school_head in BrgySchoolHead.objects.all():
+        if school_head.rank not in barangay_school_head_ranks:
+            barangay_school_head_ranks.append(school_head.rank)
+
+    barangay_school_head_len = len(barangay_school_head_ranks)
+
+    barangay_election_type = ElectionType.objects.all()
+    barangay_election_type_len = len(barangay_election_type)
+
+    barangay_contender_ranks = []
+    for contender in BarangayElectionContender.objects.all():
+        if contender.rank not in barangay_contender_ranks:
+            barangay_contender_ranks.append(contender.rank)
+
+    barangay_contender_ranks_len = len(barangay_contender_ranks)
+
+    brgy_election_results = BarangayElectionResults.objects.filter(brgy=brgy)
+
+    # Fetch election results
+    election_results = BarangayElectionResults.objects.filter(brgy=brgy)
+    election_dict = {}
+
+    # Organize results by election type and party
+    for result in election_results:
+        election_year = result.election_year
+        str_year = datetime.strftime(election_year, '%Y')
+
+        if str_year not in election_dict:
+            election_dict[str_year] = {}
+
+        for contender in result.contenders.all():
+            party = contender.party
+
+            if party not in election_dict[str_year]:
+                election_dict[str_year][party] = []
+
+            election_dict[str_year][party].append(contender)
+
+    zipped_vote_count_party_name = ''
+    party_votes = {}
+    if BarangayElectionResults.objects.filter(brgy=brgy).exists():
+
+        for election_type, parties in election_dict.items():
+            for party, contenders in parties.items():
+                # Calculate the average vote count for this party
+                avg_vote_count = sum(contender.vote_count for contender in contenders) / len(contenders)
+                if election_type not in party_votes:
+                    party_votes[election_type] = [(party, avg_vote_count)]
+                else:
+                    party_votes[election_type].append((party, avg_vote_count))
+
+    # Prepare the zipped data for rendering
+        zipped_vote_count_party_name = zip_longest(party_votes.keys(), party_votes.values())
+
+    # Prepare years for x-axis
+    years = list(election_dict.keys())
+
+    # print(party_votes)
+    # matrix = [[], []]
+    #
+    # index = -1
+    # for election_type, parties in election_dict.items():
+    #
+    #     for party, contenders in parties.items():
+    #         index += 1
+    #         matrix[index].append(contenders)
+    #
+    # for alpha, omega in zip(matrix[0][0], matrix[1][0]):
+    #     print(f'{alpha.vote_count} {omega.vote_count}')
+    #
+    # contender_gen = (
+    #     (election_type, party_name, contender)
+    #     for election_type, parties in election_dict.items()
+    #     for party_name, contenders in parties.items()
+    #     for contender in contenders
+    # )
+
     if request.method == 'POST':
-        form = ChangeBarangayNameForm(request.POST, instance=brgy)
-        if form.is_valid():
-            brgy = form.save(commit=False)
-            brgy.save()
-            return redirect('member-brgy', brgy_name=brgy.brgy_name)
+        if 'edit-brgy-detail-btn' in request.POST:
+            form = ChangeBarangayNameForm(request.POST, instance=brgy)
+            if form.is_valid():
+                brgy = form.save(commit=False)
+                brgy.save()
+                return redirect('member-brgy', brgy_name=brgy.brgy_name)
+
+        elif 'brgy-election-contender-btn' in request.POST:
+            election_year = request.POST.get('election-year')
+            contender_name = request.POST.get('contender-name')
+            contender_rank = request.POST.get('contender-rank')
+            contender_vote_count = request.POST.get('contender-votes')
+            contender_party = request.POST.get('contender-party')
+
+            brgy_result_instance = BarangayElectionResults.objects.get(election_year__year=election_year)
+
+            brgy_election_contender, created_contender = BarangayElectionContender.objects.get_or_create(
+                name=contender_name,
+                rank=contender_rank,
+                vote_count=contender_vote_count,
+                party=contender_party,
+            )
+
+            brgy_result_instance.contenders.add(brgy_election_contender)
+            brgy_result_instance.save()
+
+            brgy_election_contender.save()
+
+        elif 'add-brgy-official-btn' in request.POST:
+            official_first_name = request.POST.get('brgy-official-first-name').title()
+            official_rank = request.POST.get('brgy-official-rank').title()
+
+            official, created = BrgyOfficial.objects.get_or_create(
+                brgy=brgy,
+                name=official_first_name,
+                rank=official_rank,
+            )
+            brgy_figures.officials.add(official)
+            brgy_figures.save()
+
+        elif 'add-school-head-btn' in request.POST:
+            school_head_first_name = request.POST.get('school-head-first-name').title()
+            school_head_rank = request.POST.get('school-head-rank')
+
+            school_head, created = BrgySchoolHead.objects.get_or_create(
+                brgy=brgy,
+                name=school_head_first_name,
+                rank=school_head_rank,
+            )
+            brgy_figures.school_heads.add(school_head)
+            brgy_figures.save()
+
+        elif 'add-election-type-btn' in request.POST:
+            election_type_request = request.POST.get('election-type')
+            election_year_str = request.POST.get('election-year')
+
+            election_year = datetime.strptime(election_year_str, '%Y-%m-%d')
+
+            election_type, created_election_type = ElectionType.objects.get_or_create(
+                name=election_type_request.title()
+            )
+
+            brgy_election, created_election = BarangayElectionResults.objects.get_or_create(
+                brgy=brgy,
+                election_year=election_year,
+                election_type=election_type
+            )
+            brgy_election.save()
+        elif 'add-brgy-remark-btn' in request.POST:
+            remark = request.POST.get('brgy-remarks')
+            print(remark)
+            brgy_remark, created = BarangayRemark.objects.get_or_create(
+                brgy=brgy,
+                remark=remark
+            )
+            brgy_remark.save()
+
+            http_referrer = request.META.get('HTTP_REFERER')
+
+            if http_referrer:
+                return HttpResponseRedirect(http_referrer)
+            else:
+                return redirect('homepage')
 
     return render(request, 'member_brgy.html', {
         'member_brgy': member_brgy,
@@ -146,6 +350,23 @@ def barangay_members(request, brgy_name):
         'brgy_sitio_sum': brgy_sitio_sum,
         'brgy_cluster': brgy_cluster,
         'logged_user': logged_user,
+        'brgy_figures': brgy_figures,
+        'brgy_election_results': brgy_election_results,
+        'election_dict': election_dict,
+        'zipped_vote_count_party_name': list(zipped_vote_count_party_name),
+        'years': years,
+        'party_votes': party_votes,
+        'barangay_official_ranks': barangay_official_ranks,
+        'barangay_official_rank_len': barangay_official_rank_len,
+        'barangay_school_head_ranks': barangay_school_head_ranks,
+        'barangay_school_head_len': barangay_school_head_len,
+        'barangay_election_type_len': barangay_election_type_len,
+        'barangay_election_type': barangay_election_type,
+        'barangay_contender_ranks': barangay_contender_ranks,
+        'barangay_contender_ranks_len': barangay_contender_ranks_len,
+        'barangay_official_party': barangay_official_party,
+        'barangay_official_party_len': barangay_official_party_len,
+        'barangay_remarks': barangay_remarks,
     })
 
 
@@ -162,12 +383,31 @@ def sitio_profile(request, id):
     sitio_individual_count = Individual.objects.filter(sitio=sitio).annotate(count=Count('name'))
     sitio_individual_sum = sitio_individual_count.aggregate(sum=Sum('count'))['sum']
 
+    sitio_remarks = SitioRemark.objects.filter(sitio=sitio)
+
     if request.method == 'POST':
-        form = ChangeSitioDetailsForm(request.POST, instance=sitio)
-        if form.is_valid():
-            sitio_edited = form.save(commit=False)
-            sitio_edited.save()
-            return redirect('sitio-profile', id=sitio.id)
+        if 'edit-sitio-details-btn' in request.POST:
+            form = ChangeSitioDetailsForm(request.POST, instance=sitio)
+            if form.is_valid():
+                sitio_edited = form.save(commit=False)
+                sitio_edited.save()
+                return redirect('sitio-profile', id=sitio.id)
+        elif 'add-sitio-remark-btn' in request.POST:
+            remark = request.POST.get('sitio-remark')
+
+            sitio_remark, created = SitioRemark.objects.get_or_create(
+                sitio=sitio,
+                remark=remark,
+            )
+            sitio_remark.save()
+
+            http_referrer = request.META.get('HTTP_REFERER')
+
+            if http_referrer:
+                return HttpResponseRedirect(http_referrer)
+            else:
+                return redirect('homepage')
+
     return render(request, 'sitio_profile.html', {
         'sitio_members': sitio_members,
         'sitio_leaders': sitio_leaders,
@@ -175,6 +415,7 @@ def sitio_profile(request, id):
         'edit_sitio_details_form': edit_sitio_details_form,
         'sitio_individual_sum': sitio_individual_sum,
         'logged_user': logged_user,
+        'sitio_remarks': sitio_remarks,
     })
 
 
@@ -1633,24 +1874,25 @@ def get_filtered_leaders(request):
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Admin'])
-def tag_leader_member(request, member_name, leader_name):
-    member = Member.objects.get(name=member_name)
-    leader = Leader.objects.get(name=leader_name)
+def tag_leader_member(request, member_id, leader_id):
+    if request.method == 'POST':
+        member = Individual.objects.get(id=member_id)
+        leader = Individual.objects.get(id=leader_id)
 
-    leader_cluster, created = Cluster.objects.get_or_create(leader=leader)
-    leader_cluster.members.add(member)
-    leader_cluster.save()
+        individual_leader, created = IndividualLeaderCluster.objects.get_or_create(individual=leader)
+        individual_leader.members.add(member)
+        individual_leader.save()
 
-    current_time = timezone.now()
-    # Format the current date and time as a string
-    formatted_time = current_time.strftime("%B %d, %Y")
-    activity_log = ActivityLog.objects.create(
-        title=f"{request.user} has associated {member.name} to Leader {leader.name}",
-        content=f"{request.user} has associated {member.name} to Leader {leader.name} on {formatted_time}",
-        date=timezone.now(),
-        date_time=timezone.now(),
-    )
-    activity_log.save()
+        current_time = timezone.now()
+        # Format the current date and time as a string
+        formatted_time = current_time.strftime("%B %d, %Y")
+        activity_log = ActivityLog.objects.create(
+            title=f"{request.user} has associated {member.name} to Leader {leader.name}",
+            content=f"{request.user} has associated {member.name} to Leader {leader.name} on {formatted_time}",
+            date=timezone.now(),
+            date_time=timezone.now(),
+        )
+        activity_log.save()
 
     referring_url = request.META.get('HTTP_REFERER')
 
@@ -3793,56 +4035,128 @@ def scanned_qr_data_mobile(request):
         return Response('Scanned data does not exist!')
 
 
-# @login_required(login_url='login')
-# @allowed_users(allowed_roles=['Admin'])
-# @csrf_exempt
-# def qr_code_scanner(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body.decode('utf-8'))
-#         scanned_data = data.get('scanned_data')
-#         # Process or store the scanned data as needed
-#
-#         # encrypted_username = signer.sign(user.username)  # 1st Encrypt the username
-#         # data = encrypted_username.encode('utf-8')  # 2 Convert encrypted_username to bytes
-#         # encrypted_data = cipher_suite.encrypt(data)  # Final
-#
-#         key = b'bSKEk2cT2V8vllCpMtQWsO2FxUVQdl3S_IHwBbEE4eQ='
-#         cipher_suite = Fernet(key)
-#         signing_key = b'Cold'
-#         signer = Signer(key=signing_key)
-#
-#         # encrypted_username = signer.sign(user.username)  # 1st Encrypt the username
-#         # data = encrypted_username.encode('utf-8')  # 2 Convert encrypted_username to bytes
-#         # encrypted_data = cipher_suite.encrypt(data)  # Final
-#
-#         plain_text = cipher_suite.decrypt(scanned_data)  # 1
-#         my_string = plain_text.decode('utf-8')  # 2
-#         decrypted_username = signer.unsign(my_string)  # 3
-#         print(decrypted_username)
-#         if Individual.objects.filter(user__username=decrypted_username).exists():
-#             individual_object = Individual.objects.get(user__username=decrypted_username)
-#
-#             attendance = QRCodeAttendance.objects.create(
-#                 user=decrypted_username,
-#                 name=individual_object.name,
-#                 brgy=individual_object.brgy.brgy_name,
-#                 sitio=individual_object.sitio.name,
-#                 group=individual_object.group,
-#                 date=timezone.now(),
-#                 date_time=timezone.now(),
-#             )
-#
-#             attendance.save()
-#             return JsonResponse({'status': 'success', 'message': f'Welcome, {decrypted_username}'})
-#         # return JsonResponse({decrypted_username: True})
-#
-#     return render(request, 'qr_code_attendance.html')
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['Admin'])
+@csrf_exempt
+def qr_code_scanner(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        scanned_data = data.get('scanned_data')
+        # Process or store the scanned data as needed
+
+        # encrypted_username = signer.sign(user.username)  # 1st Encrypt the username
+        # data = encrypted_username.encode('utf-8')  # 2 Convert encrypted_username to bytes
+        # encrypted_data = cipher_suite.encrypt(data)  # Final
+
+        key = b'bSKEk2cT2V8vllCpMtQWsO2FxUVQdl3S_IHwBbEE4eQ='
+        cipher_suite = Fernet(key)
+        signing_key = b'Cold'
+        signer = Signer(key=signing_key)
+
+        # encrypted_username = signer.sign(user.username)  # 1st Encrypt the username
+        # data = encrypted_username.encode('utf-8')  # 2 Convert encrypted_username to bytes
+        # encrypted_data = cipher_suite.encrypt(data)  # Final
+
+        plain_text = cipher_suite.decrypt(scanned_data)  # 1
+        my_string = plain_text.decode('utf-8')  # 2
+        decrypted_username = signer.unsign(my_string)  # 3
+        print(decrypted_username)
+        if Individual.objects.filter(user__username=decrypted_username).exists():
+            individual_object = Individual.objects.get(user__username=decrypted_username)
+
+            attendance = QRCodeAttendance.objects.create(
+                user=decrypted_username,
+                name=individual_object.name,
+                brgy=individual_object.brgy.brgy_name,
+                sitio=individual_object.sitio.name,
+                group=individual_object.group,
+                date=timezone.now(),
+                date_time=timezone.now(),
+            )
+
+            attendance.save()
+            return JsonResponse({'status': 'success', 'message': f'Welcome, {decrypted_username}'})
+        # return JsonResponse({decrypted_username: True})
+
+    return render(request, 'qr_code_attendance.html')
 
 
-def individual(request):
-    individuals = Individual.objects.all()
-    return render(request, 'individuals.html', {
-        'individuals': individuals
+def individual_view(request, individual_id):
+    individual = Individual.objects.get(id=individual_id)
+
+    # Create QR Code for each user
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=2,
+    )
+
+    key = b'bSKEk2cT2V8vllCpMtQWsO2FxUVQdl3S_IHwBbEE4eQ='
+    cipher_suite = Fernet(key)
+    signing_key = b'Cold'
+    signer = Signer(key=signing_key)
+
+    # Commented 2/20/2024 encrypted_username = signer.sign(member.name) # 1st Encrypt the username
+    encrypted_username = signer.sign(individual.id) # 1st Encrypt the username
+    data = encrypted_username.encode('utf-8') # 2 Convert encrypted_username to bytes
+    encrypted_data = cipher_suite.encrypt(data) # Final
+
+    qr.add_data(encrypted_data)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    img.save(f'management/static/images/qr-codes/QR-Code-{individual.name}-{individual.brgy}-{individual.id}.png')
+
+    individual_parents, created_parents = IndividualParents.objects.get_or_create(individual=individual)
+    individual_siblings, created_siblings = IndividualSiblings.objects.get_or_create(individual=individual)
+    individual_spouse, created_spouse = IndividualSpouse.objects.get_or_create(individual=individual)
+    individual_children, created_children = IndividualOffspring.objects.get_or_create(individual=individual)
+
+    individual_leader = Individual.objects.filter(is_leader=True, brgy=individual.brgy)
+
+    individual_members = None
+
+    affiliated_individual_members = []
+    affiliated_members = IndividualLeaderCluster.objects.all()
+    for members in affiliated_members:
+        for member in members.members.all():
+            affiliated_individual_members.append(member.id)
+
+    individual_associated_leader = IndividualLeaderCluster.objects.filter(members__id=individual.id)
+
+    if individual.is_leader:
+        individual_members, created_members = IndividualLeaderCluster.objects.get_or_create(
+            individual=individual
+        )
+
+    start_coords = (11.05780, 124.3835)  # Manila coordinates
+    if individual.lat is not None and individual.long is not None:
+        end_coords = (individual.lat, individual.long)
+    else:
+        end_coords = (11.0582, 124.3890)    # Quezon City coordinates
+
+    # Create a Folium map centered around the starting point
+    # m = folium.Map(location=start_coords, zoom_start=12)
+    m = folium.Map(location=[14.5995, 120.9842], zoom_start=11.5, tiles='CartoDB dark_matter')
+
+    # Add markers for the start and end points
+    folium.Marker(location=start_coords, popup="Start").add_to(m)
+    folium.Marker(location=end_coords, popup="End").add_to(m)
+
+    return render(request, 'individual_page.html', {
+        'individual': individual,
+        'individual_spouse': individual_spouse,
+        'individual_parents': individual_parents,
+        'individual_siblings': individual_siblings,
+        'individual_children': individual_children,
+        'individual_members': individual_members,
+        'individual_leader': individual_leader,
+        'affiliated_individual_members': affiliated_individual_members,
+        'individual_associated_leader': individual_associated_leader,
+        'start_coords': start_coords,
+        'end_coords': end_coords,
     })
 
 
@@ -3853,56 +4167,107 @@ def individual_input(request):
     individual_mothers = Individual.objects.filter(is_parent=True, is_father=False)
     individual_fathers = Individual.objects.filter(is_parent=True, is_father=True)
 
-    # requested values
-    individual_first_name = request.POST.get('individual-first-name')
-    individual_middle_name = request.POST.get('individual-middle-name')
-    individual_last_name = request.POST.get('individual-last-name')
-    individual_suffix = request.POST.get('individual-suffix')
-    individual_gender = request.POST.get('individual-gender')
-    individual_age = request.POST.get('individual-age')
-    individual_brgy = request.POST.get('individual-brgy')
-    individual_sitio = request.POST.get('individual-sitio-result-htmx')
-    individual_house_image = request.FILES.get('individual-house-photo')
-    individual_image = request.FILES.get('individual-photo')
-    individual_leader_bool = request.POST.get('individual-leader-status')
-    individual_religion = request.POST.get('individual-religion')
-    individual_contact_number = request.POST.get('individual-number')
-    individual_latitude = request.POST.get('individual-latitude')
-    individual_longitude = request.POST.get('individual-longitude')
-    individual_oot_status = request.POST.get('individual-oot')
-    individual_swing_voter_status = request.POST.get('individual-swing-voter')
-    individual_occupation = request.POST.get('individual-occupation')
-    individual_deceased_status = request.POST.get('individual-deceased-status')
-    individual_ok_ok = request.POST.get('individual-cockroach')
-    individual_mother = request.POST.get('individual-mother')
-    individual_father = request.POST.get('individual-father')
-    individual_siblings = request.POST.get('individual-siblings')
-    individual_spouse = request.POST.get('individual-spouse')
-    individual_children = request.POST.get('individual-children')
-    individual_parent_status = request.POST.get('individual-parent-status')
+    # requested value
 
     if request.method == 'POST':
+        individual_first_name = request.POST.get('individual-first-name')
+        individual_middle_name = request.POST.get('individual-middle-name')
+        individual_last_name = request.POST.get('individual-last-name')
+        individual_suffix = request.POST.get('individual-suffix')
+        individual_gender = request.POST.get('individual-gender')
+        # individual_age = request.POST.get('individual-age')
+        individual_brgy = request.POST.get('individual-brgy')
+        individual_sitio = request.POST.get('individual-sitio-result-htmx')
+        individual_house_image = request.FILES.get('individual-house-photo')
+        individual_image = request.FILES.get('individual-photo')
+        individual_religion = request.POST.get('individual-religion')
+        individual_contact_number = request.POST.get('individual-number')
+        individual_latitude = request.POST.get('individual-latitude')
+        individual_longitude = request.POST.get('individual-longitude')
+        individual_occupation = request.POST.get('individual-occupation')
+        individual_oot_status = request.POST.get('individual-oot')
+        individual_swing_voter_status = request.POST.get('individual-swing-voter')
+        individual_leader_bool = request.POST.get('individual-leader-status')
+        # individual_deceased_status = request.POST.get('individual-deceased-status')
+        individual_ok_ok = request.POST.get('individual-cockroach')
+        individual_birthday_str = request.POST.get('individual-birthday')
 
+        # individual_birthday = datetime.strptime(individual_birthday_str, '%Y-%m-%d').date()
+        individual_birthday = datetime.strptime(individual_birthday_str, '%Y-%m-%d').date()
         selected_gender = Gender.objects.get(id=individual_gender)
         selected_brgy = Barangay.objects.get(id=individual_brgy)
 
-        if individual_sitio != "":
+        if individual_sitio is not None:
             selected_sitio = Sitio.objects.get(id=individual_sitio)
         else:
             selected_sitio = None
 
-        Individual.objects.create(
+        religion, created = Religion.objects.get_or_create(
+            name=individual_religion
+        )
+        religion.save()
+
+        occupation, created = Occupation.objects.get_or_create(
+            name=individual_occupation
+        )
+        occupation.save()
+
+        if selected_gender.gender == 'Male':
+            father = True
+        else:
+            father = False
+
+        if individual_latitude == "":
+            latitude = None
+        else:
+            latitude = float(individual_latitude)
+
+        if individual_longitude == "":
+            longitude = None
+        else:
+            longitude = float(individual_longitude)
+
+        age = int((timezone.now().date() - individual_birthday).days / 365.25)
+
+        individual, created = Individual.objects.get_or_create(
             name=individual_first_name,
             middle_name=individual_middle_name,
             last_name=individual_last_name,
             suffix=individual_suffix,
             gender=selected_gender,
-            age=individual_age,
+            age=age,
             brgy=selected_brgy,
             sitio=selected_sitio,
             group='Members',
-
+            image=individual_image,
+            house_image=individual_house_image,
+            religion=religion,
+            occupation=occupation,
+            mobile=individual_contact_number,
+            lat=latitude,
+            long=longitude,
+            is_father=father,
+            birthday=individual_birthday,
+            is_oot=individual_oot_status,
+            is_swing_voter=individual_swing_voter_status,
+            is_leader=individual_leader_bool,
+            is_cockroach=individual_ok_ok,
         )
+
+        IndividualSpouse.objects.get_or_create(
+            individual=individual
+        )
+        IndividualParents.objects.get_or_create(
+            individual=individual
+        )
+        IndividualSiblings.objects.get_or_create(
+            individual=individual
+        )
+        IndividualOffspring.objects.get_or_create(
+            individual=individual
+        )
+
+        return redirect('individual-family-conf', individual_id=individual.id)
 
     return render(request, 'individual_input.html', {
         'genders': genders,
@@ -3913,6 +4278,49 @@ def individual_input(request):
     })
 
 
+def individual_family_input(request, individual_id):
+    individual = Individual.objects.get(id=individual_id)
+    barangays = Barangay.objects.all()
+    genders = Gender.objects.all()
+
+    form_header = [
+        'father',
+        'mother',
+        'sibling',
+        'spouse',
+        'child',
+        'member'
+    ]
+
+    individual_parents, parent_created = IndividualParents.objects.get_or_create(individual=individual)
+    individual_siblings, sibling_created = IndividualSiblings.objects.get_or_create(individual=individual)
+    individual_children, child_created = IndividualOffspring.objects.get_or_create(individual=individual)
+    individual_spouse, spouse_created = IndividualSpouse.objects.get_or_create(individual=individual)
+
+    father_exists = IndividualParents.objects.filter(
+        individual=individual,
+        parents__is_father=True,
+        parents__is_parent=True).exists()
+    mother_exists = IndividualParents.objects.filter(
+        individual=individual,
+        parents__is_parent=True,
+        parents__is_father=False).exists()
+
+    return render(request, 'individual_family_conf.html', {
+        'individual': individual,
+        'barangays': barangays,
+        'genders': genders,
+        'individual_parents': individual_parents,
+        'individual_siblings': individual_siblings,
+        'individual_children': individual_children,
+        'individual_spouse': individual_spouse,
+        'father_exists': father_exists,
+        'mother_exists': mother_exists,
+        'form_header': form_header,
+    })
+
+
+# For individual & mother
 def htmx_sitio_options(request):
     selected_brgy = request.POST.get('individual-brgy')
     sitios = Sitio.objects.filter(brgy__id=selected_brgy)
@@ -3921,3 +4329,1145 @@ def htmx_sitio_options(request):
         'sitios': sitios,
     })
 
+
+def htmx_sitio_options_one_ring(request):
+
+    form_header = [
+        'father',
+        'mother',
+        'sibling',
+        'spouse',
+        'child',
+        'member'
+    ]
+
+    selected_brgy = request.POST.get('individual-brgy')
+    sitios = Sitio.objects.filter(brgy__id=selected_brgy)
+
+    return render(request, 'sitio_results_htmx_one_ring.html', {
+        'sitios': sitios,
+        'form_header': form_header,
+    })
+
+
+def one_ring(request, individual_id):
+    individual = Individual.objects.get(id=individual_id)
+
+    if request.method == 'POST':
+        individual_form_header = request.POST.get('individual-form-header')
+        individual_first_name = request.POST.get('individual-first-name')
+        individual_middle_name = request.POST.get('individual-middle-name')
+        individual_last_name = request.POST.get('individual-last-name')
+        individual_suffix = request.POST.get('individual-suffix')
+        individual_gender = request.POST.get('individual-gender')
+        individual_brgy = request.POST.get('individual-brgy')
+        individual_sitio = request.POST.get('individual-sitio-result-htmx')
+        individual_house_image = request.FILES.get('individual-house-photo')
+        individual_image = request.FILES.get('individual-photo')
+        individual_religion = request.POST.get('individual-religion')
+        individual_contact_number = request.POST.get('individual-number')
+        individual_latitude = request.POST.get('individual-latitude')
+        individual_longitude = request.POST.get('individual-longitude')
+        individual_occupation = request.POST.get('individual-occupation')
+        individual_leader_bool = request.POST.get('individual-leader-status')
+        individual_oot_status = request.POST.get('individual-oot')
+        individual_swing_voter_status = request.POST.get('individual-swing-voter')
+        individual_ok_ok = request.POST.get('individual-cockroach')
+        individual_birthday_str = request.POST.get('individual-birthday')
+
+        individual_birthday = datetime.strptime(individual_birthday_str, '%Y-%m-%d').date()
+
+        if individual_latitude == '':
+            individual_latitude = None
+
+        if individual_longitude == '':
+            individual_longitude = None
+
+        if individual_form_header == 'father':
+            gender = Gender.objects.get(gender='Male')
+        elif individual_form_header == 'mother':
+            gender = Gender.objects.get(gender='Female')
+        else:
+            gender = Gender.objects.get(id=individual_gender)
+
+        age = int((timezone.now().date() - individual_birthday).days / 365.25)
+        # print(age)
+        if individual_brgy != '' or individual_brgy is not None:
+            brgy = Barangay.objects.get(id=individual_brgy)
+        else:
+            brgy = None
+
+        if individual_sitio != '' or individual_sitio is not None:
+            sitio = Sitio.objects.get(id=individual_sitio)
+        else:
+            sitio = None
+
+        religion, created = Religion.objects.get_or_create(
+            name=individual_religion
+        )
+
+        occupation, created = Occupation.objects.get_or_create(
+            name=individual_occupation
+        )
+
+        individual_created, created = Individual.objects.get_or_create(
+            name=individual_first_name,
+            middle_name=individual_middle_name,
+            last_name=individual_last_name,
+            suffix=individual_suffix,
+            gender=gender,
+            age=age,
+            brgy=brgy,
+            sitio=sitio,
+            image=individual_image,
+            house_image=individual_house_image,
+            religion=religion,
+            occupation=occupation,
+            mobile=individual_contact_number,
+            lat=individual_latitude,
+            long=individual_longitude,
+            birthday=individual_birthday,
+            is_leader=individual_leader_bool,
+            is_oot=individual_oot_status,
+            is_swing_voter=individual_swing_voter_status,
+            is_cockroach=individual_ok_ok,
+        )
+
+        if individual_form_header == 'father':
+
+            individual_created.is_parent = True
+            individual_created.is_father = True
+            individual_created.save()
+
+            individual_parent_segment, created = IndividualParents.objects.get_or_create(
+                individual=individual
+            )
+            individual_parent_segment.parents.add(individual_created)
+            individual_parent_segment.save()
+
+            individual_father_created, father_created = IndividualOffspring.objects.get_or_create(
+                individual=individual_created
+            )
+
+            individual_father_created.children.add(individual)
+            individual_father_created.save()
+
+            # Checks if mother exists
+            if IndividualParents.objects.filter(individual=individual, parents__is_father=False,
+                                                parents__is_parent=True).exists():
+
+                individual_created_father_spouse, father_created_spouse = IndividualSpouse.objects.get_or_create(
+                    individual=individual_created,
+                )
+
+                derived_mother = IndividualParents.objects.get(
+                    individual=individual,
+                    parents__is_father=False,
+                    parents__is_parent=True
+                )
+
+                for mother in derived_mother.parents.all():
+                    if mother.is_parent and not mother.is_father:
+                        individual_created_father_spouse.spouse = mother
+                        individual_created_father_spouse.save()
+
+                        mother_spouse, mother_created_spouse = IndividualSpouse.objects.get_or_create(
+                            individual=mother
+                        )
+                        mother_spouse.spouse = individual_created
+                        mother_spouse.save()
+
+        elif individual_form_header == 'mother':
+            individual_created.is_parent = True
+            individual_created.is_father = False
+            individual_created.save()
+
+            individual_parent_segment, created = IndividualParents.objects.get_or_create(
+                individual=individual
+            )
+            individual_parent_segment.parents.add(individual_created)
+            individual_parent_segment.save()
+
+            # Check if father Exists
+            if IndividualParents.objects.filter(individual=individual, parents__is_father=True,
+                                                parents__is_parent=True).exists():
+                individual_created_mother_spouse, mother_created_spouse = IndividualSpouse.objects.get_or_create(
+                    individual=individual_created,
+                )
+
+                derived_father = IndividualParents.objects.get(
+                    individual=individual,
+                    parents__is_father=True,
+                    parents__is_parent=True
+                )
+
+                for father in derived_father.parents.all():
+                    if father.is_parent and father.is_father:
+                        individual_created_mother_spouse.spouse = father
+                        individual_created_mother_spouse.save()
+
+                        father_spouse, father_created_spouse = IndividualSpouse.objects.get_or_create(
+                            individual=father
+                        )
+                        father_spouse.spouse = individual_created
+                        father_spouse.save()
+
+            individual_mother_created, mother_created = IndividualOffspring.objects.get_or_create(
+                individual=individual_created
+            )
+            individual_mother_created.children.add(individual)
+            individual_mother_created.save()
+
+        elif individual_form_header == 'sibling':
+
+            individual_sibling_segment, individual_sibling_created = IndividualSiblings.objects.get_or_create(
+                individual=individual
+            )
+            individual_sibling_segment.siblings.add(individual_created)
+            individual_sibling_segment.save()
+
+            individual_sibling_created_segment, individual_created_sibling_created = IndividualSiblings.objects.get_or_create(
+                individual=individual_created
+            )
+            individual_sibling_created_segment.siblings.add(individual)
+
+            for sibling in individual_sibling_segment.siblings.all():
+                sibling_s_sibling = IndividualSiblings.objects.get(individual=sibling)
+                if individual_created.id != sibling.id:
+                    individual_sibling_created_segment.siblings.add(sibling)
+                    individual_sibling_created_segment.save()
+
+                    sibling_s_sibling.siblings.add(individual_created)
+                    sibling_s_sibling.save()
+
+            if IndividualParents.objects.filter(individual=individual, parents__isnull=False).exists():
+                individual_parents = IndividualParents.objects.get(
+                    individual=individual
+                )
+
+                individual_created_parents, created_parents = IndividualParents.objects.get_or_create(
+                    individual=individual_created
+                )
+
+                for parent in individual_parents.parents.all():
+                    individual_created_parents.parents.add(parent)
+                    individual_created_parents.save()
+
+                    parent_offsprings, created_offspring = IndividualOffspring.objects.get_or_create(
+                        individual=parent,
+                    )
+                    parent_offsprings.children.add(individual_created)
+                    parent_offsprings.save()
+
+        elif individual_form_header == 'spouse':
+            individual_spouse_segment, spouse_created = IndividualSpouse.objects.get_or_create(
+                individual=individual
+            )
+            individual_spouse_segment.spouse = individual_created
+            individual_spouse_segment.save()
+
+            individual_spouse_created_segment, individual_created_spouse = IndividualSpouse.objects.get_or_create(
+                individual=individual_created
+            )
+            individual_spouse_created_segment.spouse = individual
+            individual_spouse_created_segment.save()
+
+        elif individual_form_header == 'child':
+            # Associates the child to the Individual object relative to the page as a child from the
+            # page it has been created
+            individual_children_segment, created_child = IndividualOffspring.objects.get_or_create(
+                individual=individual
+            )
+            individual_children_segment.children.add(individual_created)
+            individual_children_segment.save()
+
+            # Creates a Parent object to individual created in this case associates the created child to the
+            # relative Individual Object
+            individual_created_child_parent_segment, created_parent = IndividualParents.objects.get_or_create(
+                individual=individual_created
+            )
+            individual_created_child_parent_segment.parents.add(individual)
+
+            if individual.gender.gender == 'Male':
+                individual.is_parent = True
+                individual.is_father = True
+                individual.save()
+            else:
+                individual.is_parent = True
+                individual.is_father = False
+                individual.save()
+
+            # Associates the relative Individual object's spouse as a parent to the Child Individual object created
+            if IndividualSpouse.objects.filter(individual=individual, spouse__isnull=False).exists():
+
+                individual_spouse, created_spouse = IndividualSpouse.objects.get_or_create(
+                    individual=individual,
+                )
+
+                if individual_spouse.spouse.gender == 'Female':
+                    individual_spouse.spouse.is_parent = True
+                    individual_spouse.spouse.is_father = False
+                    individual_spouse.save()
+                else:
+                    individual_spouse.spouse.is_parent = True
+                    individual_spouse.spouse.is_father = True
+                    individual_spouse.save()
+
+                individual_created_child_parent_segment.parents.add(individual_spouse.spouse)
+                individual_created_child_parent_segment.save()
+
+                individual_spouse_child, individual_spouse_created = IndividualOffspring.objects.get_or_create(
+                    individual=individual_spouse.spouse,
+                )
+                individual_spouse_child.children.add(individual_created)
+                individual_spouse_child.save()
+
+            for child in individual_children_segment.children.all():
+                derived_child_sibling_segment, created_child_seg = IndividualSiblings.objects.get_or_create(
+                    individual=child
+                )
+                for child_sibling in individual_children_segment.children.all():
+                    if child.id != child_sibling.id:
+                        derived_child_sibling_segment.siblings.add(child_sibling)
+                        derived_child_sibling_segment.save()
+
+        elif individual_form_header == 'member':
+            individual_leader_members_segment, \
+                individual_leader_created, created = IndividualLeaderCluster.objects.get_or_create(
+            )
+            individual_leader_members_segment.members.add(individual_created)
+            individual_leader_members_segment.save()
+
+    http_referrer = request.META.get('HTTP_REFERER')
+    if http_referrer:
+        return HttpResponseRedirect(http_referrer)
+    else:
+        return redirect('homepage')
+
+
+def individual_add_family(request):
+    headers = [
+        'father',
+        'mother',
+        'sibling',
+        'spouse',
+        'child',
+        'member'
+    ]
+
+    if request.method == 'POST':
+        form_header = request.POST.get('family-form-header')
+    return render(request, 'individual_family_conf_singular.html', {
+        'headers': headers,
+    })
+
+
+def election_results_func(request):
+    congressional_election_type, created_congressional = ElectionType.objects.get_or_create(
+        name='Congressional Election'
+    )
+
+    board_member_election_type, created_board_member_type = ElectionType.objects.get_or_create(
+        name='Board Member Election'
+    )
+
+    mayoral_election_type, created_mayoral_type = ElectionType.objects.get_or_create(
+        name='Mayoral Election'
+    )
+
+    congress_election_results = ElectionResults.objects.filter(election_type=congressional_election_type)
+    board_member_election_results = ElectionResults.objects.filter(election_type=board_member_election_type)
+    mayoral_election_results = ElectionResults.objects.filter(election_type=mayoral_election_type)
+
+    congressional_ranks = []
+    congressional_parties = []
+    congressional_election_dict = {}
+    for election in congress_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+        if year not in congressional_election_dict:
+            congressional_election_dict[year] = {}
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in congressional_ranks:
+                congressional_ranks.append(contender.rank)
+            if party not in congressional_election_dict[year]:
+                congressional_election_dict[year][party] = []
+                congressional_parties.append(party)
+            congressional_election_dict[year][party].append(contender)
+
+    congressional_ranks_len = len(congressional_ranks)
+    congressional_parties_len = len(congressional_parties)
+
+    congressional_contender_election_data = {}
+    for election_type, parties in congressional_election_dict.items():
+        for party, contenders in parties.items():
+            # Calculate the average vote count for this party
+            avg_vote_count = sum(contender.vote_count for contender in contenders) / len(contenders)
+            if election_type not in congressional_contender_election_data:
+                congressional_contender_election_data[election_type] = [(party, avg_vote_count)]
+            else:
+                congressional_contender_election_data[election_type].append((party, avg_vote_count))
+
+    board_member_ranks = []
+    board_member_parties = []
+    board_member_election_result_dict = {}
+    for election in board_member_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in board_member_election_result_dict:
+            board_member_election_result_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in board_member_ranks:
+                board_member_ranks.append(contender.rank)
+            if party not in board_member_election_result_dict[year]:
+                board_member_election_result_dict[year][party] = []
+                board_member_parties.append(party)
+            board_member_election_result_dict[year][party].append(contender)
+
+    board_member_ranks_len = len(board_member_ranks)
+    board_member_parties_len = len(board_member_parties)
+
+    board_member_contender_election_data = {}
+    for election_type, parties in board_member_election_result_dict.items():
+        for party, contenders in parties.items():
+            # Calculate the average vote count for this party
+            avg_vote_count = sum(contender.vote_count for contender in contenders) / len(contenders)
+            if election_type not in board_member_contender_election_data:
+                board_member_contender_election_data[election_type] = [(party, avg_vote_count)]
+            else:
+                board_member_contender_election_data[election_type].append((party, avg_vote_count))
+
+    mayoral_ranks = []
+    mayoral_parties = []
+    mayoral_election_dict = {}
+    for election in mayoral_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in mayoral_election_dict:
+            mayoral_election_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in mayoral_ranks:
+                mayoral_ranks.append(contender.rank)
+            if party not in mayoral_election_dict[year]:
+                mayoral_election_dict[year][party] = []
+                mayoral_parties.append(party)
+            mayoral_election_dict[year][party].append(contender)
+
+    mayoral_ranks_len = len(mayoral_ranks)
+    mayoral_parties_len = len(mayoral_parties)
+
+    mayoral_contender_election_data = {}
+    for election_type, parties in mayoral_election_dict.items():
+        for party, contenders in parties.items():
+            # Calculate the average vote count for this party
+            avg_vote_count = sum(contender.vote_count for contender in contenders) / len(contenders)
+            if election_type not in mayoral_contender_election_data:
+                mayoral_contender_election_data[election_type] = [(party, avg_vote_count)]
+            else:
+                mayoral_contender_election_data[election_type].append((party, avg_vote_count))
+
+    if request.method == 'POST':
+        if 'create-congress-election-btn' in request.POST:
+            congress_election_date_str = request.POST.get('congress-election-date')
+            congress_election_date = datetime.strptime(congress_election_date_str, '%Y-%m-%d')
+
+            congress_election_result, created_congress_election = ElectionResults.objects.get_or_create(
+                election_type=congressional_election_type,
+                election_year=congress_election_date,
+            )
+
+        elif 'congressional-election-type-btn' in request.POST:
+            congress_contender_name = request.POST.get('congress-contender-name')
+            congress_contender_rank = request.POST.get('congress-contender-rank')
+            congress_contender_votes = request.POST.get('congress-contender-votes')
+            congress_contender_party = request.POST.get('congress-contender-party')
+            congress_contender_election_instance = request.POST.get('congress-election-year')
+
+            congress_election_contender, created_contender = ElectionContender.objects.get_or_create(
+                name=congress_contender_name,
+                rank=congress_contender_rank,
+                vote_count=congress_contender_votes,
+                party=congress_contender_party
+            )
+
+            congress_election = ElectionResults.objects.get(election_year__year=congress_contender_election_instance)
+            congress_election.contenders.add(congress_election_contender)
+            congress_election.save()
+
+        elif 'create-board-election-type-btn' in request.POST:
+            board_member_election_date_str = request.POST.get('create-board-member-election-result')
+            board_member_election_year = datetime.strptime(board_member_election_date_str, '%Y-%m-%d')
+
+            board_election_year, board_election_created = ElectionResults.objects.get_or_create(
+                election_type=board_member_election_type,
+                election_year=board_member_election_year
+            )
+
+        elif 'add-board-member-contender-btn' in request.POST:
+            board_member_name = request.POST.get('board-member-contender-name')
+            board_member_rank = request.POST.get('board-member-contender-rank')
+            board_member_votes = request.POST.get('board-member-contender-votes')
+            board_member_party = request.POST.get('board-member-type-party')
+            board_member_election_instance = request.POST.get('board-member-election-instance')
+
+            board_member_contender, contender_created = ElectionContender.objects.get_or_create(
+                name=board_member_name,
+                rank=board_member_rank,
+                vote_count=board_member_votes,
+                party=board_member_party,
+            )
+
+            board_member_election = ElectionResults.objects.get(
+                election_year__year=board_member_election_instance
+            )
+
+            board_member_election.contenders.add(board_member_contender)
+            board_member_election.save()
+
+        elif 'create-mayoral-election-btn' in request.POST:
+            mayoral_election_date_str = request.POST.get('create-mayoral-election-instance')
+            mayoral_election_date = datetime.strptime(mayoral_election_date_str, '%Y-%m-%d')
+
+            mayoral_election_instance, created_instance = ElectionResults.objects.get_or_create(
+                election_type=mayoral_election_type,
+                election_year=mayoral_election_date
+            )
+
+        elif 'create-mayoral-contender-btn' in request.POST:
+            mayoral_contender_name = request.POST.get('mayoral-contender-name')
+            mayoral_contender_rank = request.POST.get('mayoral-contender-rank')
+            mayoral_contender_votes = request.POST.get('mayoral-contender-votes')
+            mayoral_contender_party = request.POST.get('mayoral-contender-party')
+            mayoral_contender_instance = request.POST.get('mayoral-contender-election-instance')
+
+            mayoral_contender, created_contender = ElectionContender.objects.get_or_create(
+                name=mayoral_contender_name,
+                rank=mayoral_contender_rank,
+                vote_count=mayoral_contender_votes,
+                party=mayoral_contender_party
+            )
+
+            mayoral_election_instance = ElectionResults.objects.get(
+                election_year__year=mayoral_contender_instance
+            )
+            mayoral_election_instance.contenders.add(mayoral_contender)
+            mayoral_election_instance.save()
+
+    return render(request, 'election_results.html', {
+        'congress_election_results': congress_election_results,
+        'board_member_election_results': board_member_election_results,
+        'mayoral_election_results': mayoral_election_results,
+        'mayoral_election_type': mayoral_election_type,
+        'mayoral_election_dict': mayoral_election_dict,
+        'congressional_election_dict': congressional_election_dict,
+        'board_member_election_result_dict': board_member_election_result_dict,
+        'congressional_contender_election_data': congressional_contender_election_data,
+        'board_member_contender_election_data': board_member_contender_election_data,
+        'mayoral_contender_election_data': mayoral_contender_election_data,
+
+        'congressional_ranks': congressional_ranks,
+        'congressional_parties': congressional_parties,
+        'congressional_ranks_len': congressional_ranks_len,
+        'congressional_parties_len': congressional_parties_len,
+
+        'board_member_ranks': board_member_ranks,
+        'board_member_parties': board_member_parties,
+        'board_member_ranks_len': board_member_ranks_len,
+        'board_member_parties_len': board_member_parties_len,
+
+        'mayoral_ranks': mayoral_ranks,
+        'mayoral_parties': mayoral_parties,
+        'mayoral_ranks_len': mayoral_ranks_len,
+        'mayoral_parties_len': mayoral_parties_len,
+    })
+
+
+def encode_church(request):
+    brgys = Barangay.objects.all()
+    if request.method == 'POST':
+        church_brgy = request.POST.get('individual-brgy')
+        church_lat = request.POST.get('church-lat')
+        church_long = request.POST.get('church-long')
+        church_sitio = request.POST.get('individual-sitio-result-htmx')
+
+        if church_lat == '':
+            church_lat = 0
+
+        if church_long == '':
+            church_long = 0
+
+        brgy = Barangay.objects.get(id=church_brgy)
+        if church_sitio == '' or church_sitio is None:
+            sitio = None
+        else:
+            sitio = Sitio.objects.get(id=church_sitio)
+
+        church, created = Church.objects.get_or_create(
+            brgy=brgy,
+            sitio=sitio,
+            lat=church_lat,
+            long=church_long,
+        )
+        church.save()
+
+        http_referrer = request.META.get('HTTP_REFERER')
+
+        if http_referrer:
+            return HttpResponseRedirect(http_referrer)
+        else:
+            return redirect('homepage')
+
+    churches = Church.objects.filter(lat__isnull=False, long__isnull=False)
+
+    if churches.exists():
+        center_lat = churches.aggregate(models.Avg('lat'))['lat__avg']
+        center_long = churches.aggregate(models.Avg('long'))['long__avg']
+        folium_map = folium.Map(location=[center_lat, center_long], zoom_start=11.5, tiles='CartoDB dark_matter')
+
+        for church in churches:
+
+            folium.Marker(
+                location=[church.lat, church.long],
+            ).add_to(folium_map)
+
+        map_html = folium_map._repr_html_()
+    else:
+        map_html = None
+
+    return render(request, 'church_input.html', {
+        'churches': churches,
+        'map_html': map_html,
+        'brgys': brgys,
+    })
+
+
+def brgy_profile_htmx_trigger_party_input(request):
+    return render(request, 'htmx-templates/party_input.html', {
+    })
+
+
+def trigger_select_contender_party(request):
+    barangay_official_party = []
+    for contender in BarangayElectionContender.objects.all():
+        if contender.party not in barangay_official_party:
+            barangay_official_party.append(contender.party)
+
+    barangay_official_party_len = len(barangay_official_party)
+
+    return render(request, 'htmx-templates/trigger_select_input_party_contender.html', {
+        'barangay_official_party': barangay_official_party,
+        'barangay_official_party_len': barangay_official_party_len,
+    })
+
+
+def captain_rank_manual_input(request):
+    return render(request, "htmx-templates/captain_input.html")
+
+
+def brgy_captain_existing_ranks(request):
+    barangay_contender_ranks = []
+    for contender in BarangayElectionContender.objects.all():
+        if contender.rank not in barangay_contender_ranks:
+            barangay_contender_ranks.append(contender.rank)
+
+    barangay_contender_ranks_len = len(barangay_contender_ranks)
+    return render(request, 'htmx-templates/captain_existing_ranks.html', {
+        'barangay_contender_ranks': barangay_contender_ranks,
+        'barangay_contender_ranks_len': barangay_contender_ranks_len,
+    })
+
+
+def election_type_input_trigger(request):
+    return render(request, 'htmx-templates/election_type_input.html')
+
+
+def election_existing_type_trigger(request):
+    barangay_election_type = ElectionType.objects.all()
+    barangay_election_type_len = len(barangay_election_type)
+
+    return render(request, 'htmx-templates/election_existing_types.html', {
+        'barangay_election_type': barangay_election_type,
+        'barangay_election_type_len': barangay_election_type_len,
+    })
+
+
+def brgy_official_rank_input_trigger(request):
+    return render(request, 'htmx-templates/brgy_official_input.html')
+
+
+def brgy_official_existing_rank(request):
+    barangay_official_ranks = []
+    for official in BrgyOfficial.objects.all():
+        if official.rank not in barangay_official_ranks:
+            barangay_official_ranks.append(official.rank)
+
+    barangay_official_rank_len = len(barangay_official_ranks)
+
+    return render(request, 'htmx-templates/brgy_official_existing_ranks.html', {
+        'barangay_official_ranks': barangay_official_ranks,
+        'barangay_official_rank_len': barangay_official_rank_len,
+    })
+
+
+def school_heads_input_trigger(request):
+    return render(request, 'htmx-templates/brgy_school_head_rank_input.html')
+
+
+def school_head_existing_rank(request):
+    barangay_school_head_ranks = []
+    for school_head in BrgySchoolHead.objects.all():
+        if school_head.rank not in barangay_school_head_ranks:
+            barangay_school_head_ranks.append(school_head.rank)
+
+    barangay_school_head_len = len(barangay_school_head_ranks)
+    return render(request, 'htmx-templates/brgy_existing_school_head_rank.html', {
+        'barangay_school_head_ranks': barangay_school_head_ranks,
+        'barangay_school_head_len': barangay_school_head_len,
+    })
+
+    # barangay_official_party = []
+    # for contender in BarangayElectionContender.objects.all():
+    #     if contender.party not in barangay_official_party:
+    #         barangay_official_party.append(contender.party)
+    #
+    # barangay_official_party_len = len(barangay_official_party)
+
+    # barangay_election_type = ElectionType.objects.all()
+    # barangay_election_type_len = len(barangay_election_type)
+    #
+    # barangay_contender_ranks = []
+    # for contender in BarangayElectionContender.objects.all():
+    #     if contender.rank not in barangay_contender_ranks:
+    #         barangay_contender_ranks.append(contender.rank)
+    #
+    # barangay_contender_ranks_len = len(barangay_contender_ranks)
+
+
+    # board_member_election_type, created_board_member_type = ElectionType.objects.get_or_create(
+    #     name='Board Member Election'
+    # )
+    #
+    # mayoral_election_type, created_mayoral_type = ElectionType.objects.get_or_create(
+    #     name='Mayoral Election'
+    # )
+
+    # board_member_election_results = ElectionResults.objects.filter(election_type=board_member_election_type)
+    # mayoral_election_results = ElectionResults.objects.filter(election_type=mayoral_election_type)
+
+#     board_member_ranks = []
+#     board_member_parties = []
+#     board_member_election_result_dict = {}
+#     for election in board_member_election_results:
+#         election_date = election.election_year
+#         year = datetime.strftime(election_date, '%Y')
+#
+#         if year not in board_member_election_result_dict:
+#             board_member_election_result_dict[year] = {}
+#
+#         for contender in election.contenders.all():
+#             party = contender.party
+#             if contender.rank not in board_member_ranks:
+#                 board_member_ranks.append(contender.rank)
+#             if party not in board_member_election_result_dict[year]:
+#                 board_member_election_result_dict[year][party] = []
+#                 board_member_parties.append(party)
+#             board_member_election_result_dict[year][party].append(contender)
+#
+#     board_member_ranks_len = len(board_member_ranks)
+#     board_member_parties_len = len(board_member_parties)
+#     mayoral_ranks = []
+#     mayoral_parties = []
+#     mayoral_election_dict = {}
+#     for election in mayoral_election_results:
+#         election_date = election.election_year
+#         year = datetime.strftime(election_date, '%Y')
+#
+#         if year not in mayoral_election_dict:
+#             mayoral_election_dict[year] = {}
+#
+#         for contender in election.contenders.all():
+#             party = contender.party
+#             if contender.rank not in mayoral_ranks:
+#                 mayoral_ranks.append(contender.rank)
+#             if party not in mayoral_election_dict[year]:
+#                 mayoral_election_dict[year][party] = []
+#                 mayoral_parties.append(party)
+#             mayoral_election_dict[year][party].append(contender)
+#
+#     mayoral_ranks_len = len(mayoral_ranks)
+#     mayoral_parties_len = len(mayoral_parties)
+
+
+def congressional_add_new_rank_trigger(request):
+    congressional_election_type, created_congressional = ElectionType.objects.get_or_create(
+        name='Congressional Election'
+    )
+
+    congress_election_results = ElectionResults.objects.filter(election_type=congressional_election_type)
+
+    congressional_ranks = []
+    congressional_parties = []
+    congressional_election_dict = {}
+    for election in congress_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+        if year not in congressional_election_dict:
+            congressional_election_dict[year] = {}
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in congressional_ranks:
+                congressional_ranks.append(contender.rank)
+            if party not in congressional_election_dict[year]:
+                congressional_election_dict[year][party] = []
+                congressional_parties.append(party)
+            congressional_election_dict[year][party].append(contender)
+
+    congressional_ranks_len = len(congressional_ranks)
+    congressional_parties_len = len(congressional_parties)
+
+    return render(request, 'htmx-templates/congressional_rank_input.html', {
+        'congressional_election_dict': congressional_election_dict,
+    })
+
+
+def congress_select_existing_rank(request):
+    congressional_election_type, created_congressional = ElectionType.objects.get_or_create(
+        name='Congressional Election'
+    )
+
+    congress_election_results = ElectionResults.objects.filter(election_type=congressional_election_type)
+
+    congressional_ranks = []
+    congressional_parties = []
+    congressional_election_dict = {}
+    for election in congress_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+        if year not in congressional_election_dict:
+            congressional_election_dict[year] = {}
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in congressional_ranks:
+                congressional_ranks.append(contender.rank)
+            if party not in congressional_election_dict[year]:
+                congressional_election_dict[year][party] = []
+                congressional_parties.append(party)
+            congressional_election_dict[year][party].append(contender)
+
+    return render(request, 'htmx-templates/congress-select-existing-rank.html', {
+        'congressional_ranks': congressional_ranks,
+        'congressional_parties': congressional_parties,
+        'congressional_election_dict': congressional_election_dict,
+    })
+
+
+def congress_party_input(request):
+    congressional_election_type, created_congressional = ElectionType.objects.get_or_create(
+        name='Congressional Election'
+    )
+
+    congress_election_results = ElectionResults.objects.filter(election_type=congressional_election_type)
+
+    congressional_ranks = []
+    congressional_parties = []
+    congressional_election_dict = {}
+    for election in congress_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+        if year not in congressional_election_dict:
+            congressional_election_dict[year] = {}
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in congressional_ranks:
+                congressional_ranks.append(contender.rank)
+            if party not in congressional_election_dict[year]:
+                congressional_election_dict[year][party] = []
+                congressional_parties.append(party)
+            congressional_election_dict[year][party].append(contender)
+
+    congressional_ranks_len = len(congressional_ranks)
+    congressional_parties_len = len(congressional_parties)
+    return render(request, 'htmx-templates/congress-party-input.html', {
+        'congressional_election_dict': congressional_election_dict,
+    })
+
+
+def congress_existing_party(request):
+    congressional_election_type, created_congressional = ElectionType.objects.get_or_create(
+        name='Congressional Election'
+    )
+
+    congress_election_results = ElectionResults.objects.filter(election_type=congressional_election_type)
+
+    congressional_ranks = []
+    congressional_parties = []
+    congressional_election_dict = {}
+    for election in congress_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+        if year not in congressional_election_dict:
+            congressional_election_dict[year] = {}
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in congressional_ranks:
+                congressional_ranks.append(contender.rank)
+            if party not in congressional_election_dict[year]:
+                congressional_election_dict[year][party] = []
+                congressional_parties.append(party)
+            congressional_election_dict[year][party].append(contender)
+
+    return render(request, 'htmx-templates/congress-existing-party.html', {
+        'congressional_election_dict': congressional_election_dict,
+        'congressional_parties': congressional_parties,
+    })
+
+
+def board_member_rank_input(request):
+    board_member_election_type, created_board_member_type = ElectionType.objects.get_or_create(
+        name='Board Member Election'
+    )
+    board_member_election_results = ElectionResults.objects.filter(election_type=board_member_election_type)
+    board_member_ranks = []
+    board_member_parties = []
+    board_member_election_result_dict = {}
+    for election in board_member_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in board_member_election_result_dict:
+            board_member_election_result_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in board_member_ranks:
+                board_member_ranks.append(contender.rank)
+            if party not in board_member_election_result_dict[year]:
+                board_member_election_result_dict[year][party] = []
+                board_member_parties.append(party)
+            board_member_election_result_dict[year][party].append(contender)
+    return render(request, 'htmx-templates/board-member-rank-input.html', {
+        'board_member_election_result_dict': board_member_election_result_dict,
+    })
+
+
+def board_member_existing_rank(request):
+    board_member_election_type, created_board_member_type = ElectionType.objects.get_or_create(
+        name='Board Member Election'
+    )
+
+    board_member_election_results = ElectionResults.objects.filter(election_type=board_member_election_type)
+    board_member_ranks = []
+    board_member_parties = []
+    board_member_election_result_dict = {}
+    for election in board_member_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in board_member_election_result_dict:
+            board_member_election_result_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in board_member_ranks:
+                board_member_ranks.append(contender.rank)
+            if party not in board_member_election_result_dict[year]:
+                board_member_election_result_dict[year][party] = []
+                board_member_parties.append(party)
+            board_member_election_result_dict[year][party].append(contender)
+
+    return render(request, 'htmx-templates/board-member-existing-ranks.html', {
+        'board_member_ranks': board_member_ranks,
+        'board_member_election_result_dict': board_member_election_result_dict,
+    })
+
+
+def board_member_party_input(request):
+    board_member_election_type, created_board_member_type = ElectionType.objects.get_or_create(
+        name='Board Member Election'
+    )
+
+    board_member_election_results = ElectionResults.objects.filter(election_type=board_member_election_type)
+    board_member_ranks = []
+    board_member_parties = []
+    board_member_election_result_dict = {}
+    for election in board_member_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in board_member_election_result_dict:
+            board_member_election_result_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in board_member_ranks:
+                board_member_ranks.append(contender.rank)
+            if party not in board_member_election_result_dict[year]:
+                board_member_election_result_dict[year][party] = []
+                board_member_parties.append(party)
+            board_member_election_result_dict[year][party].append(contender)
+
+    return render(request, 'htmx-templates/board-member-party-input.html', {
+        'board_member_election_result_dict': board_member_election_result_dict,
+    })
+
+
+def board_member_existing_party(request):
+    board_member_election_type, created_board_member_type = ElectionType.objects.get_or_create(
+        name='Board Member Election'
+    )
+
+    board_member_election_results = ElectionResults.objects.filter(election_type=board_member_election_type)
+    board_member_ranks = []
+    board_member_parties = []
+    board_member_election_result_dict = {}
+    for election in board_member_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in board_member_election_result_dict:
+            board_member_election_result_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in board_member_ranks:
+                board_member_ranks.append(contender.rank)
+            if party not in board_member_election_result_dict[year]:
+                board_member_election_result_dict[year][party] = []
+                board_member_parties.append(party)
+            board_member_election_result_dict[year][party].append(contender)
+
+    return render(request, 'htmx-templates/board-member-existing-party.html', {
+        'board_member_election_result_dict': board_member_election_result_dict,
+        'board_member_parties': board_member_parties,
+    })
+
+
+def mayoral_rank_input(request):
+    mayoral_election_type, created_mayoral_type = ElectionType.objects.get_or_create(
+        name='Mayoral Election'
+    )
+
+    mayoral_election_results = ElectionResults.objects.filter(election_type=mayoral_election_type)
+
+    mayoral_ranks = []
+    mayoral_parties = []
+    mayoral_election_dict = {}
+    for election in mayoral_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in mayoral_election_dict:
+            mayoral_election_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in mayoral_ranks:
+                mayoral_ranks.append(contender.rank)
+            if party not in mayoral_election_dict[year]:
+                mayoral_election_dict[year][party] = []
+                mayoral_parties.append(party)
+            mayoral_election_dict[year][party].append(contender)
+    return render(request, 'htmx-templates/mayoral-rank-input.html', {
+        'mayoral_election_dict': mayoral_election_dict,
+    })
+
+
+def mayoral_existing_rank(request):
+    mayoral_election_type, created_mayoral_type = ElectionType.objects.get_or_create(
+        name='Mayoral Election'
+    )
+
+    mayoral_election_results = ElectionResults.objects.filter(election_type=mayoral_election_type)
+
+    mayoral_ranks = []
+    mayoral_parties = []
+    mayoral_election_dict = {}
+    for election in mayoral_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in mayoral_election_dict:
+            mayoral_election_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in mayoral_ranks:
+                mayoral_ranks.append(contender.rank)
+            if party not in mayoral_election_dict[year]:
+                mayoral_election_dict[year][party] = []
+                mayoral_parties.append(party)
+            mayoral_election_dict[year][party].append(contender)
+    return render(request, 'htmx-templates/mayoral-existing-rank.html', {
+        'mayoral_election_dict': mayoral_election_dict,
+        'mayoral_ranks': mayoral_ranks,
+    })
+
+
+def mayoral_party_input(request):
+    mayoral_election_type, created_mayoral_type = ElectionType.objects.get_or_create(
+        name='Mayoral Election'
+    )
+
+    mayoral_election_results = ElectionResults.objects.filter(election_type=mayoral_election_type)
+
+    mayoral_ranks = []
+    mayoral_parties = []
+    mayoral_election_dict = {}
+    for election in mayoral_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in mayoral_election_dict:
+            mayoral_election_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in mayoral_ranks:
+                mayoral_ranks.append(contender.rank)
+            if party not in mayoral_election_dict[year]:
+                mayoral_election_dict[year][party] = []
+                mayoral_parties.append(party)
+            mayoral_election_dict[year][party].append(contender)
+
+    return render(request, 'htmx-templates/mayoral-party-input.html', {
+        'mayoral_election_dict': mayoral_election_dict,
+    })
+
+
+def mayoral_existing_party(request):
+    mayoral_election_type, created_mayoral_type = ElectionType.objects.get_or_create(
+        name='Mayoral Election'
+    )
+
+    mayoral_election_results = ElectionResults.objects.filter(election_type=mayoral_election_type)
+
+    mayoral_ranks = []
+    mayoral_parties = []
+    mayoral_election_dict = {}
+    for election in mayoral_election_results:
+        election_date = election.election_year
+        year = datetime.strftime(election_date, '%Y')
+
+        if year not in mayoral_election_dict:
+            mayoral_election_dict[year] = {}
+
+        for contender in election.contenders.all():
+            party = contender.party
+            if contender.rank not in mayoral_ranks:
+                mayoral_ranks.append(contender.rank)
+            if party not in mayoral_election_dict[year]:
+                mayoral_election_dict[year][party] = []
+                mayoral_parties.append(party)
+            mayoral_election_dict[year][party].append(contender)
+
+    return render(request, 'htmx-templates/mayoral-existing-party.html', {
+        'mayoral_parties': mayoral_parties,
+        'mayoral_election_dict': mayoral_election_dict,
+    })

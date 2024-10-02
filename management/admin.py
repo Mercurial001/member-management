@@ -18,6 +18,81 @@ from .models import ActivityLog
 from .models import LeaderConnectMemberRequest
 from .models import LeadersRequestConnect
 from .models import AmbiguousVoters
+from .models import IndividualParents
+from .models import IndividualSiblings
+from .models import IndividualSpouse
+from .models import IndividualOffspring
+from .models import IndividualLeaderCluster
+from .models import BarangayFigures
+from .models import ElectionType
+from .models import BarangayElectionResults
+from .models import BarangayElectionContender
+from .models import ElectionContender
+from .models import Religion
+from .models import Occupation
+from .models import Church
+from .models import BarangayRemark
+from .models import SitioRemark
+
+
+class BarangayRemarkAdmin(admin.ModelAdmin):
+    list_display = ('brgy',)
+
+
+class SitioRemarkAdmin(admin.ModelAdmin):
+    list_display = ('sitio',)
+
+
+class ReligionAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+class OccupationAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+class ChurchAdmin(admin.ModelAdmin):
+    list_display = ('brgy',)
+
+
+class BarangayFiguresAdmin(admin.ModelAdmin):
+    list_display = ('brgy',)
+
+
+class ElectionTypeAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+class BarangayElectionResultsAdmin(admin.ModelAdmin):
+    list_display = ('brgy',)
+
+
+class BarangayElectionContendersAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+class ElectionContendersAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+class IndividualParentsAdmin(admin.ModelAdmin):
+    list_display = ('individual',)
+
+
+class IndividualSiblingsAdmin(admin.ModelAdmin):
+    list_display = ('individual',)
+
+
+class IndividualSpouseAdmin(admin.ModelAdmin):
+    list_display = ('individual',)
+
+
+class IndividualOffspringAdmin(admin.ModelAdmin):
+    list_display = ('individual',)
+
+
+class IndividualLeaderClusterAdmin(admin.ModelAdmin):
+    list_display = ('individual',)
 
 
 class AmbiguousVotersAdmin(admin.ModelAdmin):
@@ -96,6 +171,21 @@ class CLusterAdmin(admin.ModelAdmin):
     list_display = ('leader',)
 
 
+admin.site.register(BarangayRemark, BarangayRemarkAdmin)
+admin.site.register(SitioRemark, SitioRemarkAdmin)
+admin.site.register(Religion, ReligionAdmin)
+admin.site.register(Occupation, OccupationAdmin)
+admin.site.register(Church, ChurchAdmin)
+admin.site.register(BarangayFigures, BarangayFiguresAdmin)
+admin.site.register(ElectionType, ElectionTypeAdmin)
+admin.site.register(BarangayElectionResults, BarangayElectionResultsAdmin)
+admin.site.register(BarangayElectionContender, BarangayElectionContendersAdmin)
+admin.site.register(ElectionContender, ElectionContendersAdmin)
+admin.site.register(IndividualParents, IndividualParentsAdmin)
+admin.site.register(IndividualSiblings, IndividualSiblingsAdmin)
+admin.site.register(IndividualSpouse, IndividualSpouseAdmin)
+admin.site.register(IndividualOffspring, IndividualOffspringAdmin)
+admin.site.register(IndividualLeaderCluster, IndividualLeaderClusterAdmin)
 admin.site.register(AmbiguousVoters, AmbiguousVotersAdmin)
 admin.site.register(LeadersRequestConnect, LeadersRequestConnectAdmin)
 admin.site.register(LeaderConnectMemberRequest, LeaderConnectMemberRequestAdmin)

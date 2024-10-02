@@ -32,11 +32,21 @@
     <link rel="stylesheet" href="{% static 'attendance-list.css' %}">
     <link rel="stylesheet" href="{% static 'sitio-report.css' %}">
     <link rel="stylesheet" href="{% static 'ambiguous_voters.css' %}">
+    <link rel="stylesheet" href="{% static 'individual-family-conf.css' %}">
+    <link rel="stylesheet" href="{% static 'individual-page.css' %}">
+    <link rel="stylesheet" href="{% static 'election_results.css' %}">
+    <link rel="stylesheet" href="{% static 'individual-input.css' %}">
+    <link rel="stylesheet" href="{% static 'election-results.css' %}">
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link href='https://fonts.googleapis.com/css?family=Lato:100italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Lato:100' rel='stylesheet' type='text/css'>
     <!-- Add this to include Swiper.js -->
     <!--    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>-->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
     <script src="{% static 'jquery-3.6.4.min.js' %}"></script>
     <script src="{% static 'chart.js' %}"></script>
     <script src="{% static 'swiper-bundle.min.js' %}"></script>
@@ -123,7 +133,7 @@
                         </div>
                         <div class="home-link-icon-container">
                             <div class="home-link-name">
-                                Add Barangay
+                                Barangays
                             </div>
                         </div>
                     </a>
@@ -158,6 +168,20 @@
                     </a>
                 </li>
                 <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'individual-input' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-file" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Encode Voter
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="home-header-nav-link">
                     <a class="home-link-to-page" href="{% url 'reports' %}">
                         <div class="home-link-icon-container">
                             <div class="home-link-icon-div">
@@ -171,6 +195,21 @@
                         </div>
                     </a>
                 </li>
+                <li class="home-header-nav-link">
+                    <a class="home-link-to-page" href="{% url 'election-results' %}">
+                        <div class="home-link-icon-container">
+                            <div class="home-link-icon-div">
+                                <i class="fa fa-file" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                        <div class="home-link-icon-container">
+                            <div class="home-link-name">
+                                Election Results
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
                 <li class="home-header-nav-link">
                     <div class="main-header-link-container-div" id="notification-toggle">
                         <div class="notification-counter-div">
@@ -269,11 +308,11 @@
                             </div>
                             <div class="home-base-results-div">
                                 <div class="home-base-search-results-member-container-div">
-                                    {% for member in search_engine_result_individual %}
+                                    {% for individual in search_engine_result_individual %}
                                         <div class="home-base-member-name-result">
                                             <a class="home-base-member-result-link"
-                                               href="{% url 'member-profile' member.name member.id %}">
-                                                {{ member.name }}
+                                               href="{% url 'individual' individual.id %}">
+                                                {{ individual.name }}
                                             </a>
                                         </div>
                                     {% endfor %}

@@ -95,8 +95,15 @@
                         </div>
                     </div>
                     <div class="brgy-profile-save-changes-btn">
-                        <button type="submit">Save Changes</button>
+                        <button type="submit" name="edit-brgy-detail-btn">Save Changes</button>
                     </div>
+                </form>
+                <form method="POST">
+                    {% csrf_token %}
+                    <textarea name="brgy-remarks"></textarea>
+                    <button type="submit" name="add-brgy-remark-btn">
+                        Add Remarks
+                    </button>
                 </form>
             </div>
         </div>
@@ -143,6 +150,158 @@
                 </div>
             </div>
             <div class="brgy-profile-showcase-underline"></div>
+            <div class="brgy-profile-brgy-clusters-container-div">
+                <div class="brgy-profile-cluster-title-header-div">
+                    Barangay Remarks
+                </div>
+                <div class="brgy-profile-brgy-remark-div">
+                    <ol>
+                        {% for remark in barangay_remarks %}
+                            <li class="brgy-profile-remark-div">
+                                {{ remark.remark }}
+                            </li>
+                        {% empty %}
+                            <li>
+                                None
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+            <div class="brgy-profile-brgy-clusters-container-div">
+                <div class="brgy-profile-cluster-title-header-div">
+                    Barangay {{ brgy.brgy_name }} Figures
+                </div>
+                <div class="brgy-profile-barangay-figures-div">
+                    <header class="brgy-profile-barangay-figure-div-header">
+                        Barangay Officials
+                    </header>
+                    <form method="POST" class="brgy-profile-barangay-official-form">
+                        {% csrf_token %}
+                        <div>
+                            <input class="brgy-profile-barangay-figure-input"
+                                   type="text"
+                                   name="brgy-official-first-name"
+                                   placeholder="Official Full Name"
+                            >
+                        </div>
+
+                        <div>
+                            {% if barangay_official_rank_len < 0 %}
+                            <input class="brgy-profile-barangay-figure-input"
+                                   type="text"
+                                   name="brgy-official-rank"
+                                   placeholder="Official Rank"
+                            >
+                            {% else %}
+                                <span class="brgy-official-rank-span">
+                                    <button type="button"
+                                            hx-post="{% url 'htmx-brgy-official-rank-input' %}"
+                                            hx-trigger="click"
+                                            hx-select=".brgy-official-rank-span"
+                                            hx-target=".brgy-official-rank-span"
+                                            hx-swap="outerHTML"
+                                    >
+                                        Add New Rank
+                                    </button>
+                                    <select name="brgy-official-rank"
+                                            id="">
+                                        {% for rank in barangay_official_ranks %}
+                                        <option value="{{ rank }}">{{ rank }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div class="brgy-profile-barangay-figure-add-btn">
+                            <button type="submit" name="add-brgy-official-btn">
+                                Add Brgy. Official
+                            </button>
+                        </div>
+                    </form>
+                    <div class="brgy-profile-barangay-figures-container-div">
+                        {% for official in brgy_figures.officials.all %}
+                            {% if official.rank == 'Captain' %}
+                                <div class="brgy-profile-barangay-figure-loop-div">
+                                    {{ official.name }}
+                                    {{ official.rank }}
+                                </div>
+                            {% else %}
+                                <div class="brgy-profile-barangay-figure-loop-div">
+                                    {{ official.name }}
+                                    {{ official.rank }}
+                                </div>
+                            {% endif %}
+                        {% empty %}
+                            No Officials in This Barangay
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="brgy-profile-barangay-figures-div">
+                    <header class="brgy-profile-barangay-figure-div-header">
+                        Barangay School Heads
+                    </header>
+                    <form method="POST" class="brgy-profile-barangay-official-form">
+                        {% csrf_token %}
+                        <div>
+                            <input class="brgy-profile-barangay-figure-input"
+                                   type="text"
+                                   name="school-head-first-name"
+                                   placeholder="School Head Full Name"
+                            >
+                        </div>
+                        <div>
+                            {% if barangay_school_head_len < 0 %}
+
+                            <input class="brgy-profile-barangay-figure-input"
+                                   type="text"
+                                   name="school-head-rank"
+                                   placeholder="School Head Rank"
+                            >
+                            {% else %}
+                            <span class="school-heads-htmx-span">
+                                <button type="button"
+                                        hx-post="{% url 'htmx-school-head-input-trigger' %}"
+                                        hx-trigger="click"
+                                        hx-swap="outerHTML"
+                                        hx-target=".school-heads-htmx-span"
+                                        hx-select=".school-heads-htmx-span"
+                                >
+                                    Add New Rank
+                                </button>
+                                <select name="school-head-rank">
+                                    {% for rank in barangay_school_head_ranks %}
+                                    <option value="{{ rank }}">{{ rank }}</option>
+                                    {% endfor %}
+                                </select>
+                            </span>
+
+                            {% endif %}
+
+
+
+                        </div>
+                        <div class="brgy-profile-barangay-figure-add-btn">
+                            <button type="submit" name="add-school-head-btn">
+                                Add School Head
+                            </button>
+                        </div>
+                    </form>
+                    <div class="brgy-profile-barangay-figures-container-div">
+                        {% for school_head in brgy_figures.school_heads.all %}
+                            <div class="brgy-profile-barangay-figure-loop-div">
+                                {{ school_head.name }}
+                                {{ school_head.rank }}
+                            </div>
+                        {% empty %}
+                            <div>
+                                No School Heads in this Barangay
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
             <div class="brgy-profile-brgy-details-block-container-div">
                 <div class="brgy-profile-details-title-header-div">
                     Data List
@@ -155,7 +314,8 @@
                         {% for leader in brgy_leader %}
                             <div class="brgy-profile-data-detail">
                                 <a class="brgy-profile-link-page"
-                                   href="{% url 'cluster' leader.name leader.user %}">{{ leader.name }}</a>
+                                   href="{% url 'cluster' leader.name leader.user %}">{{ leader.name }}
+                                </a>
                             </div>
                         {% empty %}
                             <div class="brgy-profile-empty-detail-notifier">
@@ -203,7 +363,7 @@
             </div>
             <div class="brgy-profile-brgy-clusters-container-div">
                 <div class="brgy-profile-cluster-title-header-div">
-                    Brgy. {{ brgy.name }} Clusters
+                    Brgy. {{ brgy.brgy_name }} Clusters
                 </div>
                 {% for cluster in brgy_cluster %}
                     <div class="brgy-profile-cluster-block-div">
@@ -224,9 +384,245 @@
                     </div>
                 {% endfor %}
             </div>
+            <div class="brgy-profile-brgy-clusters-container-div">
+                <div class="brgy-profile-cluster-title-header-div">
+                    Barangay {{ brgy.brgy_name }} Election Results
+                </div>
+                <form method="POST" class="brgy-profile-add-election-form">
+                    <header class="brgy-profile-add-election-form-header">
+                        Election Result Form
+                    </header>
+                    {% csrf_token %}
+                    {% if barangay_election_type_len < 0 %}
+                        <input class='brgy-profile-election-result-input'
+                               type="text"
+                               name="election-type"
+                               placeholder="Election Type">
+                    {% else %}
+                        <span class="election-input-span">
+                            <button type="button"
+                                    hx-post="{% url 'htmx-election-type-input' %}"
+                                    hx-trigger="click"
+                                    hx-target=".election-input-span"
+                                    hx-select=".election-input-span"
+                                    hx-swap="outerHTML"
+                            >
+                                Add New Election Result
+                            </button>
+                            <select name="election-type">
+                                {% for type in barangay_election_type %}
+                                    <option value="{{ type.name }}">{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </span>
+
+                    {% endif %}
+
+                    <input class='brgy-profile-election-result-input'
+                           type="date"
+                           name="election-year"
+                           placeholder="Election Year">
+
+                    <button type="submit" name="add-election-type-btn">Add Election Type</button>
+
+                </form>
+                {% for election_type, parties in election_dict.items %}
+                    <div class="brgy-profile-election-result-loop-div">
+                        <header class="brgy-profile-election-result-loop-header">
+                             Election Year {{ election_type }}
+                        </header>
+                        <form method="POST" class="brgy-profile-add-contender-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="election-year" value="{{ election_type }}">
+                            <input type="text" name="contender-name" placeholder="Contender Name">
+
+                            {% if barangay_contender_ranks_len < 0 %}
+                                <input type="text" name="contender-rank" placeholder="Contender Rank">
+                            {% else %}
+                            <span class="captain-input-htmx-span">
+                                <button type="button"
+                                        hx-post="{% url 'htmx-captain-input' %}"
+                                        hx-trigger="click"
+                                        hx-target=".captain-input-htmx-span"
+                                        hx-select=".captain-input-htmx-span"
+                                        hx-swap="outerHTML"
+                                >
+                                    Add New Rank
+                                </button>
+                                <select name="contender-rank">
+                                    {% for rank in barangay_contender_ranks %}
+                                    <option value="{{ rank }}">{{ rank }}</option>
+                                    {% endfor %}
+                                </select>
+                            </span>
+
+                            {% endif %}
+
+                            <input type="number" name="contender-votes" placeholder="Contender Vote">
+
+                            {% if barangay_official_party_len < 0 %}
+
+                                <input class="brgy-profile-contender-party-input" type="text" name="contender-party" placeholder="Contender Party">
+
+                            {% else %}
+                            <span class="brgy-profile-contender-party-input">
+                                <button type="button" name="manually-add-party-btn"
+                                        hx-post="{% url 'htmx-party-input' %}"
+                                        hx-trigger="click"
+                                        hx-swap="outerHTML"
+                                        hx-select=".brgy-profile-contender-party-input"
+                                        hx-target=".brgy-profile-contender-party-input"
+                                >
+                                    Add New Party
+                                </button>
+                                <select  name="contender-party">
+                                    {% for party in barangay_official_party %}
+                                    <option value="{{ party }}">{{ party }}</option>
+                                    {% endfor %}
+                                </select>
+                            </span>
+
+                            {% endif %}
+                            <button type="submit" name="brgy-election-contender-btn">
+                                Add Contender
+                            </button>
+                        </form>
+                        <div class="brgy-profile-election-result-contenders-loop-header-div">
+                            Contending Party
+                        </div>
+                        {% for party, contenders in parties.items %}
+                            <div class="brgy-profile-contenders-party-div">
+                                <header class="brgy-profile-contender-party-header">
+                                    {{ party }}
+                                </header>
+                                <div class="brgy-profile-contenders-container-div">
+                                    <table class="brgy-profile-contender-table">
+                                        <tr class="brgy-profile-contender-table-row">
+                                            <th class="brgy-profile-contender-table-head">
+                                                Name
+                                            </th>
+                                            <th class="brgy-profile-contender-table-head">
+                                                Rank
+                                            </th>
+                                            <th class="brgy-profile-contender-table-head">
+                                                Votes
+                                            </th>
+                                        </tr>
+                                        {% for contender in contenders %}
+                                            <tr class="brgy-profile-contender-table-row">
+                                                <td class="brgy-profile-contender-table-data">
+                                                    {{ contender.name }}
+                                                </td>
+                                                <td class="brgy-profile-contender-table-data">
+                                                    {{ contender.rank }}
+                                                </td>
+                                                <td class="brgy-profile-contender-table-data">
+                                                    {{ contender.vote_count }}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="brgy-members-graph-div">
+                <canvas id="brgy_members_graph"></canvas>
+            </div>
+
         </section>
 
     </section>
+    <script>
+        var ctx = document.getElementById('brgy_members_graph').getContext('2d');
+
+        // Define the data object
+        var data = {
+            labels: [], // X-axis labels (years)
+            datasets: []
+        };
+
+        // Track party names and their vote counts for each year
+        var partyData = {}; // This will hold vote data for each party across years
+
+        // Iterate over party_votes and populate the datasets correctly
+        {% for year, party_vote_tuple in party_votes.items %}
+            data.labels.push('{{ year }}');  // Append year to labels array
+
+            {% for party_vote in party_vote_tuple %}
+                var partyName = '{{ party_vote.0|safe }}';  // Party name
+                var voteData = {{ party_vote.1|safe }};  // Vote count for this year
+
+                // Check if this party already exists in the partyData object
+                if (!(partyName in partyData)) {
+                    // Initialize an empty array for this party with nulls for previous years
+                    partyData[partyName] = Array(data.labels.length - 1).fill(null);
+                }
+
+                // Append the voteData for this party in the current year
+                partyData[partyName].push(voteData);
+            {% endfor %}
+
+            // After adding votes for the current year, ensure every party has data for this year
+            for (var party in partyData) {
+                if (partyData[party].length < data.labels.length) {
+                    // Append null if no data for this party in the current year
+                    partyData[party].push(null);
+                }
+            }
+        {% endfor %}
+
+        // Now build the datasets for Chart.js using the filled partyData
+        for (var party in partyData) {
+            data.datasets.push({
+                label: party,  // Party name
+                data: partyData[party],  // Vote count data across years
+                backgroundColor: 'rgba(10, 40, 40, 0.2)',  // Adjust color if needed
+                borderColor: 'rgba(10, 40, 40, 1)',
+                borderWidth: 1
+            });
+        }
+
+        // Create the chart using the populated data object
+        var myBarChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                    x: {
+                        grid: { drawOnChartArea: false },
+                        maxRotation: 90,
+                        minRotation: 0,
+                        ticks: { autoSkip: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { drawOnChartArea: false },
+                        ticks: {
+                            callback: function(value) { return value; }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                label += context.parsed.y;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Get all elements with the class "brgy-profile-edit-btn-div"
