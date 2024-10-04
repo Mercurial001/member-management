@@ -1,0 +1,16 @@
+<span class="election-input-span">
+    <button type="button"
+            hx-post="{% url 'htmx-election-type-input' %}"
+            hx-trigger="click"
+            hx-target=".election-input-span"
+            hx-select=".election-input-span"
+            hx-swap="outerHTML"
+    >
+        Add New Election Result
+    </button>
+    <select name="election-type">
+        {% for type in barangay_election_type %}
+            <option value="{{ type.name }}">{{ type.name }}</option>
+        {% endfor %}
+    </select>
+</span>

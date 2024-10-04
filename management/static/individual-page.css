@@ -1,0 +1,28 @@
+.individual-page-parents-div{
+    display: inline-block;
+}
+
+.individual-page-family-tree-container-div{
+    text-align: center;
+}
+
+.individual-page-family-tree-div{
+    display: inline-block;
+    vertical-align: top;
+}
+
+.individual-page-family-tree-title-div{
+    margin-left: 40px;
+    font-family: 'Montserrat';
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.individual-page-family-block-div{
+    display: inline-block;
+    height: 100px;
+    width: 100px;
+    border: 1px solid rgb(10, 40, 40);
+    border-radius: 5px;
+    margin: 20px;
+}

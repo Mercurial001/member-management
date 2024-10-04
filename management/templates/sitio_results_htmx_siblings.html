@@ -1,0 +1,12 @@
+<div id="htmx-sitio-result-sibling">
+    <select name="individual-sitio-result-htmx" >
+        <option value="" disabled selected>Sitio</option>
+        {% for sitio in sitios %}
+            <option value="{{ sitio.id }}">
+                {{ sitio.name }}
+            </option>
+        {% empty %}
+            <option disabled>None</option>
+        {% endfor %}
+    </select>
+</div>

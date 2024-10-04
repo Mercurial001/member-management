@@ -1,0 +1,605 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <form method="POST" class="election-result-create-result-form">
+        <header class="election-result-creation-form-header">
+            Congressional Election Result Form
+        </header>
+
+        {% csrf_token %}
+        <input type="date" name="congress-election-date">
+
+        <button type="submit" name="create-congress-election-btn">
+            Create Congressional Election Result
+        </button>
+    </form>
+<!--    {% for election in congress_election_results %}-->
+<!--        Congress Election {{ election.election_year }}-->
+<!--        <div>Add Contenders</div>-->
+<!--        <form method="POST">-->
+<!--            {% csrf_token %}-->
+<!--            <input type="hidden" name="congress-election-year" value="{{ election.id }}">-->
+<!--            <input type="text" name="congress-contender-name" placeholder="Name">-->
+<!--            <input type="text" name="congress-contender-rank" placeholder="Rank">-->
+<!--            <input type="number" name="congress-contender-votes" placeholder="Votes">-->
+<!--            <input type="text" name="congress-contender-party" placeholder="Party">-->
+<!--            <div>-->
+<!--                <button type="submit" name="congressional-election-type-btn">-->
+<!--                    Add Congress Contender-->
+<!--                </button>-->
+<!--            </div>-->
+<!--        </form>-->
+<!--    {% endfor %}-->
+    {% for year, parties in congressional_election_dict.items %}
+        <div class="election-result-contender-form-div">
+            <header class="election-result-contender-form-header">
+                Congress Election {{ year }}
+            </header>
+            <form method="POST"  class="election-result-contender-form">
+
+                {% csrf_token %}
+                <input type="hidden" name="congress-election-year" value="{{ year }}">
+                <input type="text" name="congress-contender-name" placeholder="Name">
+                {% if congressional_ranks_len < 0 %}
+                <input type="text" name="congress-contender-rank" placeholder="Rank">
+                {% else %}
+                <span class="election-result-htmx-span" id="election-result-htmx-span-{{ year }}">
+                    <button type="button"
+                            hx-post="{% url 'htmx-congress-rank-input' %}"
+                            hx-trigger="click"
+                            hx-swap="outerHTML"
+                            hx-select="#election-result-htmx-span-{{ year }}"
+                            hx-target="#election-result-htmx-span-{{ year }}"
+                    >
+                        Add New Rank
+                    </button>
+                    <select name="congress-contender-rank">
+                        {% for rank in congressional_ranks %}
+                            <option value="{{ rank }}">
+                                {{ rank }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </span>
+
+                {% endif %}
+                <input type="number" name="congress-contender-votes" placeholder="Votes">
+                {% if congressional_parties_len < 0 %}
+                <input type="text" name="congress-contender-party" placeholder="Party">
+                {% else %}
+                <span class="election-result-htmx-span" id="election-party-congress-span-{{ year }}">
+                    <button type="button"
+                            hx-post="{% url 'htmx-congress-party-input' %}"
+                            hx-trigger="click"
+                            hx-swap="outerHTML"
+                            hx-target="#election-party-congress-span-{{ year }}"
+                            hx-select="#election-party-congress-span-{{ year }}"
+                    >
+                        Add New Party
+                    </button>
+                    <select name="congress-contender-party">
+                        {% for party in congressional_parties %}
+                        <option value="{{ party }}">{{ party }}</option>
+                        {% endfor %}
+                    </select>
+                </span>
+                {% endif %}
+                <button type="submit" name="congressional-election-type-btn">
+                    Add Congress Contender
+                </button>
+
+            </form>
+            <div class="election-result-contenders-container-div">
+                {% for party, contenders in parties.items %}
+                    <div class="election-results-contenders-div">
+                        <div class="election-result-contender-header-div">
+                            {{ party }}
+                        </div>
+                        <table>
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Rank
+                                </th>
+                                <th>
+                                    Vote Count
+                                </th>
+                            </tr>
+                            {% for contender in contenders %}
+                                <tr>
+                                    <td>
+                                        {{ contender.name }}
+                                    </td>
+                                    <td>
+                                        {{ contender.rank }}
+                                    </td>
+                                    <td>
+                                        {{ contender.vote_count }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    {% endfor %}
+    <form method="POST" class="election-result-create-result-form">
+        <header class="election-result-creation-form-header">
+            Board Member Election Result Form
+        </header>
+        {% csrf_token %}
+        <input type="date" name="create-board-member-election-result">
+        <button type="submit" name="create-board-election-type-btn">
+            Create Board Member Election Result
+        </button>
+    </form>
+    {% for year, parties in board_member_election_result_dict.items %}
+        <div class="election-result-contender-form-div">
+            <header class="election-result-contender-form-header">
+                Board Member Election {{ year }}
+            </header>
+            <form method="POST" class="election-result-contender-form">
+                {% csrf_token %}
+                <input type="text" name="board-member-contender-name" placeholder="Name">
+                {% if board_member_ranks_len < 0 %}
+                <input type="text" name="board-member-contender-rank" placeholder="Rank">
+                {% else %}
+                <span id="htmx-board-member-rank-{{ year }}">
+                    <button type="button"
+                            hx-post="{% url 'htmx-board-member-rank-input' %}"
+                            hx-trigger="click"
+                            hx-swap="outerHTML"
+                            hx-target="#htmx-board-member-rank-{{ year }}"
+                            hx-select="#htmx-board-member-rank-{{ year }}"
+                    >
+                        Add New Rank
+                    </button>
+                    <select name="board-member-contender-rank">
+                        {% for rank in board_member_ranks %}
+                        <option value="{{ rank }}">{{ rank }}</option>
+                        {% endfor %}
+                    </select>
+                </span>
+                {% endif %}
+                <input type="number" name="board-member-contender-votes" placeholder="Votes">
+                {% if board_member_parties_len < 0 %}
+                <input type="text" name="board-member-type-party" placeholder="Party">
+                {% else %}
+                <span id="board-member-party-div-{{ year }}">
+                    <button type="button"
+                            hx-post="{% url 'htmx-board-member-party-input' %}"
+                            hx-trigger="click"
+                            hx-swap="outerHTML"
+                            hx-target="#board-member-party-div-{{ year }}"
+                            hx-select="#board-member-party-div-{{ year }}"
+                    >
+                        Add New Party
+                    </button>
+                    <select name="board-member-type-party">
+                        {% for party in board_member_parties %}
+                        <option value="{{ party }}">
+                            {{ party }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </span>
+                {% endif %}
+                <input type="hidden" name="board-member-election-instance" value="{{ year }}">
+                <button type="submit" name="add-board-member-contender-btn">
+                    Add Board Member Contender
+                </button>
+            </form>
+            <div class="election-result-contenders-container-div">
+                {% for party, contenders in parties.items %}
+                    <div class="election-results-contenders-div">
+                        <div class="election-result-contender-header-div">
+                            {{ party }}
+                        </div>
+                        <table>
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Rank
+                                </th>
+                                <th>
+                                    Vote Count
+                                </th>
+                            </tr>
+                            {% for contender in contenders %}
+                                <tr>
+                                    <td>
+                                        {{ contender.name }}
+                                    </td>
+                                    <td>
+                                        {{ contender.rank }}
+                                    </td>
+                                    <td>
+                                        {{ contender.vote_count }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+    <form method="POST" class="election-result-create-result-form">
+        <header class="election-result-creation-form-header">
+            Mayoral Election Result Form
+        </header>
+        {% csrf_token %}
+        <input type="date" name="create-mayoral-election-instance">
+        <button type="submit" name="create-mayoral-election-btn">
+            Create Mayoral Election Result
+        </button>
+    </form>
+    {% for year, parties in mayoral_election_dict.items %}
+        <div class="election-result-contender-form-div">
+            <header class="election-result-contender-form-header">
+                Mayoral Election {{ year }}
+            </header>
+            <form method="POST" class="election-result-contender-form">
+                {% csrf_token %}
+                <input type="text" name="mayoral-contender-name" placeholder="Name">
+                {% if mayoral_ranks_len < 0 %}
+                <input type="text" name="mayoral-contender-rank" placeholder="Rank">
+                {% else %}
+                <span id="mayoral-htmx-request-span-{{ year }}">
+                    <button type="button"
+                            hx-post="{% url 'htmx-mayoral-rank-input' %}"
+                            hx-trigger="click"
+                            hx-swap="outerHTML"
+                            hx-select="#mayoral-htmx-request-span-{{ year }}"
+                            hx-target="#mayoral-htmx-request-span-{{ year }}"
+                    >
+                        Add New Rank
+                    </button>
+                    <select name="mayoral-contender-rank">
+                        {% for rank in mayoral_ranks %}
+                        <option value="{{ rank }}">{{ rank }}</option>
+                        {% endfor %}
+                    </select>
+                </span>
+
+                {% endif %}
+                <input type="number" name="mayoral-contender-votes" placeholder="Votes">
+                {% if party in mayoral_parties_len < 0 %}
+                <input type="text" name="mayoral-contender-party" placeholder="Party">
+                {% else %}
+                <span id="mayoral-party-htmx-request-{{ year }}">
+                    <button type="button"
+                            hx-post="{% url 'htmx-mayoral-party-input' %}"
+                            hx-trigger="click"
+                            hx-swap="outerHTML"
+                            hx-target="#mayoral-party-htmx-request-{{ year }}"
+                            hx-select="#mayoral-party-htmx-request-{{ year }}"
+                    >
+                        Add New Party
+                    </button>
+                    <select name="mayoral-contender-party">
+                        {% for party in mayoral_parties %}
+                        <option value="{{ party }}">{{ party }}</option>
+                        {% endfor %}
+                    </select>
+                </span>
+                {% endif %}
+                <input type="hidden" name="mayoral-contender-election-instance" value="{{ year }}">
+
+                <button type="submit" name="create-mayoral-contender-btn">
+                    Add Contender
+                </button>
+            </form>
+            <div class="election-result-contenders-container-div">
+                {% for party, contenders in parties.items %}
+                    <div class="election-results-contenders-div">
+                        <header class="election-result-contender-header-div">
+                            {{ party }}
+                        </header>
+                        <table>
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Rank
+                                </th>
+                                <th>
+                                    Vote Count
+                                </th>
+                            </tr>
+                            {% for contender in contenders %}
+                                <tr>
+                                    <td>
+                                        {{ contender.name }}
+                                    </td>
+                                    <td>
+                                        {{ contender.rank }}
+                                    </td>
+                                    <td>
+                                        {{ contender.vote_count }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="brgy-members-graph-div">
+        <canvas id="congressional-election-results-graph"></canvas>
+    </div>
+    <div class="brgy-members-graph-div">
+        <canvas id="board-member-election-results-graph"></canvas>
+    </div>
+    <div class="brgy-members-graph-div">
+        <canvas id="mayoral-election-results-graph"></canvas>
+    </div>
+
+    <script>
+        var ctx = document.getElementById('congressional-election-results-graph').getContext('2d');
+
+        // Define the data object
+        var data = {
+            labels: [], // X-axis labels (years)
+            datasets: []
+        };
+
+        // Track party names and their vote counts for each year
+        var partyData = {}; // This will hold vote data for each party across years
+
+        // Iterate over party_votes and populate the datasets correctly
+        {% for year, party_vote_tuple in congressional_contender_election_data.items %}
+            data.labels.push('{{ year }}');  // Append year to labels array
+
+            {% for party_vote in party_vote_tuple %}
+                var partyName = '{{ party_vote.0|safe }}';  // Party name
+                var voteData = {{ party_vote.1|safe }};  // Vote count for this year
+
+                // Check if this party already exists in the partyData object
+                if (!(partyName in partyData)) {
+                    // Initialize an empty array for this party with nulls for previous years
+                    partyData[partyName] = Array(data.labels.length - 1).fill(null);
+                }
+
+                // Append the voteData for this party in the current year
+                partyData[partyName].push(voteData);
+            {% endfor %}
+
+            // After adding votes for the current year, ensure every party has data for this year
+            for (var party in partyData) {
+                if (partyData[party].length < data.labels.length) {
+                    // Append null if no data for this party in the current year
+                    partyData[party].push(null);
+                }
+            }
+        {% endfor %}
+
+        // Now build the datasets for Chart.js using the filled partyData
+        for (var party in partyData) {
+            data.datasets.push({
+                label: party,  // Party name
+                data: partyData[party],  // Vote count data across years
+                backgroundColor: 'rgba(10, 40, 40, 0.2)',  // Adjust color if needed
+                borderColor: 'rgba(10, 40, 40, 1)',
+                borderWidth: 1
+            });
+        }
+
+        // Create the chart using the populated data object
+        var myBarChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                    x: {
+                        grid: { drawOnChartArea: false },
+                        maxRotation: 90,
+                        minRotation: 0,
+                        ticks: { autoSkip: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { drawOnChartArea: false },
+                        ticks: {
+                            callback: function(value) { return value; }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                label += context.parsed.y;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+        var ctx = document.getElementById('board-member-election-results-graph').getContext('2d');
+
+        // Define the data object
+        var data = {
+            labels: [], // X-axis labels (years)
+            datasets: []
+        };
+
+        // Track party names and their vote counts for each year
+        var partyData = {}; // This will hold vote data for each party across years
+
+        // Iterate over party_votes and populate the datasets correctly
+        {% for year, party_vote_tuple in board_member_contender_election_data.items %}
+            data.labels.push('{{ year }}');  // Append year to labels array
+
+            {% for party_vote in party_vote_tuple %}
+                var partyName = '{{ party_vote.0|safe }}';  // Party name
+                var voteData = {{ party_vote.1|safe }};  // Vote count for this year
+
+                // Check if this party already exists in the partyData object
+                if (!(partyName in partyData)) {
+                    // Initialize an empty array for this party with nulls for previous years
+                    partyData[partyName] = Array(data.labels.length - 1).fill(null);
+                }
+
+                // Append the voteData for this party in the current year
+                partyData[partyName].push(voteData);
+            {% endfor %}
+
+            // After adding votes for the current year, ensure every party has data for this year
+            for (var party in partyData) {
+                if (partyData[party].length < data.labels.length) {
+                    // Append null if no data for this party in the current year
+                    partyData[party].push(null);
+                }
+            }
+        {% endfor %}
+
+        // Now build the datasets for Chart.js using the filled partyData
+        for (var party in partyData) {
+            data.datasets.push({
+                label: party,  // Party name
+                data: partyData[party],  // Vote count data across years
+                backgroundColor: 'rgba(10, 40, 40, 0.2)',  // Adjust color if needed
+                borderColor: 'rgba(10, 40, 40, 1)',
+                borderWidth: 1
+            });
+        }
+
+        // Create the chart using the populated data object
+        var myBarChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                    x: {
+                        grid: { drawOnChartArea: false },
+                        maxRotation: 90,
+                        minRotation: 0,
+                        ticks: { autoSkip: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { drawOnChartArea: false },
+                        ticks: {
+                            callback: function(value) { return value; }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                label += context.parsed.y;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+        var ctx = document.getElementById('mayoral-election-results-graph').getContext('2d');
+
+        // Define the data object
+        var data = {
+            labels: [], // X-axis labels (years)
+            datasets: []
+        };
+
+        // Track party names and their vote counts for each year
+        var partyData = {}; // This will hold vote data for each party across years
+
+        // Iterate over party_votes and populate the datasets correctly
+        {% for year, party_vote_tuple in mayoral_contender_election_data.items %}
+            data.labels.push('{{ year }}');  // Append year to labels array
+
+            {% for party_vote in party_vote_tuple %}
+                var partyName = '{{ party_vote.0|safe }}';  // Party name
+                var voteData = {{ party_vote.1|safe }};  // Vote count for this year
+
+                // Check if this party already exists in the partyData object
+                if (!(partyName in partyData)) {
+                    // Initialize an empty array for this party with nulls for previous years
+                    partyData[partyName] = Array(data.labels.length - 1).fill(null);
+                }
+
+                // Append the voteData for this party in the current year
+                partyData[partyName].push(voteData);
+            {% endfor %}
+
+            // After adding votes for the current year, ensure every party has data for this year
+            for (var party in partyData) {
+                if (partyData[party].length < data.labels.length) {
+                    // Append null if no data for this party in the current year
+                    partyData[party].push(null);
+                }
+            }
+        {% endfor %}
+
+        // Now build the datasets for Chart.js using the filled partyData
+        for (var party in partyData) {
+            data.datasets.push({
+                label: party,  // Party name
+                data: partyData[party],  // Vote count data across years
+                backgroundColor: 'rgba(10, 40, 40, 0.2)',  // Adjust color if needed
+                borderColor: 'rgba(10, 40, 40, 1)',
+                borderWidth: 1
+            });
+        }
+
+        // Create the chart using the populated data object
+        var myBarChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                    x: {
+                        grid: { drawOnChartArea: false },
+                        maxRotation: 90,
+                        minRotation: 0,
+                        ticks: { autoSkip: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { drawOnChartArea: false },
+                        ticks: {
+                            callback: function(value) { return value; }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                label += context.parsed.y;
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

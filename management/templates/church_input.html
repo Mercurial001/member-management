@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div>
+            <select name="individual-brgy"
+                    required
+                    hx-trigger="change"
+                    hx-post="{% url 'htmx-sitio-options' %}"
+                    hx-target="#htmx-sitio-result"
+                    hx-select="#htmx-sitio-result"
+                    hx-swap="outerHTML"
+
+            >
+                <option value="" disabled selected>Select a Barangay</option>
+                {% for brgy in brgys %}
+                    <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div id="htmx-sitio-result">
+            <!-- sitio_results_htmx.html -->
+        </div>
+        <div>
+            <input type="number" name="church-lat" step="0.000001" placeholder="Latitude">
+        </div>
+        <div>
+            <input type="number" name="church-long" step="0.000001" placeholder="Longitude">
+        </div>
+        <div>
+            <button type="submit">
+                Add Church
+            </button>
+        </div>
+    </form>
+    <div>
+        {{ map_html|safe }}
+    </div>
+
+{% endblock %}

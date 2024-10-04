@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <header class="individual-conf-family-individual-voter-header">
+        <a href="{% url 'individual' individual.id %}">{{ individual.name }}</a>
+    </header>
+    {% for header in form_header %}
+        <div class="individual-family-conf-form-container-div" id="individual-{{ header }}-form-div">
+            <header class="individual-family-conf-form-header">
+               Voter {{ header }} Information Form
+            </header>
+
+            {% if father_exists and header == 'father' %}
+                {% for parent in individual_parents.parents.all %}
+                    {% if parent.is_father %}
+                        <div>
+                            <a href="{% url 'individual-family-conf' parent.id %}">
+                                {{ parent.name }} - Father
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+            {% elif mother_exists and header == 'mother' %}
+                {% for parent in individual_parents.parents.all %}
+                    {% if not parent.is_father %}
+                        <div>
+                            <a href="{% url 'individual-family-conf' parent.id %}">
+                                {{ parent.name }} - Mother
+                            </a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% elif individual_spouse.spouse is not None and header == 'spouse' %}
+                <div>
+                    <a href="{% url 'individual-family-conf' individual_spouse.spouse.id %}">
+                        {{ individual_spouse.spouse.name }}
+                    </a>
+                </div>
+            {% elif not individual.is_leader and header == 'member' %}
+
+            {% else %}
+                <div>
+                    {% if individual_siblings.siblings is not None and header == 'sibling' %}
+                        <div class="individual-family-conf-float-div">
+                            {% if individual_siblings.siblings is not None %}
+                                <div>
+                                    Voter's Sibling
+                                </div>
+                            {% endif %}
+                            {% for sibling in individual_siblings.siblings.all %}
+                                <div>
+                                    <a href="{% url 'individual-family-conf' sibling.id %}">
+                                        {{ sibling.name }}
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                    {% elif individual_children.children is not None and header == 'child' %}
+                        <div class="individual-family-conf-float-div">
+                            <div class="individual-family-conf-float-div-header">
+                                {% if individual_children.children is not None %}
+                                    Voter's Child
+                                {% endif %}
+                            </div>
+                            {% for child in individual_children.children.all %}
+                                <div>
+                                    <a href="{% url 'individual-family-conf' child.id %}">
+                                        {{ child.name }}
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="individual-family-conf-input-breaker-div">
+                        <input type="hidden" value="{{ header }}" name="individual-form-header">
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="text"
+                                   name="individual-first-name"
+                                   placeholder="First Name"
+                                   required>
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="text"
+                                   name="individual-middle-name"
+                                   placeholder="Middle Name">
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="text"
+                                   name="individual-last-name"
+                                   placeholder="Last Name"
+                                   required>
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="text"
+                                   name="individual-suffix"
+                                   placeholder="ex. Jr, Sr, III">
+                        </div>
+                        {% if header != 'mother' and header != 'father' %}
+                            <div>
+                                <select class="individual-family-conf-input"
+                                        name="individual-gender" required>
+                                    <option value="" disabled selected>Select a Gender</option>
+                                    {% for gender in genders %}
+                                        <option value="{{ gender.id }}">{{ gender.gender }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="date" name="individual-birthday" placeholder="Birthday" required>
+                        </div>
+                        <div>
+                            <select class="individual-family-conf-input"
+                                    name="individual-brgy"
+                                    required
+                                    hx-trigger="change"
+                                    hx-post="{% url 'htmx-sitio-options-one-ring' %}"
+                                    hx-target="#htmx-sitio-result-{{ header }}"
+                                    hx-select="#htmx-sitio-result-{{ header }}"
+                                    hx-swap="outerHTML"
+
+                            >
+                                <option value="" disabled selected>Select a Barangay</option>
+                                {% for brgy in barangays %}
+                                    <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div id="htmx-sitio-result-{{ header }}">
+                            <!-- sitio_results_htmx.html -->
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="text"
+                                   name="individual-religion"
+                                   placeholder="Religion">
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="number"
+                                   name="individual-number"
+                                   placeholder="Contact Number">
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="text"
+                                   name="individual-occupation"
+                                   placeholder="Occupation">
+                        </div>
+                    </div>
+
+                    <div class="individual-family-conf-input-breaker-div">
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   name='individual-house-photo'
+                                   type="file"
+                                   accept="image/jpeg, image/png">
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   name='individual-photo'
+                                   type="file"
+                                   accept="image/jpeg, image/png">
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="number"
+                                   name="individual-latitude"
+                                   step="0.000001"
+                                   placeholder="Latitude">
+                        </div>
+                        <div>
+                            <input class="individual-family-conf-input"
+                                   type="number"
+                                   name="individual-longitude"
+                                   step="0.000001"
+                                   placeholder="Longitude">
+                        </div>
+                        <div class="individual-family-conf-radio-input-div">
+                            <div>
+                                Is Voter Leader?
+                            </div>
+                            <label for="individual-leader-status-no">No</label>
+                            <input id="individual-leader-status-no"
+                                   type="radio" name="individual-leader-status" value="0">
+                            <label for="individual-leader-status-yes">Yes</label>
+                            <input id="individual-leader-status-yes"
+                                   type="radio" name="individual-leader-status" value="1">
+                        </div>
+                        <div class="individual-family-conf-radio-input-div">
+                            <div>Is Voter OOT (Out-of-Town)</div>
+                            <label>No</label>
+                            <input type="radio" name="individual-oot" value="0" required>
+                            <label>Yes</label>
+                            <input type="radio" name="individual-oot" value="1" required>
+                        </div>
+
+                        <div class="individual-family-conf-radio-input-div">
+                            <div>
+                                Tendency to swing vote?
+                            </div>
+                            <label>No</label>
+                            <input type="radio" name="individual-swing-voter" value="0">
+                            <label>Yes</label>
+                            <input type="radio" name="individual-swing-voter" value="1">
+                        </div>
+                        <!--                <div>-->
+                        <!--                    Is Voter deceased?-->
+                        <!--                    <input type="radio" name="individual-deceased-status" value="0">-->
+                        <!--                    <input type="radio" name="individual-deceased-status" value="1">-->
+                        <!--                </div>-->
+                        <div class="individual-family-conf-radio-input-div">
+                            <div>
+                                Is Voter aligned to party?
+                            </div>
+                            <label>No</label>
+                            <input type="radio" name="individual-cockroach" value="1">
+                            <label>Yes</label>
+                            <input type="radio" name="individual-cockroach" value="0">
+                        </div>
+                    </div>
+                    <div class="individual-family-conf-btn-container-div">
+                        <button class="individual-family-conf-btn" type="submit"
+                            hx-post="{% url 'one-ring' individual.id %}"
+                            hx-target="#individual-{{ header }}-form-div"
+                            hx-select="#individual-{{ header }}-form-div"
+                            hx-swap="outerHTML"
+                            hx-trigger="click"
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <script>
+        document.addEventListener('htmx:configRequest', (event) => {
+            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            event.detail.headers['X-CSRFToken'] = csrfToken;
+        });
+    </script>
+
+{% endblock %}

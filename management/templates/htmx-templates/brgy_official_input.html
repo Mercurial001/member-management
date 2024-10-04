@@ -1,0 +1,16 @@
+<span class="brgy-official-rank-span">
+    <button type="button"
+            hx-post="{% url 'htmx-brgy-official-existing-ranks' %}"
+            hx-trigger="click"
+            hx-swap="outerHTML"
+            hx-target=".brgy-official-rank-span"
+            hx-select=".brgy-official-rank-span"
+    >
+      Select Existing Ranks
+    </button>
+    <input class="brgy-profile-barangay-figure-input"
+           type="text"
+           name="brgy-official-rank"
+           placeholder="Official Rank"
+    >
+</span>

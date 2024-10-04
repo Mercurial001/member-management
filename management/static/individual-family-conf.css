@@ -1,0 +1,66 @@
+.individual-conf-family-individual-voter-header{
+    text-align: center;
+    font-family: 'Montserrat';
+    margin: 10px;
+    font-size: 20px;
+}
+
+.individual-conf-family-individual-voter-header a{
+    text-decoration: none;
+    color: rgb(10, 40, 40);
+}
+
+.individual-family-conf-form-container-div{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 5px;
+    margin: 10px;
+    width: 95%;
+    font-family: 'Montserrat';
+}
+
+.individual-family-conf-form-header{
+    background-color: rgb(10, 40, 40);
+    padding: 10px;
+    color: beige;
+    text-transform: capitalize;
+}
+
+.individual-family-conf-input-breaker-div{
+    display: inline-block;
+    vertical-align: top;
+}
+
+.individual-family-conf-input{
+    width: 350px;
+    height: 30px;
+    margin: 7px;
+}
+
+.individual-family-conf-btn-container-div{
+    text-align: center;
+}
+
+.individual-family-conf-btn{
+    margin: 10px;
+    font-family: 'Montserrat';
+    width: 100px;
+    height: 30px;
+    background-color: rgb(10, 40, 40);
+    border: 1px solid beige;
+    color: beige;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.individual-family-conf-radio-input-div{
+    margin: 10px;
+}
+
+.individual-family-conf-float-div{
+    float: right;
+    margin: 10px;
+    margin-right: 20px;
+    text-align: center;
+    width: 23%;
+    border-left: 1px solid rgb(10, 40, 40);
+}

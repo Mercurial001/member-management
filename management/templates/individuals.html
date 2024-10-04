@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    {% for individual in individuals %}
+        <div>
+            {{ individual.name }}
+        </div>
+        <div>
+            {{ individual.religion }}
+        </div>
+    {% endfor %}
+
+{% endblock %}

@@ -1,0 +1,15 @@
+<span class="election-input-span">
+    <button type="button"
+            hx-post="{% url 'htmx-existing-election-type' %}"
+            hx-trigger="click"
+            hx-target=".election-input-span"
+            hx-select=".election-input-span"
+            hx-swap="outerHTML"
+    >
+        Add New Election Result
+    </button>
+    <input class='brgy-profile-election-result-input'
+           type="text"
+           name="election-type"
+           placeholder="Election Type">
+</span>

@@ -1,0 +1,16 @@
+<span class="captain-input-htmx-span">
+    <button type="button"
+            hx-post="{% url 'htmx-captain-input' %}"
+            hx-trigger="click"
+            hx-target=".captain-input-htmx-span"
+            hx-select=".captain-input-htmx-span"
+            hx-swap="outerHTML"
+    >
+        Add New Rank
+    </button>
+    <select name="contender-rank">
+        {% for rank in barangay_contender_ranks %}
+        <option value="{{ rank }}">{{ rank }}</option>
+        {% endfor %}
+    </select>
+</span>

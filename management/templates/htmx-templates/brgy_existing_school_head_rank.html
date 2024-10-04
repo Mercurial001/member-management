@@ -1,0 +1,16 @@
+<span class="school-heads-htmx-span">
+    <button type="button"
+            hx-post="{% url 'htmx-school-head-input-trigger' %}"
+            hx-trigger="click"
+            hx-swap="outerHTML"
+            hx-target=".school-heads-htmx-span"
+            hx-select=".school-heads-htmx-span"
+    >
+        Add New Rank
+    </button>
+    <select name="school-head-rank">
+        {% for rank in barangay_school_head_ranks %}
+        <option value="{{ rank }}">{{ rank }}</option>
+        {% endfor %}
+    </select>
+</span>

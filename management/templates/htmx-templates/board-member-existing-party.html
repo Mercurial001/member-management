@@ -1,0 +1,22 @@
+{% for year, parties in board_member_election_result_dict.items %}
+
+    <span id="board-member-party-div-{{ year }}">
+        <button type="button"
+                hx-post="{% url 'htmx-board-member-party-input' %}"
+                hx-trigger="click"
+                hx-swap="outerHTML"
+                hx-target="#board-member-party-div-{{ year }}"
+                hx-select="#board-member-party-div-{{ year }}"
+        >
+            Add New Party
+        </button>
+        <select name="board-member-type-party">
+            {% for party in board_member_parties %}
+            <option value="{{ party }}">
+                {{ party }}
+            </option>
+            {% endfor %}
+        </select>
+    </span>
+
+{% endfor %}

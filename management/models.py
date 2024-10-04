@@ -183,6 +183,7 @@ class Individual(models.Model):
     is_deceased = models.BooleanField(default=False)
     is_parent = models.BooleanField(default=False)
     is_father = models.BooleanField(default=False)
+    # Add precent number for election purposes
 
     def __str__(self):
         if self.name != None:

@@ -1,0 +1,14 @@
+{% for year, parties in board_member_election_result_dict.items %}
+    <span id="htmx-board-member-rank-{{ year }}">
+        <button type="button"
+                hx-post="{% url 'htmx-board-member-existing-rank' %}"
+                hx-trigger="click"
+                hx-swap="outerHTML"
+                hx-target="#htmx-board-member-rank-{{ year }}"
+                hx-select="#htmx-board-member-rank-{{ year }}"
+        >
+            Select Existing Rank
+        </button>
+        <input type="text" name="board-member-contender-rank" placeholder="Rank">
+    </span>
+{% endfor %}

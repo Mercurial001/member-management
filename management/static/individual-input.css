@@ -1,0 +1,62 @@
+.individual-input-header-div{
+    text-align: center;
+    font-size: 40px;
+    font-family: 'Montserrat';
+    color: rgb(50, 90, 90);
+    margin: 10px;
+}
+
+.individual-input-form-container-div{
+    text-align: center;
+}
+
+.individual-input-form{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin:auto;
+    width: 70%;
+    border-radius: 2px;
+    margin-bottom: 10px;
+}
+
+.individual-input-voter-form-header{
+    background-color: rgb(50, 90, 90);
+    padding: 10px;
+    font-family: "Montserrat";
+    color: beige;
+}
+
+.individual-input-field{
+    width: 350px;
+    height: 30px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid rgb(40, 90, 90);
+}
+
+.individual-input-field:focus{
+    outline: none;
+}
+
+.individual-input-radio-input-div-container{
+    text-align: left;
+    font-family: 'Montserrat';
+    margin: 20px;
+}
+
+.individual-input-form-field-breaker-div{
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 10px;
+}
+
+.individual-input-btn{
+    width: 100px;
+    height: 30px;
+    font-family: 'Montserrat';
+    margin: 10px;
+    background-color: rgb(40, 90, 90);
+    border: 1px solid rgb(240, 240, 240);
+    color: beige;
+    border-radius: 2px;
+    cursor: pointer;
+}

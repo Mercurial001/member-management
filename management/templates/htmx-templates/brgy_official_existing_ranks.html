@@ -1,0 +1,17 @@
+<span class="brgy-official-rank-span">
+    <button type="button"
+            hx-post="{% url 'htmx-brgy-official-rank-input' %}"
+            hx-trigger="click"
+            hx-target=".brgy-official-rank-span"
+            hx-select=".brgy-official-rank-span"
+            hx-swap="outerHTML"
+    >
+        Add New Rank
+    </button>
+    <select name="brgy-official-rank"
+            id="">
+        {% for rank in barangay_official_ranks %}
+        <option value="{{ rank }}">{{ rank }}</option>
+        {% endfor %}
+    </select>
+</span>

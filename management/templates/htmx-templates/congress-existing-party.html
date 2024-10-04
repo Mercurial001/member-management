@@ -1,0 +1,18 @@
+{% for year, parties in congressional_election_dict.items %}
+    <span class="election-result-htmx-span" id="election-party-congress-span-{{ year }}">
+        <button type="button"
+                hx-post="{% url 'htmx-congress-party-input' %}"
+                hx-trigger="click"
+                hx-swap="outerHTML"
+                hx-target="#election-party-congress-span-{{ year }}"
+                hx-select="#election-party-congress-span-{{ year }}"
+        >
+            Add New Party
+        </button>
+        <select name="congress-contender-party">
+            {% for party in congressional_parties %}
+            <option value="{{ party }}">{{ party }}</option>
+            {% endfor %}
+        </select>
+    </span>
+{% endfor %}

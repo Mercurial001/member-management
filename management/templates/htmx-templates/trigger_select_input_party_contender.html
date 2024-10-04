@@ -1,0 +1,16 @@
+<span class="brgy-profile-contender-party-input">
+        <button type="button" name="manually-add-party-btn"
+                hx-post="{% url 'htmx-party-input' %}"
+                hx-trigger="click"
+                hx-swap="outerHTML"
+                hx-select=".brgy-profile-contender-party-input"
+                hx-target=".brgy-profile-contender-party-input"
+        >
+            Add New Party
+        </button>
+    <select  name="contender-party">
+        {% for party in barangay_official_party %}
+        <option value="{{ party }}">{{ party }}</option>
+        {% endfor %}
+    </select>
+</span>

@@ -1,0 +1,53 @@
+.election-result-create-result-form{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    font-family: 'Montserrat';
+    margin: auto;
+    width: 90%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.election-result-creation-form-header{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    padding: 10px;
+}
+
+.election-result-contender-form-div{
+    margin:auto;
+    width: 90%;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    font-family: 'Montserrat';
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.election-result-contender-form{
+    margin: 10px;
+
+}
+
+.election-result-contender-form-header{
+    background-color: rgb(10, 40, 40);
+    color: beige;
+    padding: 10px;
+}
+
+.election-results-contenders-div{
+    display: inline-block;
+    vertical-align: top;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    margin: 15px;
+}
+
+.election-result-contenders-container-div{
+    text-align: center;
+}
+
+.election-result-contender-header-div{
+    background-color: rgb(10, 40, 40);
+    padding: 10px;
+    font-family: 'Montserrat';
+    color: beige;
+}

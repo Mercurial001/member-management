@@ -1,0 +1,12 @@
+<span class="brgy-profile-contender-party-input">
+    <button type="button" name="manually-add-party-btn"
+            hx-post="{% url 'htmx-select-party' %}"
+            hx-trigger="click"
+            hx-swap="outerHTML"
+            hx-select=".brgy-profile-contender-party-input"
+            hx-target=".brgy-profile-contender-party-input"
+    >
+        Select Existing Party
+    </button>
+    <input type="text" name="contender-party" placeholder="Contender Party">
+</span>

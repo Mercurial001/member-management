@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <div class="individual-input-header-div">
+         Encode Voter
+    </div>
+    <div class="individual-input-form-container-div">
+        <form method="POST" enctype="multipart/form-data" class="individual-input-form">
+            <header class="individual-input-voter-form-header">
+                Voter Information Form
+            </header>
+            {% csrf_token %}
+            <div class="individual-input-form-field-breaker-div">
+                <div>
+                    <input class="individual-input-field"
+                           type="text"
+                           name="individual-first-name"
+                           placeholder="First Name"
+                           required>
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="text"
+                           name="individual-middle-name"
+                           placeholder="Middle Name">
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="text"
+                           name="individual-last-name"
+                           placeholder="Last Name"
+                           required>
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="text"
+                           name="individual-suffix"
+                           placeholder="ex. Jr, Sr, III">
+                </div>
+                <div>
+                    <select class="individual-input-field"
+                            name="individual-gender"
+                            required>
+                        <option value="" disabled selected>Select a Gender</option>
+                        {% for gender in genders %}
+                            <option value="{{ gender.id }}">{{ gender.gender }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="date"
+                           name="individual-birthday"
+                           placeholder="Birthday"
+                           required>
+                </div>
+                <div>
+                    <select class="individual-input-field"
+                            name="individual-brgy"
+                            required
+                            hx-trigger="change"
+                            hx-post="{% url 'htmx-sitio-options' %}"
+                            hx-target="#htmx-sitio-result"
+                            hx-select="#htmx-sitio-result"
+                            hx-swap="outerHTML"
+
+                    >
+                        <option value="" disabled selected>Select a Barangay</option>
+                        {% for brgy in barangays %}
+                            <option value="{{ brgy.id }}">{{ brgy.brgy_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="htmx-sitio-result">
+                    <!-- sitio_results_htmx.html -->
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="text"
+                           name="individual-religion"
+                           placeholder="Religion">
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="number"
+                           name="individual-number"
+                           placeholder="Contact Number">
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="text"
+                           name="individual-occupation"
+                           placeholder="Occupation">
+                </div>
+            </div>
+    <!--        <div>-->
+    <!--            <input type="number" name="individual-age" placeholder="Age" required>-->
+    <!--        </div>-->
+            <div class="individual-input-form-field-breaker-div">
+                <div>
+                    <input class="individual-input-field"
+                           name='individual-house-photo'
+                           type="file"
+                           accept="image/jpeg, image/png">
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           name='individual-photo'
+                           type="file"
+                           accept="image/jpeg, image/png">
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="number"
+                           name="individual-latitude"
+                           step="0.000001"
+                           placeholder="Latitude">
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="number"
+                           name="individual-longitude"
+                           step="0.000001"
+                           placeholder="Longitude">
+                </div>
+                <div class="individual-input-radio-input-div-container">
+                    <div>
+                        Is Voter Leader
+                    </div>
+                    <label>No</label>
+                    <input type="radio" name="individual-leader-status" value="0">
+                    <label>Yes</label>
+                    <input type="radio" name="individual-leader-status" value="1">
+                </div>
+
+                <div class="individual-input-radio-input-div-container">
+                    <div>
+                        Is Voter OOT (Out-of-Town)
+                    </div>
+                    <label>No</label>
+                    <input type="radio" name="individual-oot" value="0">
+                    <label>Yes</label>
+                    <input type="radio" name="individual-oot" value="1">
+                </div>
+
+                <div class="individual-input-radio-input-div-container">
+                    <div>
+                        Swing Voter
+                    </div>
+                    <label>No</label>
+                    <input type="radio" name="individual-swing-voter" value="0">
+                    <label>Yes</label>
+                    <input type="radio" name="individual-swing-voter" value="1">
+                </div>
+                <!--        <div>-->
+                <!--            <div>-->
+                <!--                Is Voter deceased?-->
+                <!--                <input type="radio" name="individual-deceased-status" value="0">-->
+                <!--                <input type="radio" name="individual-deceased-status" value="1">-->
+                <!--            </div>-->
+                <!--        </div>-->
+                <div class="individual-input-radio-input-div-container">
+                    <div>
+                        Is Voter aligned to party?
+                    </div>
+                    <label>No</label>
+                    <input type="radio" name="individual-cockroach" value="1">
+                    <label>Yes</label>
+                    <input type="radio" name="individual-cockroach" value="0">
+                </div>
+            </div>
+            <div class="individual-input-btn-container-div">
+                <button class="individual-input-btn" type="submit">Submit</button>
+            </div>
+
+        </form>
+    </div>
+    <script>
+
+    </script>
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% for year, parties in mayoral_election_dict.items %}
+
+    <span id="mayoral-party-htmx-request-{{ year }}">
+
+        <button type="button"
+                hx-post="{% url 'htmx-mayoral-existing-party' %}"
+                hx-trigger="click"
+                hx-swap="outerHTML"
+                hx-target="#mayoral-party-htmx-request-{{ year }}"
+                hx-select="#mayoral-party-htmx-request-{{ year }}"
+        >
+            Select Existing Party
+        </button>
+        <input type="text" name="mayoral-contender-party" placeholder="Party">
+    </span>
+
+{% endfor %}
