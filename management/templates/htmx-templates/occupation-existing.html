@@ -1,0 +1,20 @@
+<div id="individual-occupation-div">
+    <div class="individual-field-toggle-btn-container-div">
+        <button class='individual-field-toggle-btn' type="button"
+             hx-post="{% url 'htmx-occupation-new' %}"
+             hx-trigger="click"
+             hx-swap="outerHTML"
+             hx-target="#individual-occupation-div"
+             hx-select="#individual-occupation-div"
+        >
+            Add New Occupation
+        </button>
+    </div>
+    <select class="individual-input-field" name="individual-occupation">
+        {% for occupation in occupations %}
+            <option value="{{ occupation.id }}">
+                {{ occupation.name }}
+            </option>
+        {% endfor %}
+    </select>
+</div>

@@ -40,7 +40,7 @@
 .individual-input-radio-input-div-container{
     text-align: left;
     font-family: 'Montserrat';
-    margin: 20px;
+    margin: 10px;
 }
 
 .individual-input-form-field-breaker-div{
@@ -59,4 +59,18 @@
     color: beige;
     border-radius: 2px;
     cursor: pointer;
+}
+
+.individual-field-toggle-btn-container-div{
+    text-align: left;
+}
+
+.individual-field-toggle-btn{
+    font-family: 'Montserrat';
+    background-color: none;
+    background: none;
+    border:none;
+    font-size: 10px;
+    cursor: pointer;
+    color: rgb(120, 120, 230);
 }

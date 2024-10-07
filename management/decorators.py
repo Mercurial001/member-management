@@ -9,6 +9,7 @@ def authenticated_user(view_func):
     def wrapper_func(request, *args, **kwargs):
         if request.user.groups.filter(name='Admin').exists() and request.user.groups.filter(name='Leaders').exists():
             return redirect('homepage')
+
         elif request.user.groups.filter(name='Leaders').exists():
             user_object = User.objects.get(username=request.user)
             leader_user = Leader.objects.get(user=user_object)

@@ -132,6 +132,10 @@ urlpatterns = [
     path('htmx-mayoral-existing-rank/', views.mayoral_existing_rank, name='htmx-mayoral-existing-rank'),
     path('htmx-mayoral-party-input/', views.mayoral_party_input, name='htmx-mayoral-party-input'),
     path('htmx-mayoral-existing-party/', views.mayoral_existing_party, name='htmx-mayoral-existing-party'),
+    path('htmx-religion-existing/', views.htmx_existing_religion, name='htmx-religion-existing'),
+    path('htmx-religion-new/', views.htmx_new_religion, name='htmx-religion-new'),
+    path('htmx-occupation-existing/', views.htmx_existing_occupation, name='htmx-occupation-existing'),
+    path('htmx-occupation-new/', views.htmx_new_occupation, name='htmx-occupation-new'),
 
     path('one-ring/<int:individual_id>/', views.one_ring, name='one-ring'),
 

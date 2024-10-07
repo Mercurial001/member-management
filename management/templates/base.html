@@ -82,190 +82,221 @@
         </div>
         <ul class="home-header-nav-links">
             {% if request.user.is_authenticated %}
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'homepage' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fa fa-home"></i>
+                {% if request.user.is_superuser %}
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'homepage' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-home"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Home
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Home
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'dashboard' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fa fa-line-chart"></i>
+                        </a>
+                    </li>
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'dashboard' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-line-chart"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Dashboard
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Dashboard
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'clusters' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fa fa-users" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'clusters' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-users" aria-hidden="true"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Clusters
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Clusters
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'add-brgy' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fas fa-dharmachakra" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'add-brgy' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fas fa-dharmachakra" aria-hidden="true"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Barangays
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Barangays
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
-                <!-- Commented 2/11/2024 for V.2 -->
-<!--                <li class="home-header-nav-link">-->
-<!--                    <a class="home-link-to-page" href="{% url 'add-leader' %}">-->
-<!--                        <div class="home-link-icon-container">-->
-<!--                           <div class="home-link-icon-div">-->
-<!--                               <i class="fas fa-user-tie" aria-hidden="true"></i>-->
-<!--                           </div>-->
-<!--                        </div>-->
-<!--                        <div class="home-link-icon-container">-->
-<!--                            <div class="home-link-name">-->
-<!--                                Add Leader-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </a>-->
-<!--                </li>-->
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'registrants' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fas fa-user-plus" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <!-- Commented 2/11/2024 for V.2 -->
+    <!--                <li class="home-header-nav-link">-->
+    <!--                    <a class="home-link-to-page" href="{% url 'add-leader' %}">-->
+    <!--                        <div class="home-link-icon-container">-->
+    <!--                           <div class="home-link-icon-div">-->
+    <!--                               <i class="fas fa-user-tie" aria-hidden="true"></i>-->
+    <!--                           </div>-->
+    <!--                        </div>-->
+    <!--                        <div class="home-link-icon-container">-->
+    <!--                            <div class="home-link-name">-->
+    <!--                                Add Leader-->
+    <!--                            </div>-->
+    <!--                        </div>-->
+    <!--                    </a>-->
+    <!--                </li>-->
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'registrants' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fas fa-user-plus" aria-hidden="true"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Registrants
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Registrants
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'individual-input' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fa fa-file" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'individual-input' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-file" aria-hidden="true"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Encode Voter
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Encode Voter
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'reports' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fa fa-file" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'reports' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-file" aria-hidden="true"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Reports
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Reports
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'election-results' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fa fa-file" aria-hidden="true"></i>
+                        </a>
+                    </li>
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'election-results' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-file" aria-hidden="true"></i>
+                                </div>
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Election Results
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Election Results
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
+                        </a>
+                    </li>
 
-                <li class="home-header-nav-link">
-                    <div class="main-header-link-container-div" id="notification-toggle">
-                        <div class="notification-counter-div">
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fa fa-bell" aria-hidden="true"></i>
+                    <li class="home-header-nav-link">
+                        <div class="main-header-link-container-div" id="notification-toggle">
+                            <div class="notification-counter-div">
                             </div>
-                        </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Notification
-                            </div>
-                        </div>
-                    </div>
-                    {% csrf_token %}
-                    <div class="notification-list" id="notification-list">
-                        {% for notification in notifications %}
-                            <div class="notification">
-                                <div class="notification-title">
-                                    {{ notification.title }}
-                                </div>
-                                <div class="notification-date-time">
-                                    {{ notification.date_time | naturaltime }}
-                                </div>
-                                <div class="notification-message">
-                                    {{ notification.message }}
-                                </div>
-                                <div class="notification-delete-div">
-                                    <a class="notification-delete"
-                                       href="{% url 'delete-notification' notification.title notification.id %}">
-                                        Remove Notification
-                                    </a>
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-bell" aria-hidden="true"></i>
                                 </div>
                             </div>
-                        {% empty %}
-                            <div class="notification-empty-notifier">
-                                No Notification
-                            </div>
-                        {% endfor %}
-                    </div>
-                </li>
-                <li class="home-header-nav-link">
-                    <a class="home-link-to-page" href="{% url 'logout' %}">
-                        <div class="home-link-icon-container">
-                            <div class="home-link-icon-div">
-                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Notification
+                                </div>
                             </div>
                         </div>
-                        <div class="home-link-icon-container">
-                            <div class="home-link-name">
-                                Logout
-                            </div>
+                        {% csrf_token %}
+                        <div class="notification-list" id="notification-list">
+                            {% for notification in notifications %}
+                                <div class="notification">
+                                    <div class="notification-title">
+                                        {{ notification.title }}
+                                    </div>
+                                    <div class="notification-date-time">
+                                        {{ notification.date_time | naturaltime }}
+                                    </div>
+                                    <div class="notification-message">
+                                        {{ notification.message }}
+                                    </div>
+                                    <div class="notification-delete-div">
+                                        <a class="notification-delete"
+                                           href="{% url 'delete-notification' notification.title notification.id %}">
+                                            Remove Notification
+                                        </a>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="notification-empty-notifier">
+                                    No Notification
+                                </div>
+                            {% endfor %}
                         </div>
-                    </a>
-                </li>
+                    </li>
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'logout' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Logout
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'individual-input' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-file" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Encode Voter
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li class="home-header-nav-link">
+                        <a class="home-link-to-page" href="{% url 'logout' %}">
+                            <div class="home-link-icon-container">
+                                <div class="home-link-icon-div">
+                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                            <div class="home-link-icon-container">
+                                <div class="home-link-name">
+                                    Logout
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {% endif %}
             {% else %}
                 <li class="home-header-nav-link">
                     <a class="home-link-to-page" href="{% url 'login' %}">

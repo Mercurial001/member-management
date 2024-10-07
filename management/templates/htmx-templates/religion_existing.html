@@ -1,0 +1,18 @@
+<div id="individual-religion-div">
+    <div class="individual-field-toggle-btn-container-div">
+        <button class='individual-field-toggle-btn' type="button"
+                hx-post="{% url 'htmx-religion-new' %}"
+                hx-trigger="click"
+                hx-swap="outerHTML"
+                hx-target="#individual-religion-div"
+                hx-select="#individual-religion-div"
+        >
+            Add New Religion
+        </button>
+    </div>
+    <select class="individual-input-field" name="individual-religion">
+        {% for religion in religions %}
+            <option value="{{ religion.id }}">{{ religion.name }}</option>
+        {% endfor %}
+    </select>
+</div>

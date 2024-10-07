@@ -56,6 +56,72 @@
                            placeholder="Birthday"
                            required>
                 </div>
+                <div id="individual-religion-div">
+                    {% if religion_len >= 1 %}
+                        <div class="individual-field-toggle-btn-container-div">
+                            <button class='individual-field-toggle-btn' type="button"
+                                    hx-post="{% url 'htmx-religion-new' %}"
+                                    hx-trigger="click"
+                                    hx-swap="outerHTML"
+                                    hx-target="#individual-religion-div"
+                                    hx-select="#individual-religion-div"
+                            >
+                                Add New Religion
+                            </button>
+                        </div>
+                        <select class="individual-input-field" name="individual-religion">
+                            {% for religion in religions %}
+                                <option value="{{ religion.id }}">
+                                    {{ religion.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <input class="individual-input-field"
+                               type="text"
+                               name="individual-religion"
+                               placeholder="Religion">
+                    {% endif %}
+                </div>
+                <div>
+                    <input class="individual-input-field"
+                           type="number"
+                           name="individual-number"
+                           placeholder="Contact Number">
+                </div>
+                <div id="individual-occupation-div">
+                    {% if occupation_len >= 1 %}
+                        <div class="individual-field-toggle-btn-container-div">
+                            <button class='individual-field-toggle-btn' type="button"
+                                    hx-post="{% url 'htmx-occupation-new' %}"
+                                    hx-trigger="click"
+                                    hx-swap="outerHTML"
+                                    hx-target="#individual-occupation-div"
+                                    hx-select="#individual-occupation-div"
+                            >
+                                Add New Occupation
+                            </button>
+                        </div>
+
+                        <select class="individual-input-field" name="individual-occupation">
+                            {% for occupation in occupations %}
+                                <option value="{{ occupation.id }}">
+                                    {{ occupation.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% else %}
+                        <input class="individual-input-field"
+                               type="text"
+                               name="individual-occupation"
+                               placeholder="Occupation">
+                    {% endif %}
+                </div>
+            </div>
+    <!--        <div>-->
+    <!--            <input type="number" name="individual-age" placeholder="Age" required>-->
+    <!--        </div>-->
+            <div class="individual-input-form-field-breaker-div">
                 <div>
                     <select class="individual-input-field"
                             name="individual-brgy"
@@ -76,29 +142,6 @@
                 <div id="htmx-sitio-result">
                     <!-- sitio_results_htmx.html -->
                 </div>
-                <div>
-                    <input class="individual-input-field"
-                           type="text"
-                           name="individual-religion"
-                           placeholder="Religion">
-                </div>
-                <div>
-                    <input class="individual-input-field"
-                           type="number"
-                           name="individual-number"
-                           placeholder="Contact Number">
-                </div>
-                <div>
-                    <input class="individual-input-field"
-                           type="text"
-                           name="individual-occupation"
-                           placeholder="Occupation">
-                </div>
-            </div>
-    <!--        <div>-->
-    <!--            <input type="number" name="individual-age" placeholder="Age" required>-->
-    <!--        </div>-->
-            <div class="individual-input-form-field-breaker-div">
                 <div>
                     <input class="individual-input-field"
                            name='individual-house-photo'

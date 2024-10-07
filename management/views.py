@@ -2450,16 +2450,20 @@ def authentication(request):
             activity_log.save()
 
             login(request, user)
-            if user.groups.filter(name='Admin').exists() and user.groups.filter(name='Leaders').exists():
+            if user.is_superuser is True:
                 return redirect('homepage')
-            elif user.groups.filter(name='Leaders').exists():
-                user_object = User.objects.get(username=username)
-                leader_user = Leader.objects.get(user=user_object)
-                return redirect('profile-leader', encryption=leader_user.encryption)
-            elif user.groups.filter(name='Members').exists():
-                user_object = User.objects.get(username=username)
-                member_user = Member.objects.get(user=user_object)
-                return redirect('profile-member', encryption=member_user.encryption)
+            else:
+                return redirect('individual-input')
+            # if user.groups.filter(name='Admin').exists() and user.groups.filter(name='Leaders').exists():
+            #     return redirect('homepage')
+            # elif user.groups.filter(name='Leaders').exists():
+            #     user_object = User.objects.get(username=username)
+            #     leader_user = Leader.objects.get(user=user_object)
+            #     return redirect('profile-leader', encryption=leader_user.encryption)
+            # elif user.groups.filter(name='Members').exists():
+            #     user_object = User.objects.get(username=username)
+            #     member_user = Member.objects.get(user=user_object)
+            #     return redirect('profile-member', encryption=member_user.encryption)
         else:
             messages.error(request, 'Invalid Form Data')
 
@@ -4160,13 +4164,22 @@ def individual_view(request, individual_id):
     })
 
 
+@login_required(login_url='login')
 def individual_input(request):
     genders = Gender.objects.all()
     barangays = Barangay.objects.all()
+    religions = Religion.objects.all()
+    religion_len = len(religions)
+    occupations = Occupation.objects.all()
+    occupation_len = len(occupations)
     individual_general = Individual.objects.all()
     individual_mothers = Individual.objects.filter(is_parent=True, is_father=False)
     individual_fathers = Individual.objects.filter(is_parent=True, is_father=True)
 
+
+    # print(religion_len)
+    # if religion_len <= 1:
+    #     print('Yasha!')
     # requested value
 
     if request.method == 'POST':
@@ -4269,12 +4282,18 @@ def individual_input(request):
 
         return redirect('individual-family-conf', individual_id=individual.id)
 
+    print(occupation_len)
+
     return render(request, 'individual_input.html', {
         'genders': genders,
         'barangays': barangays,
         'individual_general': individual_general,
         'individual_mothers': individual_mothers,
         'individual_fathers': individual_fathers,
+        'religions': religions,
+        'religion_len': religion_len,
+        'occupations': occupations,
+        'occupation_len': occupation_len,
     })
 
 
@@ -5471,3 +5490,29 @@ def mayoral_existing_party(request):
         'mayoral_parties': mayoral_parties,
         'mayoral_election_dict': mayoral_election_dict,
     })
+
+
+def htmx_existing_religion(request):
+    religions = Religion.objects.all()
+
+    return render(request, 'htmx-templates/religion_existing.html', {
+        'religions': religions,
+    })
+
+
+def htmx_new_religion(request):
+    return render(request, 'htmx-templates/religion_new_input.html', {
+
+    })
+
+
+def htmx_existing_occupation(request):
+    occupations = Occupation.objects.all()
+    return render(request, 'htmx-templates/occupation-existing.html', {
+        'occupations': occupations,
+    })
+
+
+def htmx_new_occupation(request):
+
+    return render(request, 'htmx-templates/occupation-new.html')

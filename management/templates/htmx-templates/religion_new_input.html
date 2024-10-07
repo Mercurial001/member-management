@@ -1,0 +1,18 @@
+<div id="individual-religion-div">
+    <div class="individual-field-toggle-btn-container-div">
+        <button class='individual-field-toggle-btn' type="button"
+                hx-post="{% url 'htmx-religion-existing' %}"
+                hx-trigger="click"
+                hx-swap="outerHTML"
+                hx-target="#individual-religion-div"
+                hx-select="#individual-religion-div"
+        >
+            Select Religion
+        </button>
+    </div>
+
+    <input class="individual-input-field"
+           type="text"
+           name="individual-religion"
+           placeholder="Religion">
+</div>

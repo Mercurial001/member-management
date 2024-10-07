@@ -1,0 +1,17 @@
+<div id="individual-occupation-div">
+    <div class="individual-field-toggle-btn-container-div">
+        <button class='individual-field-toggle-btn' type="button"
+                hx-post="{% url 'htmx-occupation-existing' %}"
+                hx-trigger="click"
+                hx-swap="outerHTML"
+                hx-target="#individual-occupation-div"
+                hx-select="#individual-occupation-div"
+        >
+            Select Existing Occupation
+        </button>
+    </div>
+    <input class="individual-input-field"
+           type="text"
+           name="individual-occupation"
+           placeholder="Occupation">
+</div>
